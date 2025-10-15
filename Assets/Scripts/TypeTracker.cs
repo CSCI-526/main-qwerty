@@ -10,12 +10,12 @@ public class TypeTracker : MonoBehaviour
     private string prompt;
     private bool timerStarted = false;
     private float startTime = 0f;
+    private int errors;
 
-    private HashSet<int> activeErrors = new HashSet<int>(); // tracks which indices are wrong
+    private HashSet<int> activeErrors = new HashSet<int>();
 
     private void Start()
     {
-        prompt = promptText != null ? promptText.text : "";
         if (promptText != null)
         {
             prompt = promptText.text;
@@ -40,6 +40,7 @@ public class TypeTracker : MonoBehaviour
     private void OnInputChanged(string currentText)
     {
         // Start timer when first correct character is typed
+        // Going to change this to after the prompt appears and they begin typing.
         if (!timerStarted && currentText.Length > 0 && prompt.Length > 0 && currentText[0] == prompt[0])
         {
             timerStarted = true;
@@ -50,12 +51,14 @@ public class TypeTracker : MonoBehaviour
         countErrors(currentText, prompt);
     }
 
+    // Counts the errors as the player is typing
     private void countErrors(string input, string prompt)
     {
         int len = Mathf.Min(input.Length, prompt.Length);
 
         HashSet<int> newErrors = new HashSet<int>();
 
+        // Checks for errors and make sure it isn't accounting for previously accounted for errors.
         for (int i = 0; i < len; i++)
         {
             if (input[i] != prompt[i])
@@ -65,26 +68,16 @@ public class TypeTracker : MonoBehaviour
                 if (!activeErrors.Contains(i))
                 {
                     Debug.Log($"Error at index {i}: expected '{prompt[i]}', got '{input[i]}'");
-                    // TODO: Apply damage here later if needed
+                    errors++;
+                    // Add player damage here
                 }
             }
         }
 
-        /*
-        foreach (int oldIndex in activeErrors)
-        {
-            if (oldIndex < len && input[oldIndex] == prompt[oldIndex])
-            {
-                Debug.Log($"Fixed error at index {oldIndex}");
-            }
-        }
-        */
-
-        // Replace old error set with new one
         activeErrors = newErrors;
     }
 
-
+    // Calculates the WPM and accuracy for damage calculations
     private void endTyping(string input)
     {
 
@@ -96,60 +89,26 @@ public class TypeTracker : MonoBehaviour
 
         float totalMinutes = Mathf.Max(0.0001f, totalTime / 60f);
 
-        int correctChars = countCorrect(input, prompt);
-        int totalChars = prompt.Length;
-        int totalErrors = countTotalErrors(input, prompt);
-
         float grossWPM = (float)input.Length / 5f / totalMinutes;
-        float netWPM = grossWPM - (totalErrors / totalMinutes);
+        float netWPM = grossWPM - (errors / totalMinutes);
         netWPM = Mathf.Max(0, netWPM);
 
-        // Debug.Log($"Prompt length: {prompt.Length}, Input length: {input.Length}");
 
         float accuracy = 0f;
-        if(totalChars > 0)
+        if (input.Length > 0)
         {
-            accuracy = ((float) correctChars / totalChars) * 100f;
+            accuracy = ((float)(Mathf.Max(0, input.Length - errors)) / input.Length) * 100f;
         }
 
+        // Add enemy damage logic here
         Debug.Log($"Typing Test Ended (Enter pressed)");
-        Debug.Log($"Time: {totalTime:F2}s | Gross WPM: {grossWPM:F1} | Net WPM: {netWPM:F1} | Accuracy: {accuracy:F1}% | Errors: {totalErrors}");
+        Debug.Log($"Time: {totalTime:F2}s | Gross WPM: {grossWPM:F1} | Net WPM: {netWPM:F1} | Accuracy: {accuracy:F1}% | Errors: {errors}");
 
         inputField.text = "";
         promptText.text = "";
         timerStarted = false;
-        totalErrors = 0;
-    }
-
-    private int countCorrect(string input, string prompt)
-    {
-        int correct = 0;
-        int len = Mathf.Min(input.Length, prompt.Length);
-        for (int i = 0; i < len; i++)
-        {
-            if (input[i] == prompt[i])
-                correct++;
-        }
-        return correct;
-    }
-
-    private int countTotalErrors(string input, string prompt)
-    {
-        int errors = 0;
-        int len = Mathf.Min(input.Length, prompt.Length);
-
-        for (int i = 0; i < len; i++)
-        {
-            if (input[i] != prompt[i])
-            {
-                errors++;
-            }
-        }
-
-        // Count extra characters beyond prompt as errors
-        if (input.Length > prompt.Length)
-            errors += input.Length - prompt.Length;
-
-        return errors;
+        startTime = 0;
+        errors = 0;
+        activeErrors = new HashSet<int>();
     }
 }
