@@ -10,7 +10,10 @@ public class PlayerController : NetworkBehaviour
         NetworkVariableWritePermission.Server
     );
 
+    [SerializeField] PlayerIcon playerIcon;
     [SerializeField] HealthBar healthBar;
+
+    private ulong playerId;
 
     public override void OnNetworkSpawn()
     {
@@ -28,4 +31,9 @@ public class PlayerController : NetworkBehaviour
     {
         healthBar.SetFillAmount((float)newHealth / maxHealth);
     }
+
+    public void SetPlayerID(ulong id) => playerId = id;
+    public ulong GetPlayerID() { return playerId; }
+
+    public void SetPlayerName(string name) { playerIcon.SetPlayerName(name); }
 }

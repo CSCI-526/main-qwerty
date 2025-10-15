@@ -1,9 +1,6 @@
-using System.Linq;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
-using Unity.Services.Authentication.PlayerAccounts;
-using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
 public class SharedCanvasController : NetworkBehaviour
@@ -27,8 +24,9 @@ public class SharedCanvasController : NetworkBehaviour
         NetworkObject no = go.GetComponent<NetworkObject>();
         no.Spawn(true);
         go.transform.SetParent(playerPanel);
-        go.GetComponent<PlayerIcon>().SetPlayerID(requesterClientId);
-        go.GetComponent<PlayerIcon>().PlayerName.Value = playerName;
+        PlayerController pc = go.GetComponent<PlayerController>();
+        pc.SetPlayerID(requesterClientId);
+        pc.SetPlayerName(playerName.ToString());
     }
 
     public override void OnNetworkSpawn()
