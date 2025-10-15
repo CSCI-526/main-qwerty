@@ -10,7 +10,7 @@ public class ConnectionManager : MonoBehaviour
 {
     private string _profileName;
     private string _sessionName;
-    private int _maxPlayers = 10;
+    private int _maxPlayers = 4;
     private ConnectionState _state = ConnectionState.Disconnected;
     private ISession _session;
     private NetworkManager m_NetworkManager;
