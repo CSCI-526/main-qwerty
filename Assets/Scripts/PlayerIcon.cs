@@ -10,7 +10,6 @@ public class PlayerIcon : NetworkBehaviour
     [SerializeField] private TMP_Text nameText;
     private ulong playerId;
 
-    // Example networked state: name and color, owner can write
     public NetworkVariable<FixedString128Bytes> PlayerName = new NetworkVariable<FixedString128Bytes>(
         new FixedString128Bytes(""),
         NetworkVariableReadPermission.Everyone,

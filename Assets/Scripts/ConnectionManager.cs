@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Multiplayer;
+using UnityEditor;
 using UnityEngine;
 
 public class ConnectionManager : MonoBehaviour
@@ -55,13 +58,13 @@ public class ConnectionManager : MonoBehaviour
 
         using (new GUILayout.HorizontalScope(GUILayout.Width(250)))
         {
-            GUILayout.Label("Profile Name", GUILayout.Width(100));
+            GUILayout.Label("Player Name", GUILayout.Width(100));
             _profileName = GUILayout.TextField(_profileName);
         }
 
         using (new GUILayout.HorizontalScope(GUILayout.Width(250)))
         {
-            GUILayout.Label("Session Name", GUILayout.Width(100));
+            GUILayout.Label("Lobby Code", GUILayout.Width(100));
             _sessionName = GUILayout.TextField(_sessionName);
         }
 
@@ -103,4 +106,7 @@ public class ConnectionManager : MonoBehaviour
             Debug.LogException(e);
         }
     }
+
+    public ISession GetSession() => _session;
+    public String GetProfileName() => _profileName;
 }
