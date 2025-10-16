@@ -7,7 +7,7 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private TMP_InputField inputField;   // player input
     [SerializeField] private TMP_Text promptText;   // prompt text
 
-    [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
+    [SerializeField] private GameObject typingEffectManager; // manager of curses & buffs    
 
     private string prompt;
     private bool timerStarted = false;
