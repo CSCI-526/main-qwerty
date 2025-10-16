@@ -47,7 +47,7 @@ public class TypeTracker : MonoBehaviour
         }
     }
 
-    // Called when player presses 1 or 2
+    // For changing abilities
     private void changeMode(int newMode)
     {
         // If they’re already in that mode, do nothing
@@ -67,7 +67,6 @@ public class TypeTracker : MonoBehaviour
             ability2.color = new Color(0f, 1f, 0f, 1f); // Black at 30% opacity
         }
 
-        // Reset current typing state
         resetState();
         EnterTargetPhase();
     }
@@ -168,17 +167,36 @@ public class TypeTracker : MonoBehaviour
         activeErrors = newErrors;
     }
 
-    // Ends typing phase (calculates stats)
+    // Ends typing phase to calculate damage to enemy
     private void endTyping(string input)
     {
-        float totalTime = timerStarted ? Time.time - startTime : 0f;
+        float accuracy, totalTime;
+
+        if (timerStarted)
+        {
+            totalTime = Time.time - startTime;
+        }
+        else
+        {
+            totalTime = 0f;
+        }
+
         float totalMinutes = Mathf.Max(0.0001f, totalTime / 60f);
 
         float grossWPM = (float)input.Length / 5f / totalMinutes;
         float netWPM = grossWPM - (errors / totalMinutes);
         netWPM = Mathf.Max(0, netWPM);
 
-        float accuracy = input.Length > 0 ? ((float)Mathf.Max(0, input.Length - errors) / input.Length) * 100f : 0f;
+        if (input.Length > 0)
+        {
+            int correctCharacters = Mathf.Max(0, input.Length - errors);
+            float ratio = (float)correctCharacters / input.Length;
+            accuracy = ratio * 100f;
+        }
+        else
+        {
+            accuracy = 0f;
+        }
 
         // TODO: Add enemy damage logic here
         Debug.Log($"Typing Test Ended (Enter pressed)");
@@ -188,6 +206,8 @@ public class TypeTracker : MonoBehaviour
         EnterTargetPhase();
     }
 
+    // Dummy function to test targeting
+    // Replace with Josh's list generation stuff
     private bool IsValidTarget(string target)
     {
         if(target == "Hello")
@@ -206,12 +226,24 @@ public class TypeTracker : MonoBehaviour
         }
     }
 
+    // For getting mode names for UI
     private string GetModeName()
     {
-        return mode == 1 ? "Attack" : mode == 2 ? "Heal" : "None";
+        if (mode == 1)
+        {
+            return "Attack";
+        }
+        else if (mode == 2)
+        {
+            return "Heal";
+        }
+        else
+        {
+            return "None";
+        }
     }
 
-    // Helper: resets everything when switching modes or finishing
+    // Resets all values
     private void resetState()
     {
         inputField.text = "";
@@ -225,18 +257,17 @@ public class TypeTracker : MonoBehaviour
         FocusInputField();
     }
 
-    // Ensures the input field is selected and activated so the user can type immediately
+    // Ensures text field is always active
     private void FocusInputField()
     {
         if (inputField == null) return;
 
-        // Fallback to EventSystem selection first (helps in some Unity builds)
         if (EventSystem.current != null)
         {
             EventSystem.current.SetSelectedGameObject(inputField.gameObject);
         }
 
         inputField.Select();
-        inputField.ActivateInputField(); // ensures caret is visible and keyboard is ready
+        inputField.ActivateInputField();
     }
 }
