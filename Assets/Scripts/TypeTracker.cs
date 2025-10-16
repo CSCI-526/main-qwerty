@@ -12,6 +12,8 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private TMP_Text promptText;       // Displayed prompt
     [SerializeField] private Image ability1, ability2;
 
+    [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
+
     private string prompt;
     private bool timerStarted = false;
     private float startTime = 0f;
@@ -54,7 +56,7 @@ public class TypeTracker : MonoBehaviour
     // For changing abilities
     private void changeMode(int newMode)
     {
-        // If they’re already in that mode, do nothing
+        // If theyï¿½re already in that mode, do nothing
         if (mode == newMode)
             return;
 
@@ -130,7 +132,7 @@ public class TypeTracker : MonoBehaviour
             return;
         }
 
-        // If they’re typing the prompt and press Enter, end typing
+        // If theyï¿½re typing the prompt and press Enter, end typing
         if (!awaitingTarget && !string.IsNullOrEmpty(prompt))
         {
             endTyping(input);
