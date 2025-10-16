@@ -2,11 +2,13 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class TypeTracker : MonoBehaviour
 {
     [SerializeField] private TMP_InputField inputField; // Player input
     [SerializeField] private TMP_Text promptText;       // Displayed prompt
+    [SerializeField] private Image ability1, ability2;
 
     private string prompt;
     private bool timerStarted = false;
@@ -14,8 +16,9 @@ public class TypeTracker : MonoBehaviour
     private int errors;
 
     private int mode = 0; // 0 = none, 1 = attack, 2 = heal
-    private bool awaitingTarget = false; // Whether we're asking for a target name
+    private bool awaitingTarget = true; // Whether we're asking for a target name
     private HashSet<int> activeErrors = new HashSet<int>();
+
 
     private void Start()
     {
@@ -51,16 +54,30 @@ public class TypeTracker : MonoBehaviour
         if (mode == newMode)
             return;
 
-        // Reset current typing state
-        ResetTypingState();
-
         mode = newMode;
+
+        if (mode == 1)
+        { 
+            ability1.color = new Color(0f, 1f, 0f, 1f); // Green at 100% opacity
+            ability2.color = new Color(0f, 0f, 0f, 0.3f); // Black at 30% opacity
+        }
+        if (mode == 2)
+        {
+            ability1.color = new Color(0f, 0f, 0f, 0.3f); // Green at 100% opacity
+            ability2.color = new Color(0f, 1f, 0f, 1f); // Black at 30% opacity
+        }
+
+        // Reset current typing state
+        resetState();
+        EnterTargetPhase();
+    }
+
+    private void EnterTargetPhase()
+    {
         awaitingTarget = true;
-
-        string modeName = mode == 1 ? "Attacking" : "Healing";
-        promptText.text = $"Mode: {modeName}\nEnter Target:";
+        string modeName = GetModeName();
+        promptText.text = $"{modeName}. Enter Target:";
         Debug.Log($"Switched to {modeName} mode. Awaiting target...");
-
         FocusInputField();
     }
 
@@ -167,9 +184,8 @@ public class TypeTracker : MonoBehaviour
         Debug.Log($"Typing Test Ended (Enter pressed)");
         Debug.Log($"Time: {totalTime:F2}s | Gross WPM: {grossWPM:F1} | Net WPM: {netWPM:F1} | Accuracy: {accuracy:F1}% | Errors: {errors}");
 
-        ResetTypingState();
-
-        FocusInputField();
+        resetState();
+        EnterTargetPhase();
     }
 
     private bool IsValidTarget(string target)
@@ -196,7 +212,7 @@ public class TypeTracker : MonoBehaviour
     }
 
     // Helper: resets everything when switching modes or finishing
-    private void ResetTypingState()
+    private void resetState()
     {
         inputField.text = "";
         promptText.text = "";
