@@ -7,7 +7,7 @@ public class TypingEffectManager : MonoBehaviour
 {
     [SerializeField] private TMP_Text effectText; // list of current curses & buffs
 
-    [SerializeField] private List<TypingEffectBase> activeTypingEffects = new(); // currently active curses & buffs
+    private List<TypingEffectBase> activeTypingEffects = new(); // currently active curses & buffs
 
     private void Start()
     {

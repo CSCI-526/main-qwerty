@@ -10,9 +10,6 @@ public class EnemyController : TargetableController
     [SerializeField] private float attackCooldown = 10;
     private float attackCd = 0;
 
-    // Temporary Variables
-    [SerializeField] private int minLength = 5;
-    [SerializeField] private int maxLength = 8;
     private List<string> wordList = new List<string>();
 
     [Header("GameObjects")]
@@ -27,11 +24,18 @@ public class EnemyController : TargetableController
     public override void OnNetworkSpawn()
     {
         InitHealth();
+        InitTargeting();
+        RandomizeTargetWord();
     }
 
     protected override void Die()
     {
         gameManager.RemoveEnemy(this);
+    }
+
+    protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
+    {
+        targetWordText.text = newWord.ToString();
     }
 
     private void Update()
@@ -41,7 +45,7 @@ public class EnemyController : TargetableController
 
         if (attackCd <= 0)
         {
-            ShootWord(GenerateWord());
+            ShootWord(gameManager.GenerateWord());
             attackCd = attackCooldown;
         }
         else
@@ -82,53 +86,6 @@ public class EnemyController : TargetableController
     public List<string> GetWordList()
     {
         return wordList;
-    }
-
-    private string GenerateWord()
-    {
-        string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z" };
-        string[] vowels = { "a", "e", "i", "o", "u" };
-
-        string word = "";
-
-        int requestedLength = UnityEngine.Random.Range(minLength, maxLength + 1);
-
-        // Generate the word in consonant / vowel pairs
-        while (word.Length < requestedLength)
-        {
-            if (requestedLength != 1)
-            {
-                // Add the consonant
-                string consonant = consonants[UnityEngine.Random.Range(0, consonants.Length)];
-
-                if (consonant == "q" && word.Length + 3 <= requestedLength) // check +3 because we'd add 3 characters in this case, the "qu" and the vowel.  Change 3 to 2 to allow words that end in "qu"
-                {
-                    word += "qu";
-                }
-                else
-                {
-                    while (consonant == "q")
-                    {
-                        // Replace an orphaned "q"
-                        consonant = consonants[UnityEngine.Random.Range(0, consonants.Length)];
-                    }
-
-                    if (word.Length + 1 <= requestedLength)
-                    {
-                        // Only add a consonant if there's enough room remaining
-                        word += consonant;
-                    }
-                }
-            }
-
-            if (word.Length + 1 <= requestedLength)
-            {
-                // Only add a vowel if there's enough room remaining
-                word += vowels[UnityEngine.Random.Range(0, vowels.Length)];
-            }
-        }
-
-        return word;
     }
 
 }

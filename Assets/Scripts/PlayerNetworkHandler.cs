@@ -15,7 +15,8 @@ public class PlayerNetworkHandler : NetworkBehaviour
             if (gameManager != null)
             {
                 gameManager.SpawnPlayer(NetworkManager.Singleton.LocalClientId, playerName.ToString());
-                gameManager.SpawnEnemy();
+                if(IsOwner)
+                    gameManager.SpawnEnemy();
             }
         }
     }

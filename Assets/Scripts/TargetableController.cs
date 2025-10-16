@@ -1,3 +1,4 @@
+using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -65,10 +66,36 @@ public abstract class TargetableController : NetworkBehaviour
         NetworkVariableWritePermission.Owner
     );
 
-    public virtual void SetTargetWord(string word)
+    public TextMeshProUGUI targetWordText;
+
+    [Rpc(SendTo.Owner)]
+    protected virtual void UpdateTargetWordRpc(FixedString128Bytes newWord)
+    {
+        targetWord.Value = newWord;
+    }
+
+    protected virtual void InitTargeting()
+    {
+        targetWord.OnValueChanged += OnTargetWordChanged;
+    }
+
+    public virtual void SetTargetWord(string newWord)
+    {
+        UpdateTargetWordRpc(new FixedString128Bytes(newWord));
+    }
+
+    protected abstract void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord);
+
+    public string GetTargetWord()
+    {
+        return targetWord.Value.ToString();
+    }
+
+    public void RandomizeTargetWord()
     {
         if (!IsOwner) return;
-        targetWord.Value = new FixedString128Bytes(word);
+        string newWord = gameManager.GenerateWord();
+        SetTargetWord(newWord);
     }
 
     #endregion

@@ -33,6 +33,11 @@ public class ProjectileController : TargetableController
         Destroy(gameObject);
     }
 
+    protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
+    {
+        targetWordText.text = newWord.ToString();
+    }
+
     private void MoveTowardsTarget()
     {
         if (target == null || target.IsDead())

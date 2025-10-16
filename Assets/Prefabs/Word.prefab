@@ -255,7 +255,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  maxHealth: 25
+  maxHealth: 1
   currentHealth:
     m_InternalValue: 100
   healthBar: {fileID: 7162309032724442781}
@@ -396,6 +396,7 @@ MonoBehaviour:
         byte0123: 0
         byte0124: 0
         byte0125: 0
+  targetWordText: {fileID: 613936294155128085}
   wordSpeed: 75
   damage: 50
 --- !u!114 &5089214614066085484

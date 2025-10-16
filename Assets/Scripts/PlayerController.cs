@@ -10,11 +10,18 @@ public class PlayerController : TargetableController
     public override void OnNetworkSpawn()
     {
         InitHealth();
+        InitTargeting();
+        RandomizeTargetWord();
     }
 
     protected override void Die()
     {
         gameManager.RemovePlayer(this);
+    }
+
+    protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
+    {
+        targetWordText.text = newWord.ToString();
     }
 
     #region Network Variable Methods

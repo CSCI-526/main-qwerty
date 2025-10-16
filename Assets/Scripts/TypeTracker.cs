@@ -3,6 +3,8 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Net;
+using Unity.VisualScripting;
 
 public class TypeTracker : MonoBehaviour
 {
@@ -22,6 +24,9 @@ public class TypeTracker : MonoBehaviour
     private int mode = 0; // 0 = none, 1 = attack, 2 = heal
     private bool awaitingTarget = true; // Whether we're asking for a target name
     private HashSet<int> activeErrors = new HashSet<int>();
+
+    private TargetableController currentTarget;
+    GameManager gameManager => FindFirstObjectByType<GameManager>();
 
 
     private void Start()
@@ -92,23 +97,36 @@ public class TypeTracker : MonoBehaviour
         // If we're waiting for a target
         if (awaitingTarget)
         {
-            if (IsValidTarget(input))
+            currentTarget = gameManager.GetTargetFromWord(input);
+
+            if (currentTarget != null)
             {
                 awaitingTarget = false;
 
-                // TODO: retrieve the prompt from your Prompt Generator here
-                // Example:
-                // prompt = PromptGenerator.GetPrompt(mode, input);
-                // promptText.text = prompt;
-
-                // for outputting to UI
-                if (mode == 1)
+                if(currentTarget is ProjectileController)
                 {
-                    promptText.text = promptGenerator.GetRandomSentence("Attack");
+                    inputField.text = "";
+                    if (mode == 1)
+                    {
+                        currentTarget.ModifyCurrentHealth(-10);
+                    }
+                    else if (mode == 2)
+                    {
+                        currentTarget.ModifyCurrentHealth(10);
+                    }
+                    currentTarget = null;
+                    EnterTargetPhase();
+                    return;
+                }
+                else if (mode == 1)
+                {
+                    string temp = promptGenerator.GetRandomSentence("Attack");
+                    promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
                 }
                 else if (mode == 2)
                 {
-                    promptText.text = promptGenerator.GetRandomSentence("Heal");
+                    string temp = promptGenerator.GetRandomSentence("Heal");
+                    promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
                 }
 
                 prompt = promptText.text; // For comparisons
@@ -227,7 +245,16 @@ public class TypeTracker : MonoBehaviour
             accuracy = 0f;
         }
 
-        // TODO: Add enemy damage logic here
+        if(mode == 1)
+        {
+            currentTarget.ModifyCurrentHealth(-10);
+        }
+        else if (mode == 2)
+        {
+            currentTarget.ModifyCurrentHealth(10);
+        }
+        currentTarget.RandomizeTargetWord();
+        currentTarget = null;
         Debug.Log($"Typing Test Ended (Enter pressed)");
         Debug.Log($"Time: {totalTime:F2}s | Gross WPM: {grossWPM:F1} | Net WPM: {netWPM:F1} | Accuracy: {accuracy:F1}% | Errors: {errors}");
 
