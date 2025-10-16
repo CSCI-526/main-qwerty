@@ -20,6 +20,7 @@ public class SentenceGeneratorBase: MonoBehaviour
         }
 
         int randomIndex = Random.Range(0, lines.Length);
+        Debug.Log($"New Random Sentence: {lines[randomIndex].Trim()}");
         return lines[randomIndex].Trim();
     }
 }
