@@ -5,17 +5,17 @@ using UnityEngine;
 public class PlayerNetworkHandler : NetworkBehaviour
 {
     NetworkManager networkManager => NetworkManager.Singleton;
+    GameManager gameManager => FindFirstObjectByType<GameManager>();
 
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
         {
-            SharedCanvasController sharedCanvas = FindFirstObjectByType<SharedCanvasController>();
             FixedString128Bytes playerName = new FixedString128Bytes(networkManager.GetComponent<ConnectionManager>().GetProfileName());
-            if (sharedCanvas != null)
+            if (gameManager != null)
             {
-                sharedCanvas.RequestSpawnPlayerIconOwnerRpc(NetworkManager.Singleton.LocalClientId, playerName);
-                sharedCanvas.RequestSpawnEnemyIconOwnerRpc();
+                gameManager.SpawnPlayer(NetworkManager.Singleton.LocalClientId, playerName.ToString());
+                gameManager.SpawnEnemy();
             }
         }
     }

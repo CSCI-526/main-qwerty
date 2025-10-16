@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -13,7 +14,14 @@ public class GameManager : NetworkBehaviour
     [Header("GameObjects")]
     [SerializeField] private GameObject projectileParent;
 
+    private SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>();
+
     #region Players
+
+    public void SpawnPlayer(ulong requesterClientId, string playerName)
+    {
+        sharedCanvas.RequestSpawnPlayerIconOwnerRpc(requesterClientId, new FixedString128Bytes(playerName));
+    }
 
     public void AddPlayer(PlayerController player)
     {
@@ -35,6 +43,11 @@ public class GameManager : NetworkBehaviour
     #endregion
 
     #region Enemies
+
+    public void SpawnEnemy()
+    {
+        sharedCanvas.RequestSpawnEnemyIconOwnerRpc();
+    }
 
     public void AddEnemy(EnemyController enemy)
     {

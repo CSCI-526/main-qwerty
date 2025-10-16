@@ -41,7 +41,7 @@ public class EnemyController : TargetableController
 
         if (attackCd <= 0)
         {
-            ShootWord();
+            ShootWord(GenerateWord());
             attackCd = attackCooldown;
         }
         else
@@ -50,10 +50,8 @@ public class EnemyController : TargetableController
         }
     }
 
-    private void ShootWord()
+    private void ShootWord(string word)
     {
-        string word = GenerateWord();
-
         PlayerController targetPlayer = gameManager.GetRandomPlayer();
 
         if(targetPlayer == null) return;
