@@ -3,7 +3,7 @@ using UnityEngine;
 public class SentenceGeneratorBase: MonoBehaviour
 {
     // Loads a text file from Resources and returns a random line
-    protected string GetRandomSentence(string fileNameWithoutExtension)
+    public string GetRandomSentence(string fileNameWithoutExtension)
     {
         TextAsset textFile = Resources.Load<TextAsset>(fileNameWithoutExtension);
         if (textFile == null)

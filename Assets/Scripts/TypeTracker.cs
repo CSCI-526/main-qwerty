@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class TypeTracker : MonoBehaviour
 {
+    [SerializeField] public SentenceGeneratorBase promptGenerator;
+
     [SerializeField] private TMP_InputField inputField; // Player input
     [SerializeField] private TMP_Text promptText;       // Displayed prompt
     [SerializeField] private Image ability1, ability2;
@@ -32,11 +34,13 @@ public class TypeTracker : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+        if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false)
         {
             changeMode(1);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false)
         {
             changeMode(2);
         }
@@ -94,8 +98,18 @@ public class TypeTracker : MonoBehaviour
                 // Example:
                 // prompt = PromptGenerator.GetPrompt(mode, input);
                 // promptText.text = prompt;
-                promptText.text = "The quick brown fox jumped over the lazy dog."; // placeholder
-                prompt = promptText.text;
+
+                // for outputting to UI
+                if (mode == 1)
+                {
+                    promptText.text = promptGenerator.GetRandomSentence("Attack");
+                }
+                else if (mode == 2)
+                {
+                    promptText.text = promptGenerator.GetRandomSentence("Heal");
+                }
+
+                prompt = promptText.text; // For comparisons
 
                 Debug.Log($"Target '{input}' selected. Starting {GetModeName()} prompt...");
                 inputField.text = "";
@@ -148,7 +162,7 @@ public class TypeTracker : MonoBehaviour
 
         HashSet<int> newErrors = new HashSet<int>();
 
-        // Checks for errors and make sure it isn't accounting for previously accounted for errors.
+        // Check all characters that overlap with the prompt
         for (int i = 0; i < len; i++)
         {
             if (input[i] != prompt[i])
@@ -164,8 +178,21 @@ public class TypeTracker : MonoBehaviour
             }
         }
 
+        // Count any extra characters typed beyond the prompt as errors
+        for (int i = prompt.Length; i < input.Length; i++)
+        {
+            newErrors.Add(i);
+            if (!activeErrors.Contains(i))
+            {
+                Debug.Log($"Extra character error at index {i}: '{input[i]}' beyond prompt length");
+                errors++;
+                // Add player damage here
+            }
+        }
+
         activeErrors = newErrors;
     }
+
 
     // Ends typing phase to calculate damage to enemy
     private void endTyping(string input)
