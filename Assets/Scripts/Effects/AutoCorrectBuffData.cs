@@ -9,9 +9,21 @@ public class AutoCorrectBuffData : TypingEffectBase
         this.autoCorrectCount = autoCorrectCount;
     }
 
-    public override string OnInputChanged(ref string currentText, ref string prompt)
+    public override string ApplyEffectOnPrompt(ref string prompt)
     {
         return prompt;
+    }
+
+    public override string GetEffectDescription()
+    {
+        if (effectDescription != null)
+        {
+            return effectDescription;
+        }
+        else
+        {
+            return "Auto Correct Buff";
+        }
     }
 
     public override void OnEndTyping(ref int errors)

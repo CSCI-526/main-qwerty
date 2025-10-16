@@ -1,28 +1,56 @@
+using System.Text;
+
 public class DisableLetterCurseData : TypingEffectBase
 {
     private char disabledLetter;
+    private bool isCaseSensitive;
 
-    public void Initialize(char disabledLetter)
+    public void Initialize(char disabledLetter, bool isCaseSensitive)
     {
         this.disabledLetter = disabledLetter;
+        this.isCaseSensitive = isCaseSensitive;
     }
 
-    public override string OnInputChanged(ref string currentText, ref string prompt)
+    public override string ApplyEffectOnPrompt(ref string prompt)
     {
-        int len = currentText.Length;
-        if (len > 0 && len <= prompt.Length && prompt[len - 1] == disabledLetter)
+        if (isCaseSensitive)
         {
-            return prompt[..(len - 1)] + " " + prompt[len..];
+            return prompt.Replace(disabledLetter.ToString(), "");
         }
         else
         {
-            return prompt;
+            var stringBuilder = new StringBuilder();
+            foreach (char c in prompt)
+            {
+                if (char.ToLower(c) != char.ToLower(disabledLetter))
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+            return stringBuilder.ToString();
         }
     }
 
     public override void OnEndTyping(ref int errors)
     {
         return;
+    }
+
+    public override string GetEffectDescription()
+    {
+        if (effectDescription != null)
+        {
+            return effectDescription;
+        }
+
+        if (isCaseSensitive)
+        {
+            return $"Letter {disabledLetter} disabled";
+        }
+        else
+        {
+            return $"Letter {char.ToLower(disabledLetter)}/{char.ToUpper(disabledLetter)} disabled";
+        }
     }
 
     // Curses of same disabled letters are equal

@@ -6,9 +6,14 @@ public abstract class TypingEffectBase : ScriptableObject
     public string effectName;
     [Header("Effect Description")]
     [TextArea]
-    public string effectDescription;
+    protected string effectDescription;
 
-    public abstract string OnInputChanged(ref string currentText, ref string prompt);
+    public virtual string GetEffectDescription()
+    {
+        return effectDescription;
+    }
+
+    public abstract string ApplyEffectOnPrompt(ref string prompt);
 
     public abstract void OnEndTyping(ref int errors);
 }

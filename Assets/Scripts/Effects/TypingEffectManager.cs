@@ -23,21 +23,30 @@ public class TypingEffectManager : MonoBehaviour
     {
         if (effectText != null)
         {
-            string desc = string.Join(", ", activeTypingEffects.Select(e => e.effectDescription));
+            string desc = string.Join(", ", activeTypingEffects.Select(e => e.GetEffectDescription()));
             effectText.text = desc;
         }
     }
 
-    public string OnInputChanged(ref string currentText, ref string prompt)
+    /// <summary>
+    /// Apply active effects to the prompt. Effects are applied per-prompt instead of per-character.
+    /// </summary>
+    /// <param name="prompt">The original prompt (also the displayed prompt).</param>
+    /// <returns>The underlying prompt used for comparing with user inputs.</returns>
+    public string ApplyEffectOnPrompt(ref string prompt)
     {
         string newPrompt = prompt;
         foreach (var typingEffect in activeTypingEffects)
         {
-            newPrompt = typingEffect.OnInputChanged(ref currentText, ref newPrompt);
+            newPrompt = typingEffect.ApplyEffectOnPrompt(ref newPrompt);
         }
         return newPrompt;
     }
 
+    /// <summary>
+    /// Apply some effects (e.g. autocorrect quota) to error count (per-prompt). 
+    /// </summary>
+    /// <param name="errors">Reference to error counter.</param>
     public void OnEndTyping(ref int errors)
     {
         foreach (var typingEffect in activeTypingEffects)
@@ -46,7 +55,10 @@ public class TypingEffectManager : MonoBehaviour
         }
     }
 
-    // interface for adding curses & buffs
+    /// <summary>
+    /// Interface for adding effect.
+    /// </summary>
+    /// <param name="typingEffect">The effect to be added.</param>
     public void AddTypingEffect(TypingEffectBase typingEffect)
     {
         if (!activeTypingEffects.Contains(typingEffect))
@@ -56,7 +68,10 @@ public class TypingEffectManager : MonoBehaviour
         }
     }
 
-    // interface for removing curses (mainly) & (some temporary) buffs 
+    /// <summary>
+    /// Interface for removing curses (mainly) & (some temporary) buffs 
+    /// </summary>
+    /// <param name="typingEffect">The effect to be removed.</param>
     public void RemoveTypingEffect(TypingEffectBase typingEffect)
     {
         if (activeTypingEffects.Contains(typingEffect))
@@ -66,19 +81,32 @@ public class TypingEffectManager : MonoBehaviour
         }
     }
 
-    // shortcuts for adding certain curses & buffs
-    public void DisableLetter(char letter)
+    /// <summary>
+    /// Shorthand for adding DisableLetter Curse.
+    /// </summary>
+    /// <param name="letter">The letter to be disabled (case sensitive or not).</param>
+    public void DisableLetter(char letter, bool isCaseSensitive = false)
     {
         var effect = ScriptableObject.CreateInstance<DisableLetterCurseData>();
-        effect.Initialize(letter);
+        effect.Initialize(letter, isCaseSensitive);
         AddTypingEffect(effect);
     }
+
+    /// <summary>
+    /// Shorthand for adding ForceCapitalize Curse.
+    /// </summary>
+    /// <param name="letter">The letter that is forced capitalized.</param>
     public void ForceCapitalize(char letter)
     {
         var effect = ScriptableObject.CreateInstance<ForceCapitalizeCurseData>();
         effect.Initialize(letter);
         AddTypingEffect(effect);
     }
+
+    /// <summary>
+    /// Shorthand for adding AutoCorrect Buff.
+    /// </summary>
+    /// <param name="count">The autocorrect quota to be added.</param>
     public void AddAutoCorrect(int count)
     {
         var effect = ScriptableObject.CreateInstance<AutoCorrectBuffData>();

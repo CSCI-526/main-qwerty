@@ -49,9 +49,6 @@ public class TypeTracker : MonoBehaviour
             startTime = Time.time;
         }
 
-        // curses & buffs change underlying prompt (used for later comparison)
-        prompt = typingEffectManager.OnInputChanged(ref currentText, ref prompt);
-
         // Track current errors while typing
         countErrors(currentText, prompt);
     }
@@ -97,9 +94,6 @@ public class TypeTracker : MonoBehaviour
         float grossWPM = (float)input.Length / 5f / totalMinutes;
         float netWPM = grossWPM - (errors / totalMinutes);
         netWPM = Mathf.Max(0, netWPM);
-
-        // curses & buffs can influence the count of errors
-        typingEffectManager.OnEndTyping(ref errors);
 
         float accuracy = 0f;
         if (input.Length > 0)

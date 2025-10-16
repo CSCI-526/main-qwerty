@@ -7,22 +7,26 @@ public class ForceCapitalizeCurseData : TypingEffectBase
         this.capitalizedLetter = char.ToLower(capitalizedLetter);
     }
 
-    public override string OnInputChanged(ref string currentText, ref string prompt)
+    public override string ApplyEffectOnPrompt(ref string prompt)
     {
-        int len = currentText.Length;
-        if (len > 0 && len <= prompt.Length && char.ToLower(prompt[len - 1]) == capitalizedLetter)
-        {
-            return prompt[..(len - 1)] + char.ToUpper(capitalizedLetter) + prompt[len..];
-        }
-        else
-        {
-            return prompt;
-        }
+        return prompt.Replace(capitalizedLetter, char.ToUpper(capitalizedLetter));
     }
 
     public override void OnEndTyping(ref int errors)
     {
         return;
+    }
+
+    public override string GetEffectDescription()
+    {
+        if (effectDescription != null)
+        {
+            return effectDescription;
+        }
+        else
+        {
+            return $"Capslock on Letter {char.ToUpper(capitalizedLetter)}";
+        }
     }
 
     // Curses of same disabled letters are equal
