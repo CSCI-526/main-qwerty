@@ -47,7 +47,6 @@ public abstract class TargetableController : NetworkBehaviour
 
     public virtual void ModifyCurrentHealth(int amount)
     {
-        if (!IsOwner) return;
         UpdateCurrentHealthRpc(currentHealth.Value + amount);
     }
 
@@ -66,6 +65,15 @@ public abstract class TargetableController : NetworkBehaviour
         NetworkVariableWritePermission.Owner
     );
 
+    [DoNotSerialize]
+    public NetworkVariable<ulong> networkedTargetingId = new NetworkVariable<ulong>(
+        0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
+    public ulong targetingId;
+
     public TextMeshProUGUI targetWordText;
 
     [Rpc(SendTo.Owner)]
@@ -76,6 +84,7 @@ public abstract class TargetableController : NetworkBehaviour
 
     protected virtual void InitTargeting()
     {
+        OnTargetWordChanged(new FixedString128Bytes(""), targetWord.Value);
         targetWord.OnValueChanged += OnTargetWordChanged;
     }
 
@@ -93,9 +102,16 @@ public abstract class TargetableController : NetworkBehaviour
 
     public void RandomizeTargetWord()
     {
-        if (!IsOwner) return;
         string newWord = gameManager.GenerateWord();
         SetTargetWord(newWord);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetTargetingIdEveryoneRpc(ulong id)
+    {
+        targetingId = id;
+        if(IsOwner)
+            networkedTargetingId.Value = id;
     }
 
     #endregion

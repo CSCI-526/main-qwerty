@@ -28,7 +28,7 @@ public class ProjectileController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemoveProjectile(this);
+        gameManager.RemoveProjectileRpc(targetingId);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);
     }

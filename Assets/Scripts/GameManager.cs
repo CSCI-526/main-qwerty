@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -19,6 +20,8 @@ public class GameManager : NetworkBehaviour
     public TypingEffectManager typingEffectManager => FindFirstObjectByType<TypingEffectManager>();
     private SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>();
 
+    public ulong projectileTargetingIdCounter = 0;
+
     #region Players
 
     public void SpawnPlayer(ulong requesterClientId, string playerName)
@@ -26,14 +29,17 @@ public class GameManager : NetworkBehaviour
         sharedCanvas.RequestSpawnPlayerIconOwnerRpc(requesterClientId, new FixedString128Bytes(playerName));
     }
 
-    public void AddPlayer(PlayerController player)
+    [Rpc(SendTo.Everyone)]
+    public void AddPlayerRpc(ulong targetingID)
     {
-        players.Add(player);
+        players.Add(FindObjectsByType<PlayerController>(FindObjectsSortMode.None).FirstOrDefault(p => p.targetingId == targetingID));
     }
 
-    public void RemovePlayer(PlayerController player)
+    [Rpc(SendTo.Everyone)]
+    public void RemovePlayerRpc(ulong targetingID)
     {
-        players.Remove(player);
+        int index = players.FindIndex(players => players.targetingId == targetingID);
+        players.RemoveAt(index);
     }
 
     public PlayerController GetRandomPlayer()
@@ -52,28 +58,34 @@ public class GameManager : NetworkBehaviour
         sharedCanvas.RequestSpawnEnemyIconOwnerRpc();
     }
 
-    public void AddEnemy(EnemyController enemy)
+    [Rpc(SendTo.Everyone)]
+    public void AddEnemyRpc(ulong targetingID)
     {
-        enemies.Add(enemy);
+        enemies.Add(FindObjectsByType<EnemyController>(FindObjectsSortMode.None).FirstOrDefault(e => e.targetingId == targetingID));
     }
 
-    public void RemoveEnemy(EnemyController enemy)
+    [Rpc(SendTo.Everyone)]
+    public void RemoveEnemyRpc(ulong targetingID)
     {
-        enemies.Remove(enemy);
+        int index = enemies.FindIndex(e => e.targetingId == targetingID);
+        enemies.RemoveAt(index);
     }
 
     #endregion
 
     #region Projectiles
 
-    public void AddProjectile(ProjectileController projectile)
+    [Rpc(SendTo.Everyone)]
+    public void AddProjectileRpc(ulong targetingID)
     {
-        projectiles.Add(projectile);
+        projectiles.Add(FindObjectsByType<ProjectileController>(FindObjectsSortMode.None).FirstOrDefault(p => p.targetingId == targetingID));
     }
 
-    public void RemoveProjectile(ProjectileController projectile)
+    [Rpc(SendTo.Everyone)]
+    public void RemoveProjectileRpc(ulong targetingID)
     {
-        projectiles.Remove(projectile);
+        int index = projectiles.FindIndex(p => p.targetingId == targetingID);
+        projectiles.RemoveAt(index);
     }
 
     public GameObject GetProjectileParent() { return projectileParent; }
@@ -84,6 +96,8 @@ public class GameManager : NetworkBehaviour
 
     public TargetableController GetTargetFromWord(string word)
     {
+        Debug.Log("Searching for target with word: " + word);
+
         foreach (var enemy in enemies)
         {
             if (enemy.IsDead()) continue;
@@ -159,6 +173,41 @@ public class GameManager : NetworkBehaviour
         }
 
         return word;
+    }
+
+    [Rpc(SendTo.Owner)]
+    public void SyncListsRpc(ulong requesterClientId)
+    {
+        foreach (var player in players)
+        {
+            SyncPlayersRpc(player.targetingId, RpcTarget.Single(requesterClientId, RpcTargetUse.Temp));
+        }
+        foreach (var enemy in enemies)
+        {
+            SyncEnemiesRpc(enemy.targetingId, RpcTarget.Single(requesterClientId, RpcTargetUse.Temp));
+        }
+        foreach (var projectile in projectiles)
+        {
+            SyncProjectilesRpc(projectile.targetingId, RpcTarget.Single(requesterClientId, RpcTargetUse.Temp));
+        }
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void SyncPlayersRpc(ulong targetingID, RpcParams clientId)
+    {
+        players.Add(FindObjectsByType<PlayerController>(FindObjectsSortMode.None).FirstOrDefault(p => p.networkedTargetingId.Value == targetingID));
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void SyncEnemiesRpc(ulong targetingID, RpcParams clientId)
+    {
+        enemies.Add(FindObjectsByType<EnemyController>(FindObjectsSortMode.None).FirstOrDefault(e => e.networkedTargetingId.Value == targetingID));
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void SyncProjectilesRpc(ulong targetingID, RpcParams clientId)
+    {
+        projectiles.Add(FindObjectsByType<ProjectileController>(FindObjectsSortMode.None).FirstOrDefault(p => p.networkedTargetingId.Value == targetingID));
     }
 
     #endregion

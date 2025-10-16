@@ -30,7 +30,7 @@ public class EnemyController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemoveEnemy(this);
+        gameManager.RemoveEnemyRpc(targetingId);
     }
 
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
@@ -72,8 +72,9 @@ public class EnemyController : TargetableController
         pc.SetTargetWord(word);
         pc.SetSpawner(this);
         pc.SetTarget(targetPlayer);
+        pc.SetTargetingIdEveryoneRpc(++gameManager.projectileTargetingIdCounter);
 
-        gameManager.AddProjectile(pc);
+        gameManager.AddProjectileRpc(pc.targetingId);
 
         wordList.Add(word);
     }

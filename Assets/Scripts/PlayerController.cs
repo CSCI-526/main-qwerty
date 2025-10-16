@@ -16,7 +16,7 @@ public class PlayerController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemovePlayer(this);
+        gameManager.RemovePlayerRpc(targetingId);
     }
 
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)

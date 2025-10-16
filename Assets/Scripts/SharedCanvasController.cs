@@ -10,6 +10,8 @@ public class SharedCanvasController : NetworkBehaviour
     [SerializeField] private RectTransform enemyPanel;
     [SerializeField] private NetworkObject enemyPrefab;
 
+    private ulong enemyIdCounter = 0;
+
     private GameManager gameManager => FindFirstObjectByType<GameManager>();
 
     [Rpc(SendTo.Owner)]
@@ -20,9 +22,10 @@ public class SharedCanvasController : NetworkBehaviour
         no.Spawn(true);
         go.transform.SetParent(playerPanel);
         PlayerController pc = go.GetComponent<PlayerController>();
-        gameManager.AddPlayer(pc);
         pc.SetPlayerID(requesterClientId);
         pc.SetPlayerName(playerName.ToString());
+        pc.SetTargetingIdEveryoneRpc(requesterClientId);
+        gameManager.AddPlayerRpc(pc.targetingId);
     }
 
     [Rpc(SendTo.Owner)]
@@ -32,6 +35,8 @@ public class SharedCanvasController : NetworkBehaviour
         NetworkObject no = go.GetComponent<NetworkObject>();
         no.Spawn(true);
         go.transform.SetParent(enemyPanel);
-        gameManager.AddEnemy(go.GetComponent<EnemyController>());
+        EnemyController ec = go.GetComponent<EnemyController>();
+        ec.SetTargetingIdEveryoneRpc(++enemyIdCounter);
+        gameManager.AddEnemyRpc(ec.targetingId);
     }
 }
