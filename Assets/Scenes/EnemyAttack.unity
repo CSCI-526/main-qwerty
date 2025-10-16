@@ -284,7 +284,6 @@ GameObject:
   - component: {fileID: 430357336}
   - component: {fileID: 430357339}
   - component: {fileID: 430357338}
-  - component: {fileID: 430357337}
   m_Layer: 5
   m_Name: WordStart
   m_TagString: Untagged
@@ -311,22 +310,6 @@ RectTransform:
   m_AnchoredPosition: {x: 500, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &430357337
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 430357335}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 578bb48debe9b894a9c2eceae9591209, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackSpeed: 5
-  minLength: 5
-  maxLength: 8
-  wordPrefab: {fileID: 758967849696552827, guid: 18a436f6931f59a49a5e87a166102501, type: 3}
 --- !u!114 &430357338
 MonoBehaviour:
   m_ObjectHideFlags: 0
