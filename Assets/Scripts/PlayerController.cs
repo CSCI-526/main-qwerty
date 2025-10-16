@@ -13,6 +13,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] PlayerIcon playerIcon;
     [SerializeField] HealthBar healthBar;
 
+    private bool isDead = false;
     private ulong playerId;
 
     public override void OnNetworkSpawn()
@@ -21,19 +22,29 @@ public class PlayerController : NetworkBehaviour
         currentHealth.OnValueChanged += OnHealthChanged;
     }
 
+    #region Health Methods
     [Rpc(SendTo.Owner)]
     private void UpdateCurrentHealthRpc(int newHealth)
     {
-        currentHealth.Value = newHealth;
+        currentHealth.Value = Mathf.Clamp(newHealth, 0, maxHealth);
     }
 
     private void OnHealthChanged(int oldHealth, int newHealth)
     {
         healthBar.SetFillAmount((float)newHealth / maxHealth);
+        if (currentHealth.Value <= 0)
+        {
+            isDead = true;
+        }
     }
+    
+    public bool IsDead() { return isDead; }
+    #endregion
 
+    #region Network Variable Methods
     public void SetPlayerID(ulong id) => playerId = id;
     public ulong GetPlayerID() { return playerId; }
 
     public void SetPlayerName(string name) { playerIcon.SetPlayerName(name); }
+    #endregion
 }

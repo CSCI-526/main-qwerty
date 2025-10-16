@@ -10,7 +10,7 @@ public class PlayerNetworkHandler : NetworkBehaviour
     {
         if (IsOwner)
         {
-            var sharedCanvas = FindObjectOfType<SharedCanvasController>();
+            SharedCanvasController sharedCanvas = FindFirstObjectByType<SharedCanvasController>();
             FixedString128Bytes playerName = new FixedString128Bytes(networkManager.GetComponent<ConnectionManager>().GetProfileName());
             if (sharedCanvas != null)
             {
