@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GameManager : NetworkBehaviour
 {
-    [Header("Players and Enemies")]
+    [Header("Controllers")]
     [SerializeField] private List<PlayerController> players = new List<PlayerController>();
     [SerializeField] private List<EnemyController> enemies = new List<EnemyController>();
     [SerializeField] private List<ProjectileController> projectiles = new List<ProjectileController>();
@@ -61,6 +61,39 @@ public class GameManager : NetworkBehaviour
     }
 
     public GameObject GetProjectileParent() { return projectileParent; }
+
+    #endregion
+
+    #region Targeting
+
+    public TargetableController GetTargetFromWord(string word)
+    {
+        foreach (var enemy in enemies)
+        {
+            if (enemy.IsDead()) continue;
+            if (enemy.name.Equals(word))
+            {
+                return enemy;
+            }
+        }
+        foreach (var player in players)
+        {
+            if (player.IsDead()) continue;
+            if (player.GetPlayerID().ToString().Equals(word) || player.name.Equals(word))
+            {
+                return player;
+            }
+        }
+        foreach (var projectile in projectiles)
+        {
+            if (projectile.IsDead()) continue;
+            if (projectile.name.Equals(word))
+            {
+                return projectile;
+            }
+        }
+        return null;
+    }
 
     #endregion
 }

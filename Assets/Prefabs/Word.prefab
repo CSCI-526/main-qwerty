@@ -397,6 +397,7 @@ MonoBehaviour:
         byte0124: 0
         byte0125: 0
   wordSpeed: 75
+  damage: 50
 --- !u!114 &5089214614066085484
 MonoBehaviour:
   m_ObjectHideFlags: 0

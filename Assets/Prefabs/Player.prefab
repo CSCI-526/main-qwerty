@@ -456,8 +456,147 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   maxHealth: 100
-  playerIcon: {fileID: 7791024457676251120}
+  currentHealth:
+    m_InternalValue: 100
   healthBar: {fileID: 2065767858107740977}
+  targetWord:
+    m_InternalValue:
+      utf8LengthInBytes: 0
+      bytes:
+        offset0000:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0016:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0032:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0048:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0064:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0080:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0096:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0112: 0
+        byte0113: 0
+        byte0114: 0
+        byte0115: 0
+        byte0116: 0
+        byte0117: 0
+        byte0118: 0
+        byte0119: 0
+        byte0120: 0
+        byte0121: 0
+        byte0122: 0
+        byte0123: 0
+        byte0124: 0
+        byte0125: 0
+  playerIcon: {fileID: 7791024457676251120}
 --- !u!114 &-3715622935044040562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -586,7 +725,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -75}
+  m_AnchoredPosition: {x: 0, y: -50}
   m_SizeDelta: {x: 100, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2086288779880173038
