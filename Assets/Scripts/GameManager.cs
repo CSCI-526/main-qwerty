@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
-public class EnemyAttack : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     [Header("Enemy Settings")]
     [SerializeField] private int attackSpeed = 5;
@@ -14,6 +12,7 @@ public class EnemyAttack : MonoBehaviour
 
     [Header("Prefabs and GameObjects")]
     [SerializeField] private GameObject wordPrefab;
+    [SerializeField] private GameObject wordStartingPoint;
 
     private List<string> wordList = new List<string>();
 
@@ -40,10 +39,10 @@ public class EnemyAttack : MonoBehaviour
     private void ShootWord()
     {
         string word = GenerateWord();
-        GameObject projectile = Instantiate(wordPrefab, transform.position, Quaternion.identity);
+        GameObject projectile = Instantiate(wordPrefab, wordStartingPoint.transform.position, Quaternion.identity);
         projectile.GetComponent<TMP_Text>().text = word;
-        projectile.transform.SetParent(gameObject.transform);
-        projectile.transform.rotation = transform.rotation;
+        projectile.transform.SetParent(wordStartingPoint.transform);
+        projectile.transform.rotation = wordStartingPoint.transform.rotation;
         projectile.transform.localScale = Vector3.one;
         wordList.Add(word);
         //string result = "";

@@ -7,10 +7,13 @@ public class WordMove : MonoBehaviour
     [SerializeField] private int wordSpeed = 5;
     [SerializeField] private int collideX = -500;
 
+    private GameObject gameManager;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        gameManager = GameObject.Find("GameManager");
+        //Debug.Log(gameManager);
     }
 
     // Update is called once per frame
@@ -21,7 +24,7 @@ public class WordMove : MonoBehaviour
         {
             string word = gameObject.GetComponent<TMP_Text>().text;
             Debug.Log("Hit by word: " + word);
-            gameObject.GetComponentInParent<EnemyAttack>().RemoveWord(word);
+            gameManager.GetComponent<GameManager>().RemoveWord(word);
             Destroy(gameObject);
         }
     }
