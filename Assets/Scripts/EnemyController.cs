@@ -1,68 +1,84 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public class EnemyAttack : MonoBehaviour
+public class EnemyController : TargetableController
 {
     [Header("Enemy Settings")]
-    [SerializeField] private int attackSpeed = 5;
+    [SerializeField] private float attackCooldown = 10;
+    private float attackCd = 0;
+
+    // Temporary Variables
     [SerializeField] private int minLength = 5;
     [SerializeField] private int maxLength = 8;
-    private int attackCd = 0;
-
-    [Header("Prefabs and GameObjects")]
-    [SerializeField] private GameObject wordPrefab;
-
     private List<string> wordList = new List<string>();
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [Header("GameObjects")]
+    [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] private GameObject projectileStartingPoint;
+
+    private void Start()
     {
-        attackCd = attackSpeed * 60;
+        attackCd = attackCooldown;
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void OnNetworkSpawn()
     {
-        if (attackCd > 0)
+        InitHealth();
+    }
+
+    protected override void Die()
+    {
+        gameManager.RemoveEnemy(this);
+    }
+
+    private void Update()
+    {
+        if (!IsOwner) return;
+        if (IsDead()) return;
+
+        if (attackCd <= 0)
         {
-            attackCd--;
-            if (attackCd == 0)
-            {
-                ShootWord();
-                attackCd = attackSpeed * 60;
-            }
+            ShootWord();
+            attackCd = attackCooldown;
+        }
+        else
+        {
+            attackCd -= Time.deltaTime;
         }
     }
 
     private void ShootWord()
     {
         string word = GenerateWord();
-        GameObject projectile = Instantiate(wordPrefab, transform.position, Quaternion.identity);
-        projectile.GetComponent<TMP_Text>().text = word;
-        projectile.transform.SetParent(gameObject.transform);
-        projectile.transform.rotation = transform.rotation;
+
+        PlayerController targetPlayer = gameManager.GetRandomPlayer();
+
+        if(targetPlayer == null) return;
+
+        GameObject projectile = Instantiate(projectilePrefab, projectileStartingPoint.transform.position, Quaternion.identity);
+        projectile.GetComponent<NetworkObject>().Spawn(true);
+
+        projectile.transform.SetParent(gameManager.GetProjectileParent().transform);
+        projectile.transform.rotation = projectileStartingPoint.transform.rotation;
         projectile.transform.localScale = Vector3.one;
+        
+        ProjectileController pc = projectile.GetComponent<ProjectileController>();
+        pc.UpdateTextEveryoneRpc(new FixedString128Bytes(word));
+        pc.SetTargetWord(word);
+        pc.SetSpawner(this);
+        pc.SetTarget(targetPlayer);
+
+        gameManager.AddProjectile(pc);
+
         wordList.Add(word);
-        //string result = "";
-        //foreach (var item in wordList)
-        //{
-        //    result += item.ToString() + ", ";
-        //}
-        //Debug.Log(result);
     }
 
     public void RemoveWord(string word)
     {
         wordList.Remove(word);
-        //string result = "";
-        //foreach (var item in wordList)
-        //{
-        //    result += item.ToString() + ", ";
-        //}
-        //Debug.Log(result);
     }
 
     public List<string> GetWordList()
@@ -114,7 +130,7 @@ public class EnemyAttack : MonoBehaviour
             }
         }
 
-        //Debug.Log(word);
         return word;
     }
+
 }

@@ -14,7 +14,8 @@ public class PlayerNetworkHandler : NetworkBehaviour
             FixedString128Bytes playerName = new FixedString128Bytes(networkManager.GetComponent<ConnectionManager>().GetProfileName());
             if (sharedCanvas != null)
             {
-                sharedCanvas.RequestSpawnIconOwnerRpc(NetworkManager.Singleton.LocalClientId, playerName);
+                sharedCanvas.RequestSpawnPlayerIconOwnerRpc(NetworkManager.Singleton.LocalClientId, playerName);
+                sharedCanvas.RequestSpawnEnemyIconOwnerRpc();
             }
         }
     }

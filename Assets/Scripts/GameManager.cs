@@ -1,119 +1,66 @@
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
-    [Header("Enemy Settings")]
-    [SerializeField] private int attackSpeed = 5;
-    [SerializeField] private int minLength = 5;
-    [SerializeField] private int maxLength = 8;
-    private int attackCd = 0;
+    [Header("Players and Enemies")]
+    [SerializeField] private List<PlayerController> players = new List<PlayerController>();
+    [SerializeField] private List<EnemyController> enemies = new List<EnemyController>();
+    [SerializeField] private List<ProjectileController> projectiles = new List<ProjectileController>();
 
-    [Header("Prefabs and GameObjects")]
-    [SerializeField] private GameObject wordPrefab;
-    [SerializeField] private GameObject wordStartingPoint;
+    [Header("GameObjects")]
+    [SerializeField] private GameObject projectileParent;
 
-    private List<string> wordList = new List<string>();
+    #region Players
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void AddPlayer(PlayerController player)
     {
-        attackCd = attackSpeed * 60;
+        players.Add(player);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void RemovePlayer(PlayerController player)
     {
-        if (attackCd > 0)
-        {
-            attackCd--;
-            if (attackCd == 0)
-            {
-                ShootWord();
-                attackCd = attackSpeed * 60;
-            }
-        }
+        players.Remove(player);
     }
 
-    private void ShootWord()
+    public PlayerController GetRandomPlayer()
     {
-        string word = GenerateWord();
-        GameObject projectile = Instantiate(wordPrefab, wordStartingPoint.transform.position, Quaternion.identity);
-        projectile.GetComponent<TMP_Text>().text = word;
-        projectile.transform.SetParent(wordStartingPoint.transform);
-        projectile.transform.rotation = wordStartingPoint.transform.rotation;
-        projectile.transform.localScale = Vector3.one;
-        wordList.Add(word);
-        //string result = "";
-        //foreach (var item in wordList)
-        //{
-        //    result += item.ToString() + ", ";
-        //}
-        //Debug.Log(result);
+        if (players.Count == 0) return null;
+        int randomIndex = Random.Range(0, players.Count);
+        return players[randomIndex];
     }
 
-    public void RemoveWord(string word)
+    #endregion
+
+    #region Enemies
+
+    public void AddEnemy(EnemyController enemy)
     {
-        wordList.Remove(word);
-        //string result = "";
-        //foreach (var item in wordList)
-        //{
-        //    result += item.ToString() + ", ";
-        //}
-        //Debug.Log(result);
+        enemies.Add(enemy);
     }
 
-    public List<string> GetWordList()
+    public void RemoveEnemy(EnemyController enemy)
     {
-        return wordList;
+        enemies.Remove(enemy);
     }
 
-    private string GenerateWord()
+    #endregion
+
+    #region Projectiles
+
+    public void AddProjectile(ProjectileController projectile)
     {
-        string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z" };
-        string[] vowels = { "a", "e", "i", "o", "u" };
-
-        string word = "";
-
-        int requestedLength = UnityEngine.Random.Range(minLength, maxLength + 1);
-
-        // Generate the word in consonant / vowel pairs
-        while (word.Length < requestedLength)
-        {
-            if (requestedLength != 1)
-            {
-                // Add the consonant
-                string consonant = consonants[UnityEngine.Random.Range(0, consonants.Length)];
-
-                if (consonant == "q" && word.Length + 3 <= requestedLength) // check +3 because we'd add 3 characters in this case, the "qu" and the vowel.  Change 3 to 2 to allow words that end in "qu"
-                {
-                    word += "qu";
-                }
-                else
-                {
-                    while (consonant == "q")
-                    {
-                        // Replace an orphaned "q"
-                        consonant = consonants[UnityEngine.Random.Range(0, consonants.Length)];
-                    }
-
-                    if (word.Length + 1 <= requestedLength)
-                    {
-                        // Only add a consonant if there's enough room remaining
-                        word += consonant;
-                    }
-                }
-            }
-
-            if (word.Length + 1 <= requestedLength)
-            {
-                // Only add a vowel if there's enough room remaining
-                word += vowels[UnityEngine.Random.Range(0, vowels.Length)];
-            }
-        }
-
-        //Debug.Log(word);
-        return word;
+        projectiles.Add(projectile);
     }
+
+    public void RemoveProjectile(ProjectileController projectile)
+    {
+        projectiles.Remove(projectile);
+    }
+
+    public GameObject GetProjectileParent() { return projectileParent; }
+
+    #endregion
 }

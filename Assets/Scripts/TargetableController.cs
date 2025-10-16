@@ -1,0 +1,78 @@
+using Unity.Collections;
+using Unity.Netcode;
+using Unity.VisualScripting;
+using UnityEngine;
+
+public abstract class TargetableController : NetworkBehaviour
+{
+    #region Health
+
+    public int maxHealth = 100;
+    
+    [DoNotSerialize]
+    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(
+        100,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
+    public HealthBar healthBar;
+
+    private bool isDead = false;
+
+    protected virtual void InitHealth()
+    {
+        UpdateCurrentHealthRpc(maxHealth);
+        currentHealth.OnValueChanged += OnHealthChanged;
+    }
+
+    [Rpc(SendTo.Owner)]
+    protected virtual void UpdateCurrentHealthRpc(int newHealth)
+    {
+        currentHealth.Value = Mathf.Clamp(newHealth, 0, maxHealth);
+    }
+
+    protected virtual void OnHealthChanged(int oldHealth, int newHealth)
+    {
+        if (healthBar != null)
+            healthBar.SetFillAmount((float)newHealth / maxHealth);
+
+        if (currentHealth.Value <= 0)
+        {
+            isDead = true;
+            Die();
+        }
+    }
+
+    public virtual void ModifyCurrentHealth(int amount)
+    {
+        if (!IsOwner) return;
+        UpdateCurrentHealthRpc(currentHealth.Value + amount);
+    }
+
+    public bool IsDead() { return isDead; }
+
+    protected abstract void Die();
+
+    #endregion
+
+    #region Targeting
+
+    [DoNotSerialize]
+    public NetworkVariable<FixedString128Bytes> targetWord = new NetworkVariable<FixedString128Bytes>(
+        new FixedString128Bytes(""),
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner
+    );
+
+    public virtual void SetTargetWord(string word)
+    {
+        if (!IsOwner) return;
+        targetWord.Value = new FixedString128Bytes(word);
+    }
+
+    #endregion
+
+    [DoNotSerialize]
+    public GameManager gameManager => FindFirstObjectByType<GameManager>();
+}
