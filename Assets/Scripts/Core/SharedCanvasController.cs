@@ -22,7 +22,7 @@ public class SharedCanvasController : NetworkBehaviour
         no.Spawn(true);
         go.transform.SetParent(playerPanel);
         PlayerController pc = go.GetComponent<PlayerController>();
-        pc.SetPlayerID(requesterClientId);
+        pc.SetPlayerIDRpc(requesterClientId);
         pc.SetPlayerName(playerName.ToString());
         pc.SetTargetingIdEveryoneRpc(requesterClientId);
         gameManager.AddPlayerRpc(pc.targetingId);
