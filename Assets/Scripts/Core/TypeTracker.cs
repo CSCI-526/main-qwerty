@@ -87,7 +87,6 @@ public class TypeTracker : MonoBehaviour
         awaitingTarget = true;
         string modeName = GetModeName();
         promptText.text = $"{modeName}. Enter Target:";
-        Debug.Log($"Switched to {modeName} mode. Awaiting target...");
         FocusInputField();
     }
 
@@ -131,7 +130,6 @@ public class TypeTracker : MonoBehaviour
 
                 prompt = promptText.text; // For comparisons
 
-                Debug.Log($"Target '{input}' selected. Starting {GetModeName()} prompt...");
                 inputField.text = "";
                 timerStarted = true; // will start when they begin typing
                 startTime = Time.time;
@@ -141,7 +139,6 @@ public class TypeTracker : MonoBehaviour
             else
             {
                 promptText.text = "Invalid Target. Try Again.";
-                Debug.Log($"Invalid target: {input}");
                 inputField.text = "";
 
                 FocusInputField();
@@ -191,9 +188,8 @@ public class TypeTracker : MonoBehaviour
 
                 if (!activeErrors.Contains(i))
                 {
-                    Debug.Log($"Error at index {i}: expected '{prompt[i]}', got '{input[i]}'");
                     errors++;
-                    // Add player damage here
+                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
                 }
             }
         }
@@ -204,9 +200,8 @@ public class TypeTracker : MonoBehaviour
             newErrors.Add(i);
             if (!activeErrors.Contains(i))
             {
-                Debug.Log($"Extra character error at index {i}: '{input[i]}' beyond prompt length");
                 errors++;
-                // Add player damage here
+                gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
             }
         }
 
@@ -245,13 +240,15 @@ public class TypeTracker : MonoBehaviour
             accuracy = 0f;
         }
 
+        int healthModifier = (int)((netWPM / 5) * (accuracy / 100f));
+
         if(mode == 1)
         {
-            currentTarget.ModifyCurrentHealth(-10);
+            currentTarget.ModifyCurrentHealth(-healthModifier);
         }
         else if (mode == 2)
         {
-            currentTarget.ModifyCurrentHealth(10);
+            currentTarget.ModifyCurrentHealth(healthModifier);
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;

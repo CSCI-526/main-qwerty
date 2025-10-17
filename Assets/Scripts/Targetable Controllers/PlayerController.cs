@@ -25,7 +25,8 @@ public class PlayerController : TargetableController
     }
 
     #region Network Variable Methods
-    public void SetPlayerID(ulong id) => playerId = id;
+    [Rpc(SendTo.Everyone)]
+    public void SetPlayerIDRpc(ulong id) => playerId = id;
     public ulong GetPlayerID() { return playerId; }
 
     public void SetPlayerName(string name) { playerIcon.SetPlayerName(name); }

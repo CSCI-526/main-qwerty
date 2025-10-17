@@ -31,6 +31,8 @@ public class EnemyController : TargetableController
     protected override void Die()
     {
         gameManager.RemoveEnemyRpc(targetingId);
+        gameObject.GetComponent<NetworkObject>().Despawn(false);
+        Destroy(gameObject);
     }
 
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
