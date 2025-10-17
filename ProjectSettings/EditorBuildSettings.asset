@@ -18,7 +18,7 @@ EditorBuildSettings:
     path: Assets/DA_Minimal_Setup/DA_Setup.unity
     guid: fd1c897bc532da24caa72a9139d6298e
   - enabled: 0
-    path: Assets/Scenes/NetworkTestingScene.unity
+    path: Assets/Scenes/MainScene.unity
     guid: faf21a1d176332449acf0766f94d966a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
