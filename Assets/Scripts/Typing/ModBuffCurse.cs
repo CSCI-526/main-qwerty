@@ -6,12 +6,14 @@ public class ModBuffCurse : TypingEffectBase
     private int punishmentCurse;
     private int healCurse;
     private int damageCurse;
+    private int bulletSpeedCurse;
 
-    public void Initialize(int punishmentCurse, int healCurse, int damageCurse)
+    public void Initialize(int punishmentCurse, int healCurse, int damageCurse, int bulletSpeedCurse)
     {
         this.punishmentCurse = punishmentCurse;
         this.healCurse = healCurse;
         this.damageCurse = damageCurse;
+        this.bulletSpeedCurse = bulletSpeedCurse;
     }
 
     public override string ApplyEffectOnPrompt(ref string prompt)
@@ -40,6 +42,10 @@ public class ModBuffCurse : TypingEffectBase
             {
                 output += "Damage " + (this.damageCurse == -1 ? "doubled. " : "halved. ");
             }
+            if (this.bulletSpeedCurse != 0)
+            {
+                output += "Bullet Speed " + (this.bulletSpeedCurse == 1 ? "doubled. " : "halved. ");
+            }
             return output;
         }
     }
@@ -55,6 +61,10 @@ public class ModBuffCurse : TypingEffectBase
     public override int ApplyDamageMod()
     {
         return this.damageCurse;
+    }
+    public override int ApplyBulletSpeedMod()
+    {
+        return this.bulletSpeedCurse;
     }
 
     public override void OnEndTyping(ref int errors)

@@ -184,33 +184,46 @@ public class TypingEffectManager : MonoBehaviour
     public TypingEffectBase PunishmentMod(int curse)
     {
         var effect = ScriptableObject.CreateInstance<ModBuffCurse>();
-        effect.Initialize(curse, 0, 0);
+        effect.Initialize(curse, 0, 0, 0);
         AddTypingEffect(effect);
         return effect;
     }
 
     /// <summary>
-    /// Shorthand for adding Punishment Buff/Curse.
+    /// Shorthand for adding Damage Buff/Curse.
     /// </summary>
     /// <param name="curse">It is a curse (1 - damage halved) or buff (-1 - damage doubled).</param>
     /// <returns>Effect data</returns>
     public TypingEffectBase DamageMod(int curse)
     {
         var effect = ScriptableObject.CreateInstance<ModBuffCurse>();
-        effect.Initialize(0, curse, 0);
+        effect.Initialize(0, curse, 0, 0);
         AddTypingEffect(effect);
         return effect;
     }
 
     /// <summary>
-    /// Shorthand for adding Punishment Buff/Curse.
+    /// Shorthand for adding Heal Buff/Curse.
     /// </summary>
     /// <param name="curse">It is a curse (1 - heal halved) or buff (-1 - heal doubled).</param>
     /// <returns>Effect data</returns>
     public TypingEffectBase HealMod(int curse)
     {
         var effect = ScriptableObject.CreateInstance<ModBuffCurse>();
-        effect.Initialize(0, curse, 0);
+        effect.Initialize(0, curse, 0, 0);
+        AddTypingEffect(effect);
+        return effect;
+    }
+
+    /// <summary>
+    /// Shorthand for adding Bullet Speed Buff/Curse.
+    /// </summary>
+    /// <param name="curse">It is a curse (1 - speed doubled) or buff (-1 - speed halved).</param>
+    /// <returns>Effect data</returns>
+    public TypingEffectBase BulletSpeedMod(int curse)
+    {
+        var effect = ScriptableObject.CreateInstance<ModBuffCurse>();
+        effect.Initialize(0, 0, 0, curse);
         AddTypingEffect(effect);
         return effect;
     }

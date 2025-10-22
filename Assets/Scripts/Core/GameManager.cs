@@ -241,7 +241,7 @@ public class GameManager : NetworkBehaviour
         }
         else if (randomBuff == 3)
         {
-
+            randomBuffData = typingEffectManager.BulletSpeedMod(-1);
         }
         else if (randomBuff == 4)
         {
@@ -267,7 +267,7 @@ public class GameManager : NetworkBehaviour
         }
         else if (randomCurse == 3)
         {
-            
+            randomCurseData = typingEffectManager.BulletSpeedMod(1);
         }
         else if (randomCurse == 4)
         {

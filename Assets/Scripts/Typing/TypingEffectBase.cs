@@ -13,7 +13,7 @@ public abstract class TypingEffectBase : ScriptableObject
         return effectDescription;
     }
 
-    // 0 - Standard, 1 - Doubled, -1 - Halved
+    // 0 - Standard, 1 - Cursed, -1 - Buffed
     public virtual int ApplyPunishmentMod()
     {
         return 0;
@@ -25,6 +25,11 @@ public abstract class TypingEffectBase : ScriptableObject
     }
 
     public virtual int ApplyDamageMod()
+    {
+        return 0;
+    }
+
+    public virtual int ApplyBulletSpeedMod()
     {
         return 0;
     }
