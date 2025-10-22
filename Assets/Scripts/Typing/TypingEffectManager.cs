@@ -133,6 +133,16 @@ public class TypingEffectManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Shorthand for adding AllLowercase Buff (for all letters).
+    /// </summary>
+    public void AllLowercase()
+    {
+        var effect = ScriptableObject.CreateInstance<AllLowercaseBuffData>();
+        // effect.Initialize();
+        AddTypingEffect(effect);
+    }
+
+    /// <summary>
     /// Shorthand for adding DisableLetter Curse.
     /// </summary>
     /// <param name="letter">The letter to be disabled (case sensitive or not).</param>
