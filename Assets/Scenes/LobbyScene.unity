@@ -1678,6 +1678,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   playerCountText: {fileID: 1126771605}
   lobbyCodeText: {fileID: 1240007954}
+  gameScene: MainScene
 --- !u!1001 &845640764
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4811,7 +4812,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 59
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
