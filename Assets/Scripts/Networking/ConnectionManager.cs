@@ -49,8 +49,27 @@ public class ConnectionManager : MonoBehaviour
         }
     }
 
+    public void StartLobby(string playerName, string lobbyCode)
+    {
+        _profileName = playerName;
+        _sessionName = lobbyCode;
+        CreateOrJoinSessionAsync();
+    }
+
+    public String GetLobbyCode()
+    {
+        return _sessionName;
+    }
+
+    public bool IsConnected()
+    {
+        return _state == ConnectionState.Connected;
+    }
+
+    /*
     private void OnGUI()
     {
+
         if (_state == ConnectionState.Connected)
             return;
 
@@ -75,6 +94,8 @@ public class ConnectionManager : MonoBehaviour
             CreateOrJoinSessionAsync();
         }
     }
+    */
+    
 
     private void OnDestroy()
     {
