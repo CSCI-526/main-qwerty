@@ -1,14 +1,19 @@
+using System.Runtime.CompilerServices;
 using TMPro;
 using Unity.Netcode;
 using Unity.Services.Core;
+using Unity.Services.Matchmaker.Models;
 using Unity.Services.Multiplayer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class SharedLobbyManager : NetworkBehaviour
 {
     [SerializeField] private TMP_Text playerCountText;
     [SerializeField] private TMP_Text lobbyCodeText;
+
+    [SerializeField] private GameObject startGameButton;
 
     [SerializeField] private string gameScene = "MainScene";
 
@@ -19,6 +24,14 @@ public class SharedLobbyManager : NetworkBehaviour
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if(IsOwner)
+        {
+            startGameButton.SetActive(true);
+        }
     }
 
     private void OnDestroy()
@@ -49,7 +62,6 @@ public class SharedLobbyManager : NetworkBehaviour
 
     public void StartGame()
     {
-        // Load scene over distributed authority session
         try
         {
             NetworkManager.Singleton.SceneManager.LoadScene(gameScene, LoadSceneMode.Single);

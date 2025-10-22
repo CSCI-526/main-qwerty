@@ -66,37 +66,6 @@ public class ConnectionManager : MonoBehaviour
         return _state == ConnectionState.Connected;
     }
 
-    /*
-    private void OnGUI()
-    {
-
-        if (_state == ConnectionState.Connected)
-            return;
-
-        GUI.enabled = _state != ConnectionState.Connecting;
-
-        using (new GUILayout.HorizontalScope(GUILayout.Width(250)))
-        {
-            GUILayout.Label("Player Name", GUILayout.Width(100));
-            _profileName = GUILayout.TextField(_profileName);
-        }
-
-        using (new GUILayout.HorizontalScope(GUILayout.Width(250)))
-        {
-            GUILayout.Label("Lobby Code", GUILayout.Width(100));
-            _sessionName = GUILayout.TextField(_sessionName);
-        }
-
-        GUI.enabled = GUI.enabled && !string.IsNullOrEmpty(_profileName) && !string.IsNullOrEmpty(_sessionName);
-
-        if (GUILayout.Button("Create or Join Session"))
-        {
-            CreateOrJoinSessionAsync();
-        }
-    }
-    */
-    
-
     private void OnDestroy()
     {
         _session?.LeaveAsync();

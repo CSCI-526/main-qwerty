@@ -1678,6 +1678,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   playerCountText: {fileID: 1126771605}
   lobbyCodeText: {fileID: 1240007954}
+  startGameButton: {fileID: 2079599930}
   gameScene: MainScene
 --- !u!1001 &845640764
 PrefabInstance:
@@ -5040,7 +5041,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2079599931
 RectTransform:
   m_ObjectHideFlags: 0
