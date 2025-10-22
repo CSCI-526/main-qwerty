@@ -189,7 +189,8 @@ public class TypeTracker : MonoBehaviour
                 if (!activeErrors.Contains(i))
                 {
                     errors++;
-                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
+                    int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
+                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -5 : mod == 1 ? -10 : -2);
                 }
             }
         }
@@ -241,14 +242,15 @@ public class TypeTracker : MonoBehaviour
         }
 
         int healthModifier = (int)((netWPM / 5) * (accuracy / 100f));
-
-        if(mode == 1)
+        if (mode == 1)
         {
-            currentTarget.ModifyCurrentHealth(-healthModifier);
+            int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
+            currentTarget.ModifyCurrentHealth(mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
         }
         else if (mode == 2)
         {
-            currentTarget.ModifyCurrentHealth(healthModifier);
+            int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
+            currentTarget.ModifyCurrentHealth(mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;

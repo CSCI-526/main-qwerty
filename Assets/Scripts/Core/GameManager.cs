@@ -212,23 +212,81 @@ public class GameManager : NetworkBehaviour
     #region Typing Effect
 
     [Rpc(SendTo.SpecifiedInParams)]
-    public void AddRandomTypingEffectRpc(RpcParams rpcParams)
+    public void AddRandomCurseBuffEffectRpc(RpcParams rpcParams)
     {
-        int randomNumber = Random.Range(0, 2);
-        char randomChar = (char)Random.Range(65, 91); // ASCII A-Z
-        if (randomNumber == 0)
+        int randomBuff = Random.Range(0, 6);
+        int randomCurse = Random.Range(0, 6);
+        while (randomBuff == randomCurse)
         {
-            typingEffectManager.ForceCapitalize(randomChar);
-        }
-        else
-        {
-            typingEffectManager.DisableLetter(randomChar);
+            randomCurse = Random.Range(0, 6);
         }
 
-        StartCoroutine(ShowCurseText(randomNumber, randomChar, 5f));
+        // Buff
+        if (randomBuff == 0)
+        {
+            typingEffectManager.PunishmentMod(-1);
+        } 
+        else if (randomBuff == 1)
+        {
+            typingEffectManager.HealMod(-1);
+        }
+        else if (randomBuff == 2)
+        {
+            typingEffectManager.DamageMod(-1);
+        }
+        else if (randomBuff == 3)
+        {
+
+        }
+        else if (randomBuff == 4)
+        {
+
+        }
+        else if (randomBuff == 5)
+        {
+
+        }
+
+        // Curse
+        if (randomCurse == 0)
+        {
+            typingEffectManager.PunishmentMod(1);
+        }
+        else if (randomCurse == 1)
+        {
+            typingEffectManager.HealMod(1);
+        }
+        else if (randomCurse == 2)
+        {
+            typingEffectManager.DamageMod(1);
+        }
+        else if (randomCurse == 3)
+        {
+
+        }
+        else if (randomCurse == 4)
+        {
+
+        }
+        else if (randomCurse == 5)
+        {
+
+        }
+
+        char randomChar = (char)Random.Range(65, 91); // ASCII A-Z
+        //if (randomCurse == 0)
+        //{
+        //    typingEffectManager.ForceCapitalize(randomChar);
+        //}
+        //else
+        //{
+        //    typingEffectManager.DisableLetter(randomChar);
+        //}
+
+        StartCoroutine(ShowCurseText(randomCurse, randomChar, 5f));
     }
 
-    IEnumerator ShowCurseText(int curseType, char character, float duration)
+    public IEnumerator ShowCurseText(int curseType, char character, float duration)
     {
         curseText.gameObject.SetActive(true);
         if(curseType == 0)
