@@ -110,17 +110,6 @@ public class TypingEffectManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Shorthand for adding DisableLetter Curse.
-    /// </summary>
-    /// <param name="letter">The letter to be disabled (case sensitive or not).</param>
-    public void DisableLetter(char letter, bool isCaseSensitive = false)
-    {
-        var effect = ScriptableObject.CreateInstance<DisableLetterCurseData>();
-        effect.Initialize(letter, isCaseSensitive);
-        AddTypingEffect(effect);
-    }
-
-    /// <summary>
     /// Shorthand for adding ForceCapitalize Curse.
     /// </summary>
     /// <param name="letter">The letter that is forced capitalized.</param>
@@ -128,6 +117,30 @@ public class TypingEffectManager : MonoBehaviour
     {
         var effect = ScriptableObject.CreateInstance<ForceCapitalizeCurseData>();
         effect.Initialize(letter);
+        AddTypingEffect(effect);
+    }
+
+    /// <summary>
+    /// Shorthand for adding ForceDoubling Curse.
+    /// </summary>
+    /// <param name="letter">The letter that is forced doubled.</param>
+    /// <param name="isCaseSensitive">Is the provided letter case sensitive or not. (case-insensitive by default)</param>
+    public void ForceDoubling(char letter, bool isCaseSensitive = false)
+    {
+        var effect = ScriptableObject.CreateInstance<ForceDoublingCurseData>();
+        effect.Initialize(letter, isCaseSensitive);
+        AddTypingEffect(effect);
+    }
+
+    /// <summary>
+    /// Shorthand for adding DisableLetter Curse.
+    /// </summary>
+    /// <param name="letter">The letter to be disabled (case sensitive or not).</param>
+    /// <param name="isCaseSensitive">Is the provided letter case sensitive or not. (case-insensitive by default)</param>
+    public void DisableLetter(char letter, bool isCaseSensitive = false)
+    {
+        var effect = ScriptableObject.CreateInstance<DisableLetterCurseData>();
+        effect.Initialize(letter, isCaseSensitive);
         AddTypingEffect(effect);
     }
 

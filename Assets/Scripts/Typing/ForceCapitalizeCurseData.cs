@@ -29,7 +29,7 @@ public class ForceCapitalizeCurseData : TypingEffectBase
         }
     }
 
-    // Curses of same disabled letters are equal
+    // Curses of same forced capitalized letters are equal
     public override bool Equals(object obj)
     {
         if (obj is ForceCapitalizeCurseData other)
