@@ -245,11 +245,11 @@ public class GameManager : NetworkBehaviour
         }
         else if (randomBuff == 4)
         {
-            randomBuffData = typingEffectManager.ForceCapitalize(randomChar);
+            randomBuffData = typingEffectManager.AllLowercase();
         }
         else if (randomBuff == 5)
         {
-            randomBuffData = typingEffectManager.ForceDoubling(randomChar);
+            localPlayer.ModifyCurrentHealth(50);
         }
 
         // Curse
@@ -267,15 +267,15 @@ public class GameManager : NetworkBehaviour
         }
         else if (randomCurse == 3)
         {
-
+            
         }
         else if (randomCurse == 4)
         {
-            randomCurseData = typingEffectManager.AllLowercase();
+            randomCurseData = typingEffectManager.ForceCapitalize(randomChar);
         }
         else if (randomCurse == 5)
         {
-
+            randomCurseData = typingEffectManager.ForceDoubling(randomChar);
         }
 
         // StartCoroutine(ShowCurseText(randomCurse, randomChar, 5f));
