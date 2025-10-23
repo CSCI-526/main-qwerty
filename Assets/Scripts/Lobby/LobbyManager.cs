@@ -16,10 +16,13 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI lobbyCodeText;
     [SerializeField] TMP_InputField joinCodeInputField;
     [SerializeField] TMP_InputField playerNameInputField;
+    [SerializeField] Toggle allowAnalyticsToggle;
 
-    [Header("Error UI Elements")]
+    [Header("Warning UI Elements")]
     [SerializeField] GameObject playerNameError;
     [SerializeField] GameObject joinCodeError;
+    [SerializeField] GameObject playerNameWarning;
+    [SerializeField] GameObject allowAnalyticsWarning;
 
     private NetworkManager networkManager => NetworkManager.Singleton;
 
@@ -48,12 +51,16 @@ public class LobbyManager : MonoBehaviour
     {
         if(playerNameInputField != null)
         {
+            if (!allowAnalyticsToggle.isOn) return;
             if (playerNameInputField.text.Length >= 3 && playerNameInputField.text.Length <= 10)
             {
                 playerName = playerNameInputField.text;
                 playerNameUI.SetActive(false);
+                playerNameWarning.SetActive(false);
+                allowAnalyticsWarning.SetActive(false);
                 joinLobbyUI.SetActive(true);
                 createLobbyUI.SetActive(true);
+                networkManager.GetComponent<AnalyticsManager>().SetPlayerConsent(true);
             }
             else
                 StartCoroutine(ShowTemp(playerNameError, 3f));
