@@ -13,4 +13,16 @@ public class AnalyticsManager : MonoBehaviour
     {
         AnalyticsService.Instance.StartDataCollection();
     }
+
+    public void StartAnalyticsDataCollection()
+    {
+        AnalyticsService.Instance.StartDataCollection();
+    }
+
+    public void PushAnalyticsEvent(CustomEvent analyticsEvent)
+    {
+        AnalyticsService.Instance.RecordEvent(analyticsEvent);
+        AnalyticsService.Instance.Flush();
+        Debug.Log("Analytics Event Pushed: " + analyticsEvent.ToString());
+    }
 }
