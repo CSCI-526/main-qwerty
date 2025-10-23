@@ -27,6 +27,11 @@ public class TypeTracker : MonoBehaviour
     private bool awaitingTarget = true; // Whether we're asking for a target name
     private HashSet<int> activeErrors = new HashSet<int>();
 
+    [SerializeField] private RectTransform caretRect;
+    [SerializeField] private float caretBlinkRate = 0.5f; 
+    private float caretTimer = 0f;
+    private bool caretVisible = true;
+
     private TargetableController currentTarget;
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
@@ -37,6 +42,9 @@ public class TypeTracker : MonoBehaviour
 
         inputField.text = "";
         inputField.onValueChanged.AddListener(OnInputChanged);
+
+        if (caretRect != null)
+            caretRect.gameObject.SetActive(false);
 
         FocusInputField();
     }
@@ -58,9 +66,17 @@ public class TypeTracker : MonoBehaviour
         {
             onEnter(inputField.text);
         }
-        
-        if (!awaitingTarget && timerStarted)
-            countErrors(inputField.text, prompt);
+
+        caretTimer += Time.deltaTime;
+        if (caretTimer >= caretBlinkRate)
+        {
+            caretTimer = 0f;
+            caretVisible = !caretVisible;
+            caretRect.gameObject.SetActive(caretVisible);
+        }
+
+        // keep caret positioned to current input length every frame (accurate movement)
+        positionCaret(inputField.text.Length);
     }
 
     // For changing abilities
@@ -181,6 +197,11 @@ public class TypeTracker : MonoBehaviour
         if (!awaitingTarget && timerStarted)
         {
             countErrors(currentText, prompt);
+        }
+
+        if (awaitingTarget || string.IsNullOrEmpty(prompt))
+        {
+            promptText.text = currentText;
         }
     }
 
@@ -372,5 +393,75 @@ public class TypeTracker : MonoBehaviour
 
         inputField.Select();
         inputField.ActivateInputField();
+    }
+
+    private void positionCaret(int caretIndex)
+    {
+        if (caretRect == null)
+            return;
+
+        // Pick active text source
+        TMP_Text activeText = promptText;
+
+        if (activeText == null)
+            return;
+
+        // Make sure mesh data is up to date
+        activeText.ForceMeshUpdate();
+
+        // TMP_InputField sometimes delays mesh rebuilds — ensure it updates now
+        if (activeText is TMP_Text && activeText.textInfo.characterCount == 0)
+        {
+            Canvas.ForceUpdateCanvases(); // force layout refresh
+            activeText.ForceMeshUpdate();
+        }
+
+        var textInfo = activeText.textInfo;
+        int charCount = textInfo.characterCount;
+
+        Vector3 localPos;
+
+        // Fallback: if still no chars, anchor caret at start of text box
+        if (charCount == 0)
+        {
+            var rt = activeText.rectTransform;
+            localPos = new Vector3(rt.rect.xMin + 4f, rt.rect.yMin * -.5f, 0f);
+        }
+        else
+        {
+            int idx = Mathf.Clamp(caretIndex, 0, charCount);
+            TMP_CharacterInfo ci;
+
+            if (idx == 0)
+            {
+                ci = textInfo.characterInfo[0];
+                localPos = new Vector3(ci.origin, ci.baseLine, 0);
+            }
+            else if (idx >= charCount)
+            {
+                ci = textInfo.characterInfo[charCount - 1];
+                localPos = new Vector3(ci.xAdvance, ci.baseLine, 0);
+            }
+            else
+            {
+                ci = textInfo.characterInfo[idx - 1];
+                localPos = new Vector3(ci.xAdvance, ci.baseLine, 0);
+            }
+        }
+
+        // Convert to anchored position in parent space
+        Vector3 worldPos = activeText.transform.TransformPoint(localPos);
+        RectTransform parentRect = caretRect.parent as RectTransform;
+        Canvas canvas = activeText.canvas;
+        Camera cam = (canvas.renderMode == RenderMode.ScreenSpaceOverlay) ? null : canvas.worldCamera;
+
+        Vector2 anchored;
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(cam, worldPos);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, screenPoint, cam, out anchored);
+
+        caretRect.anchoredPosition = anchored;
+
+        // Adjust vertically (centered on text baseline)
+        caretRect.anchoredPosition += new Vector2(0, caretRect.sizeDelta.y * 0.3f);
     }
 }
