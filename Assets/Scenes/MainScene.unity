@@ -348,7 +348,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  typingElements: {fileID: 0}
+  typingElements: {fileID: 773131780}
   startBattleButton: {fileID: 1020654710}
 --- !u!4 &387264344
 Transform:
