@@ -31,6 +31,7 @@ public abstract class TargetableController : NetworkBehaviour
     [Rpc(SendTo.Owner)]
     protected virtual void UpdateCurrentHealthRpc(int newHealth)
     {
+        Debug.Log(newHealth + " / " + maxHealth);
         currentHealth.Value = Mathf.Clamp(newHealth, 0, maxHealth);
     }
 

@@ -23,15 +23,16 @@ public class EnemyController : TargetableController
 
     public override void OnNetworkSpawn()
     {
-        InitHealth();
         InitTargeting();
         RandomizeTargetWord();
+        currentHealth.OnValueChanged += OnHealthChanged;
     }
 
     public void SetMaxHealth(float multiplier)
     {
         maxHealth = (int)(maxHealth * multiplier);
         UpdateCurrentHealthRpc(maxHealth);
+        OnHealthChanged(currentHealth.Value, maxHealth);
     }
 
     public void SetAttackCooldown(float multiplier)
