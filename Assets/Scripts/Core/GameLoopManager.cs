@@ -10,6 +10,7 @@ public class GameLoopManager : NetworkBehaviour
     [SerializeField] private GameObject startBattleButton;
 
     private bool inCombat = false;
+    private int battleCount = 0;
 
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
@@ -42,6 +43,7 @@ public class GameLoopManager : NetworkBehaviour
         gameManager.RemoveAllPlayersRpc();
         gameManager.RemoveAllEnemiesRpc();
         gameManager.RemoveAllProjectilesRpc();
+        battleCount = 0;
         ToggleTypingElementsRpc(false);
     }
 
@@ -85,6 +87,7 @@ public class GameLoopManager : NetworkBehaviour
         gameManager.RemoveAllEnemiesRpc();
         gameManager.RemoveAllProjectilesRpc();
         ToggleTypingElementsRpc(false);
+        battleCount++;
         AssignRandomCurses();
     }
 
@@ -93,6 +96,7 @@ public class GameLoopManager : NetworkBehaviour
     {
         typingElements.SetActive(state);
         startBattleButton.SetActive(!state);
+
     }
 
     public void AssignRandomCurses()
@@ -100,7 +104,17 @@ public class GameLoopManager : NetworkBehaviour
         if (!IsOwner) return;
         foreach (ulong clientID in gameManager.networkManager.ConnectedClientsIds)
         {
-            gameManager.AddRandomTypingEffectRpc(RpcTarget.Single(clientID, RpcTargetUse.Temp));
+            gameManager.AddRandomCurseBuffEffectRpc(RpcTarget.Single(clientID, RpcTargetUse.Temp));
         }
+    }
+
+    public float GetEnemyHealthMultiplier()
+    {
+        return (1f + (battleCount * 0.4f)) * (1f + ((gameManager.networkManager.ConnectedClients.Count - 1) * 0.2f));
+    }
+
+    public float GetEnemyAttackCooldownMultiplier()
+    {
+        return Mathf.Pow(0.9f, battleCount) * Mathf.Pow(0.85f, gameManager.networkManager.ConnectedClients.Count - 1);
     }
 }

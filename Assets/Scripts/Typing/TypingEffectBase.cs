@@ -13,6 +13,27 @@ public abstract class TypingEffectBase : ScriptableObject
         return effectDescription;
     }
 
+    // 0 - Standard, 1 - Cursed, -1 - Buffed
+    public virtual int ApplyPunishmentMod()
+    {
+        return 0;
+    }
+
+    public virtual int ApplyHealMod()
+    {
+        return 0;
+    }
+
+    public virtual int ApplyDamageMod()
+    {
+        return 0;
+    }
+
+    public virtual int ApplyBulletSpeedMod()
+    {
+        return 0;
+    }
+
     public abstract string ApplyEffectOnPrompt(ref string prompt);
 
     public abstract void OnEndTyping(ref int errors);

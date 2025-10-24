@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Services.Core;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -23,6 +24,8 @@ public class GameManager : NetworkBehaviour
     public TypingEffectManager typingEffectManager => FindFirstObjectByType<TypingEffectManager>();
     public NetworkManager networkManager => NetworkManager.Singleton;
     private SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>();
+    public GameLoopManager gameLoopManager => FindFirstObjectByType<GameLoopManager>();
+    public AnalyticsManager analyticsManager => FindFirstObjectByType<AnalyticsManager>();
 
     public ulong projectileTargetingIdCounter = 0;
 
@@ -98,7 +101,7 @@ public class GameManager : NetworkBehaviour
 
     public void SpawnEnemy()
     {
-        sharedCanvas.RequestSpawnEnemyIconOwnerRpc();
+        sharedCanvas.RequestSpawnEnemyIconOwnerRpc(gameLoopManager.GetEnemyHealthMultiplier(), gameLoopManager.GetEnemyAttackCooldownMultiplier());
     }
 
     [Rpc(SendTo.Everyone)]
@@ -178,8 +181,6 @@ public class GameManager : NetworkBehaviour
 
     public TargetableController GetTargetFromWord(string word)
     {
-        Debug.Log("Searching for target with word: " + word);
-
         foreach (var enemy in enemies)
         {
             if (enemy.IsDead()) continue;
@@ -212,29 +213,90 @@ public class GameManager : NetworkBehaviour
     #region Typing Effect
 
     [Rpc(SendTo.SpecifiedInParams)]
-    public void AddRandomTypingEffectRpc(RpcParams rpcParams)
+    public void AddRandomCurseBuffEffectRpc(RpcParams rpcParams)
     {
-        int randomNumber = Random.Range(0, 2);
-        char randomChar = (char)Random.Range(65, 91); // ASCII A-Z
-        if (randomNumber == 0)
+        int randomBuff = Random.Range(0, 5);
+        int randomCurse = Random.Range(0, 6);
+        while (randomBuff == randomCurse)
         {
-            typingEffectManager.ForceCapitalize(randomChar);
-        }
-        else
-        {
-            typingEffectManager.DisableLetter(randomChar);
+            randomCurse = Random.Range(0, 6);
         }
 
-        StartCoroutine(ShowCurseText(randomNumber, randomChar, 5f));
+        char randomChar = (char)Random.Range(65, 91); // ASCII A-Z
+
+        TypingEffectBase randomBuffData = null;
+        TypingEffectBase randomCurseData = null;
+
+        // Buff
+        if (randomBuff == 0)
+        {
+            randomBuffData = typingEffectManager.PunishmentMod(-1);
+        }
+        else if (randomBuff == 1)
+        {
+            randomBuffData = typingEffectManager.HealMod(-1);
+        }
+        else if (randomBuff == 2)
+        {
+            randomBuffData = typingEffectManager.DamageMod(-1);
+        }
+        else if (randomBuff == 3)
+        {
+            randomBuffData = typingEffectManager.BulletSpeedMod(-1);
+        }
+        else if (randomBuff == 4)
+        {
+            randomBuffData = typingEffectManager.AllLowercase();
+        }
+        /*
+        else if (randomBuff == 5)
+        {
+            localPlayer.ModifyCurrentHealth(50);
+        }
+        */
+
+        // Curse
+        if (randomCurse == 0)
+        {
+            randomCurseData = typingEffectManager.PunishmentMod(1);
+        }
+        else if (randomCurse == 1)
+        {
+            randomCurseData = typingEffectManager.HealMod(1);
+        }
+        else if (randomCurse == 2)
+        {
+            randomCurseData = typingEffectManager.DamageMod(1);
+        }
+        else if (randomCurse == 3)
+        {
+            randomCurseData = typingEffectManager.BulletSpeedMod(1);
+        }
+        else if (randomCurse == 4)
+        {
+            randomCurseData = typingEffectManager.ForceCapitalize(randomChar);
+        }
+        else if (randomCurse == 5)
+        {
+            randomCurseData = typingEffectManager.ForceDoubling(randomChar);
+        }
+
+        StartCoroutine(ShowCurseBuffText(randomBuffData, randomCurseData, 5f));
     }
 
-    IEnumerator ShowCurseText(int curseType, char character, float duration)
+    public IEnumerator ShowCurseBuffText(TypingEffectBase buff, TypingEffectBase curse, float duration)
     {
         curseText.gameObject.SetActive(true);
-        if(curseType == 0)
-            curseText.text = "You've been cursed!\nAll letters \'" + character + "\' must be capitalized!";
-        else
-            curseText.text = "You've been cursed!\n\'" + character + "\' can no longer be used!";
+        string newCurseText = "";
+        if (buff != null)
+        {
+            newCurseText += "New Buff:\n" + buff.GetEffectDescription() + "\n";
+        }
+        if (curse != null)
+        {
+            newCurseText += "New Curse:\n" + curse.GetEffectDescription() + "\n";
+        }
+        curseText.text = newCurseText;
         yield return new WaitForSeconds(duration);
         curseText.gameObject.SetActive(false);
     }

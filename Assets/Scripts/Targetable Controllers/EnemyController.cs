@@ -28,6 +28,17 @@ public class EnemyController : TargetableController
         RandomizeTargetWord();
     }
 
+    public void SetMaxHealth(float multiplier)
+    {
+        maxHealth = (int)(maxHealth * multiplier);
+        UpdateCurrentHealthRpc(maxHealth);
+    }
+
+    public void SetAttackCooldown(float multiplier)
+    {
+        attackCooldown *= multiplier;
+    }
+
     protected override void Die()
     {
         gameManager.RemoveEnemyRpc(targetingId);

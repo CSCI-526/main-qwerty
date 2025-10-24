@@ -1,10 +1,12 @@
-using UnityEngine;
-using TMPro;
+using System.Collections;
 using System.Collections.Generic;
+using System.Net;
+using TMPro;
+using Unity.Services.Analytics;
+using Unity.VisualScripting;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using System.Net;
-using Unity.VisualScripting;
 
 public class TypeTracker : MonoBehaviour
 {
@@ -12,6 +14,7 @@ public class TypeTracker : MonoBehaviour
 
     [SerializeField] private TMP_InputField inputField; // Player input
     [SerializeField] private TMP_Text promptText;       // Displayed prompt
+    [SerializeField] private TMP_Text instructionText;       // Displayed prompt
     [SerializeField] private Image ability1, ability2;
 
     [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
@@ -25,18 +28,69 @@ public class TypeTracker : MonoBehaviour
     private bool awaitingTarget = true; // Whether we're asking for a target name
     private HashSet<int> activeErrors = new HashSet<int>();
 
+    [SerializeField] private RectTransform caretRect;
+    [SerializeField] private float caretBlinkRate = 0.5f; 
+    private float caretTimer = 0f;
+    private bool caretVisible = true;
+
+    private int numSubmissions = 0;
+    private float averageWPM = 0f;
+    private float averageAccuracy = 0f;
+    private int damageDealt = 0;
+    private int healingDone = 0;
+
     private TargetableController currentTarget;
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
-
     private void Start()
     {
-        promptText.text = "Select ability: 1 for attack and 2 for healing.\n";
+        instructionText.text = "Select ability: 1 for attack and 2 for healing.\n";
+        promptText.text = "";
 
         inputField.text = "";
         inputField.onValueChanged.AddListener(OnInputChanged);
 
+        if (caretRect != null)
+            caretRect.gameObject.SetActive(false);
+
         FocusInputField();
+    }
+
+    public void OnEnable()
+    {
+        resetState();
+        EnterTargetPhase();
+        ResetMetrics();
+    }
+
+    public void OnDisable()
+    {
+        ReportStats();
+    }
+
+    private void ReportStats()
+    {
+        if(numSubmissions == 0)
+            return;
+
+        StatsEvent statsEvent = new StatsEvent
+        {
+            NumSubmissions = numSubmissions,
+            AverageWPM = averageWPM,
+            AverageAccuracy = averageAccuracy,
+            DamageDealt = damageDealt,
+            HealingDone = healingDone
+        };
+        gameManager.analyticsManager.PushAnalyticsEvent(statsEvent);
+    }
+
+    private void ResetMetrics()
+    {
+        numSubmissions = 0;
+        averageWPM = 0f;
+        averageAccuracy = 0f;
+        damageDealt = 0;
+        healingDone = 0;
     }
 
     private void Update()
@@ -56,12 +110,23 @@ public class TypeTracker : MonoBehaviour
         {
             onEnter(inputField.text);
         }
+
+        caretTimer += Time.deltaTime;
+        if (caretTimer >= caretBlinkRate)
+        {
+            caretTimer = 0f;
+            caretVisible = !caretVisible;
+            caretRect.gameObject.SetActive(caretVisible);
+        }
+
+        // Updates caret location
+        positionCaret(inputField.text.Length);
     }
 
     // For changing abilities
     private void changeMode(int newMode)
     {
-        // If they�re already in that mode, do nothing
+        // If they're already in that mode, do nothing
         if (mode == newMode)
             return;
 
@@ -86,7 +151,7 @@ public class TypeTracker : MonoBehaviour
     {
         awaitingTarget = true;
         string modeName = GetModeName();
-        promptText.text = $"{modeName}. Enter Target:";
+        instructionText.text = $"{modeName}. Enter <color=yellow>Target</color>:";
         FocusInputField();
     }
 
@@ -102,9 +167,8 @@ public class TypeTracker : MonoBehaviour
             {
                 awaitingTarget = false;
 
-                if(currentTarget is ProjectileController)
+                if (currentTarget is ProjectileController)
                 {
-                    inputField.text = "";
                     if (mode == 1)
                     {
                         currentTarget.ModifyCurrentHealth(-10);
@@ -115,6 +179,8 @@ public class TypeTracker : MonoBehaviour
                     }
                     currentTarget = null;
                     EnterTargetPhase();
+                    inputField.text = "";
+                    promptText.text = "";
                     return;
                 }
                 else if (mode == 1)
@@ -129,6 +195,8 @@ public class TypeTracker : MonoBehaviour
                 }
 
                 prompt = promptText.text; // For comparisons
+                promptText.color = Color.gray;
+                instructionText.text = "Type the prompt below!";
 
                 inputField.text = "";
                 timerStarted = true; // will start when they begin typing
@@ -138,8 +206,9 @@ public class TypeTracker : MonoBehaviour
             }
             else
             {
-                promptText.text = "Invalid Target. Try Again.";
+                instructionText.text = "Invalid Target. Try Again.";
                 inputField.text = "";
+                promptText.text = "";
 
                 FocusInputField();
             }
@@ -170,6 +239,11 @@ public class TypeTracker : MonoBehaviour
         {
             countErrors(currentText, prompt);
         }
+
+        if (awaitingTarget || string.IsNullOrEmpty(prompt))
+        {
+            promptText.text = currentText;
+        }
     }
 
     // Counts the errors as the player is typing
@@ -177,27 +251,45 @@ public class TypeTracker : MonoBehaviour
     {
         int len = Mathf.Min(input.Length, prompt.Length);
 
+        string outputText = "";
+        promptText.color = Color.white;
+
+        string newPrompt = NormalizeText(prompt);
+        string newInput = NormalizeText(input);
+
         HashSet<int> newErrors = new HashSet<int>();
 
         // Check all characters that overlap with the prompt
         for (int i = 0; i < len; i++)
         {
-            if (input[i] != prompt[i])
+            if (newInput[i] != newPrompt[i])
             {
                 newErrors.Add(i);
+                outputText += $"<mark=#FF0000>{input[i]}</mark>";
 
                 if (!activeErrors.Contains(i))
                 {
                     errors++;
-                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
+                    int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
+                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -5 : mod == 1 ? -10 : -2);
                 }
             }
+            else
+            {
+                outputText += prompt[i];
+            }
+        }
+
+        if (len < prompt.Length)
+        {
+            outputText += $"<color=#888888>{prompt.Substring(len)}</color>"; // remaining
         }
 
         // Count any extra characters typed beyond the prompt as errors
         for (int i = prompt.Length; i < input.Length; i++)
         {
             newErrors.Add(i);
+            outputText += $"<mark=#FF0000>{input[i]}</mark>";
             if (!activeErrors.Contains(i))
             {
                 errors++;
@@ -206,6 +298,7 @@ public class TypeTracker : MonoBehaviour
         }
 
         activeErrors = newErrors;
+        promptText.text = outputText;
     }
 
 
@@ -240,27 +333,33 @@ public class TypeTracker : MonoBehaviour
             accuracy = 0f;
         }
 
-        int healthModifier = (int)((netWPM / 5) * (accuracy / 100f));
+        numSubmissions++;
+        averageWPM = ((averageWPM * (numSubmissions - 1)) + netWPM) / numSubmissions;
+        averageAccuracy = ((averageAccuracy * (numSubmissions - 1)) + accuracy) / numSubmissions;
 
-        if(mode == 1)
+        int healthModifier = (int)((netWPM / 5) * (accuracy / 100f));
+        if (mode == 1)
         {
-            currentTarget.ModifyCurrentHealth(-healthModifier);
+            int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
+            currentTarget.ModifyCurrentHealth(mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
+            damageDealt -= mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2;
         }
         else if (mode == 2)
         {
-            currentTarget.ModifyCurrentHealth(healthModifier);
+            int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
+            currentTarget.ModifyCurrentHealth(mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
+            healingDone += mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2;
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;
-        Debug.Log($"Typing Test Ended (Enter pressed)");
-        Debug.Log($"Time: {totalTime:F2}s | Gross WPM: {grossWPM:F1} | Net WPM: {netWPM:F1} | Accuracy: {accuracy:F1}% | Errors: {errors}");
+        //Debug.Log($"Typing Test Ended (Enter pressed)");
+        //Debug.Log($"Time: {totalTime:F2}s | Gross WPM: {grossWPM:F1} | Net WPM: {netWPM:F1} | Accuracy: {accuracy:F1}% | Errors: {errors}");
 
         resetState();
         EnterTargetPhase();
     }
 
     // Dummy function to test targeting
-    // Replace with Josh's list generation stuff
     private bool IsValidTarget(string target)
     {
         if(target == "Hello")
@@ -305,10 +404,32 @@ public class TypeTracker : MonoBehaviour
         startTime = 0;
         errors = 0;
         activeErrors.Clear();
-        awaitingTarget = false;
+        awaitingTarget = true;
+        promptText.color = Color.white;
 
         FocusInputField();
     }
+
+    private string NormalizeText(string text)
+    {
+        if (text == null)
+        {
+            return "";
+        }
+
+        string normalized = text.Normalize(System.Text.NormalizationForm.FormKC);
+        normalized = normalized.Replace('‘', '\'')
+                               .Replace("‘", "'")
+                               .Replace("’", "'")
+                               .Replace("“", "\"")
+                               .Replace("”", "\"")
+                               .Replace("–", "-")
+                               .Replace("—", "-")
+                               .Replace("…", "...");
+
+        return normalized;
+    }
+
 
     // Ensures text field is always active
     private void FocusInputField()
@@ -322,5 +443,73 @@ public class TypeTracker : MonoBehaviour
 
         inputField.Select();
         inputField.ActivateInputField();
+    }
+
+    private void positionCaret(int caretIndex)
+    {
+        if (caretRect == null)
+        {
+            return;
+        }
+
+        TMP_Text activeText = promptText;
+
+        if (activeText == null)
+        {  
+            return; 
+        }
+
+        activeText.ForceMeshUpdate();
+
+        if (activeText is TMP_Text && activeText.textInfo.characterCount == 0)
+        {
+            Canvas.ForceUpdateCanvases();
+            activeText.ForceMeshUpdate();
+        }
+
+        var textInfo = activeText.textInfo;
+        int charCount = textInfo.characterCount;
+
+        Vector3 localPos;
+
+        if (charCount == 0)
+        {
+            var rt = activeText.rectTransform;
+            localPos = new Vector3(rt.rect.xMin + 4f, rt.rect.yMin * -.65f, 0f);
+        }
+        else
+        {
+            int idx = Mathf.Clamp(caretIndex, 0, charCount);
+            TMP_CharacterInfo ci;
+
+            if (idx == 0)
+            {
+                ci = textInfo.characterInfo[0];
+                localPos = new Vector3(ci.origin, ci.baseLine, 0);
+            }
+            else if (idx >= charCount)
+            {
+                ci = textInfo.characterInfo[charCount - 1];
+                localPos = new Vector3(ci.xAdvance, ci.baseLine, 0);
+            }
+            else
+            {
+                ci = textInfo.characterInfo[idx - 1];
+                localPos = new Vector3(ci.xAdvance, ci.baseLine, 0);
+            }
+        }
+
+        Vector3 worldPos = activeText.transform.TransformPoint(localPos);
+        RectTransform parentRect = caretRect.parent as RectTransform;
+        Canvas canvas = activeText.canvas;
+        Camera cam = (canvas.renderMode == RenderMode.ScreenSpaceOverlay) ? null : canvas.worldCamera;
+
+        Vector2 anchored;
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(cam, worldPos);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, screenPoint, cam, out anchored);
+
+        caretRect.anchoredPosition = anchored;
+
+        caretRect.anchoredPosition += new Vector2(0, caretRect.sizeDelta.y * 0.3f);
     }
 }
