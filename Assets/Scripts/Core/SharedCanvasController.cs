@@ -37,7 +37,7 @@ public class SharedCanvasController : NetworkBehaviour
         go.transform.SetParent(enemyPanel);
         EnemyController ec = go.GetComponent<EnemyController>();
         ec.SetTargetingIdEveryoneRpc(++enemyIdCounter);
-        ec.SetMaxHealth(maxHealthMultiplier);
+        ec.SetMaxHealthRpc(maxHealthMultiplier);
         ec.SetAttackCooldown(attackCooldownMultiplier);
         gameManager.AddEnemyRpc(ec.targetingId);
     }

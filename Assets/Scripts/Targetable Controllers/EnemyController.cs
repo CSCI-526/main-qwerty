@@ -28,7 +28,8 @@ public class EnemyController : TargetableController
         currentHealth.OnValueChanged += OnHealthChanged;
     }
 
-    public void SetMaxHealth(float multiplier)
+    [Rpc(SendTo.Everyone)]
+    public void SetMaxHealthRpc(float multiplier)
     {
         maxHealth = (int)(maxHealth * multiplier);
         UpdateCurrentHealthRpc(maxHealth);
