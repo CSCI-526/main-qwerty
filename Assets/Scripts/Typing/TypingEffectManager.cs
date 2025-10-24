@@ -49,7 +49,7 @@ public class TypingEffectManager : MonoBehaviour
     /// <returns>The mod containing punishment, heal and damages.</returns>
     public int[] ApplyEffectOnMod()
     {
-        int[] output = { 0, 0, 0 };
+        int[] output = { 0, 0, 0, 0 };
         foreach (var typingEffect in activeTypingEffects)
         {
             if (typingEffect.ApplyPunishmentMod() != 0)
@@ -65,6 +65,11 @@ public class TypingEffectManager : MonoBehaviour
             if (typingEffect.ApplyDamageMod() != 0)
             {
                 output[2] = typingEffect.ApplyDamageMod();
+            }
+
+            if (typingEffect.ApplyBulletSpeedMod() != 0)
+            {
+                output[3] = typingEffect.ApplyBulletSpeedMod();
             }
         }
 

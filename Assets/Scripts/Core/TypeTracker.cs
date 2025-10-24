@@ -125,7 +125,6 @@ public class TypeTracker : MonoBehaviour
 
                 if (currentTarget is ProjectileController)
                 {
-                    inputField.text = "";
                     if (mode == 1)
                     {
                         currentTarget.ModifyCurrentHealth(-10);
@@ -136,6 +135,8 @@ public class TypeTracker : MonoBehaviour
                     }
                     currentTarget = null;
                     EnterTargetPhase();
+                    inputField.text = "";
+                    promptText.text = "";
                     return;
                 }
                 else if (mode == 1)
