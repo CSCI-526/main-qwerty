@@ -75,7 +75,7 @@ public class TypeTracker : MonoBehaviour
             caretRect.gameObject.SetActive(caretVisible);
         }
 
-        // keep caret positioned to current input length every frame (accurate movement)
+        // Updates caret location
         positionCaret(inputField.text.Length);
     }
 
@@ -117,41 +117,36 @@ public class TypeTracker : MonoBehaviour
         // If we're waiting for a target
         if (awaitingTarget)
         {
-            //currentTarget = gameManager.GetTargetFromWord(input);
+            currentTarget = gameManager.GetTargetFromWord(input);
 
-            //if (currentTarget != null)
-            //{
-            if (IsValidTarget(input))
+            if (currentTarget != null)
             {
                 awaitingTarget = false;
 
-                //if(currentTarget is ProjectileController)
-                //{
-                //    inputField.text = "";
-                //    if (mode == 1)
-                //    {
-                //        currentTarget.ModifyCurrentHealth(-10);
-                //    }
-                //    else if (mode == 2)
-                //    {
-                //        currentTarget.ModifyCurrentHealth(10);
-                //    }
-                //    currentTarget = null;
-                //    EnterTargetPhase();
-                //    return;
-                //}
-                //else if (mode == 1)
-                if(mode == 1)
+                if (currentTarget is ProjectileController)
+                {
+                    inputField.text = "";
+                    if (mode == 1)
+                    {
+                        currentTarget.ModifyCurrentHealth(-10);
+                    }
+                    else if (mode == 2)
+                    {
+                        currentTarget.ModifyCurrentHealth(10);
+                    }
+                    currentTarget = null;
+                    EnterTargetPhase();
+                    return;
+                }
+                else if (mode == 1)
                 {
                     string temp = promptGenerator.GetRandomSentence("Attack");
-                    //promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
-                    promptText.text = temp;
+                    promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
                 }
                 else if (mode == 2)
                 {
                     string temp = promptGenerator.GetRandomSentence("Heal");
-                    //promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
-                    promptText.text = temp;
+                    promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
                 }
 
                 prompt = promptText.text; // For comparisons
@@ -211,7 +206,6 @@ public class TypeTracker : MonoBehaviour
     {
         int len = Mathf.Min(input.Length, prompt.Length);
 
-        // For user feedback
         string outputText = "";
         promptText.color = Color.white;
 
@@ -231,7 +225,7 @@ public class TypeTracker : MonoBehaviour
                 if (!activeErrors.Contains(i))
                 {
                     errors++;
-                    //gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
+                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
                 }
             }
             else
@@ -253,7 +247,7 @@ public class TypeTracker : MonoBehaviour
             if (!activeErrors.Contains(i))
             {
                 errors++;
-                //gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
+                gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
             }
         }
 
@@ -297,16 +291,16 @@ public class TypeTracker : MonoBehaviour
 
         if(mode == 1)
         {
-            //currentTarget.ModifyCurrentHealth(-healthModifier);
+            currentTarget.ModifyCurrentHealth(-healthModifier);
         }
         else if (mode == 2)
         {
-            //currentTarget.ModifyCurrentHealth(healthModifier);
+            currentTarget.ModifyCurrentHealth(healthModifier);
         }
-        //currentTarget.RandomizeTargetWord();
-        //currentTarget = null;
-        Debug.Log($"Typing Test Ended (Enter pressed)");
-        Debug.Log($"Time: {totalTime:F2}s | Gross WPM: {grossWPM:F1} | Net WPM: {netWPM:F1} | Accuracy: {accuracy:F1}% | Errors: {errors}");
+        currentTarget.RandomizeTargetWord();
+        currentTarget = null;
+        //Debug.Log($"Typing Test Ended (Enter pressed)");
+        //Debug.Log($"Time: {totalTime:F2}s | Gross WPM: {grossWPM:F1} | Net WPM: {netWPM:F1} | Accuracy: {accuracy:F1}% | Errors: {errors}");
 
         resetState();
         EnterTargetPhase();
@@ -401,19 +395,22 @@ public class TypeTracker : MonoBehaviour
     private void positionCaret(int caretIndex)
     {
         if (caretRect == null)
+        {
             return;
+        }
 
-        // Pick active text source
         TMP_Text activeText = promptText;
 
         if (activeText == null)
-            return;
+        {  
+            return; 
+        }
 
         activeText.ForceMeshUpdate();
 
         if (activeText is TMP_Text && activeText.textInfo.characterCount == 0)
         {
-            Canvas.ForceUpdateCanvases(); // force layout refresh
+            Canvas.ForceUpdateCanvases();
             activeText.ForceMeshUpdate();
         }
 
@@ -449,7 +446,6 @@ public class TypeTracker : MonoBehaviour
             }
         }
 
-        // Convert to anchored position in parent space
         Vector3 worldPos = activeText.transform.TransformPoint(localPos);
         RectTransform parentRect = caretRect.parent as RectTransform;
         Canvas canvas = activeText.canvas;
@@ -461,7 +457,6 @@ public class TypeTracker : MonoBehaviour
 
         caretRect.anchoredPosition = anchored;
 
-        // Adjust vertically (centered on text baseline)
         caretRect.anchoredPosition += new Vector2(0, caretRect.sizeDelta.y * 0.3f);
     }
 }
