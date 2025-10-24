@@ -107,7 +107,7 @@ public class TypeTracker : MonoBehaviour
     {
         awaitingTarget = true;
         string modeName = GetModeName();
-        instructionText.text = $"{modeName}. Enter Target:";
+        instructionText.text = $"{modeName}. Enter <color=yellow>Target</color>:";
         FocusInputField();
     }
 
