@@ -202,7 +202,7 @@ public class TypingEffectManager : MonoBehaviour
     public TypingEffectBase DamageMod(int curse)
     {
         var effect = ScriptableObject.CreateInstance<ModBuffCurse>();
-        effect.Initialize(0, curse, 0, 0);
+        effect.Initialize(0, 0, curse, 0);
         AddTypingEffect(effect);
         return effect;
     }

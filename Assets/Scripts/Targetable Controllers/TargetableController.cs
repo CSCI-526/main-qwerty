@@ -24,6 +24,7 @@ public abstract class TargetableController : NetworkBehaviour
     protected virtual void InitHealth()
     {
         UpdateCurrentHealthRpc(maxHealth);
+        OnHealthChanged(currentHealth.Value, maxHealth);
         currentHealth.OnValueChanged += OnHealthChanged;
     }
 
@@ -36,7 +37,7 @@ public abstract class TargetableController : NetworkBehaviour
     protected virtual void OnHealthChanged(int oldHealth, int newHealth)
     {
         if (healthBar != null)
-            healthBar.SetFillAmount((float)newHealth / maxHealth);
+            healthBar.SetFillAmount(newHealth, maxHealth);
 
         if (currentHealth.Value <= 0)
         {

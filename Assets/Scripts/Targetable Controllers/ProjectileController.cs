@@ -52,7 +52,7 @@ public class ProjectileController : TargetableController
                 mod = gameManager.typingEffectManager.ApplyEffectOnMod()[3];
             }
             Vector3 direction = (target.transform.position - transform.position).normalized;
-            transform.Translate(direction * (mod == 0 ? wordSpeed : mod == 1 ? 10 : 3) * Time.deltaTime);
+            transform.Translate(direction * (mod == 0 ? wordSpeed : mod == 1 ? wordSpeed * 2 : wordSpeed / 2) * Time.deltaTime);
         }
     }
 

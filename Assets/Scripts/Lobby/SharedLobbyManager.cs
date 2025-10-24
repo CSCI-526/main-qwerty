@@ -19,7 +19,6 @@ public class SharedLobbyManager : NetworkBehaviour
 
     private async void Start()
     {
-        UpdatePlayerCountText();
         lobbyCodeText.text = NetworkManager.Singleton.GetComponent<ConnectionManager>().GetLobbyCode();
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
@@ -28,7 +27,8 @@ public class SharedLobbyManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if(IsOwner)
+        UpdatePlayerCountTextRpc();
+        if (IsOwner)
         {
             startGameButton.SetActive(true);
         }
@@ -43,15 +43,16 @@ public class SharedLobbyManager : NetworkBehaviour
 
     private void OnClientConnected(ulong clientId)
     {
-        UpdatePlayerCountText();
+        UpdatePlayerCountTextRpc();
     }
 
     private void OnClientDisconnected(ulong clientId)
     {
-        UpdatePlayerCountText();
+        UpdatePlayerCountTextRpc();
     }
 
-    public void UpdatePlayerCountText()
+    [Rpc(SendTo.Everyone)]
+    public void UpdatePlayerCountTextRpc()
     {
         if (NetworkManager.Singleton != null)
         {

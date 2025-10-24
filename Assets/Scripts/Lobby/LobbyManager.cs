@@ -51,7 +51,6 @@ public class LobbyManager : MonoBehaviour
     {
         if(playerNameInputField != null)
         {
-            if (!allowAnalyticsToggle.isOn) return;
             if (playerNameInputField.text.Length >= 3 && playerNameInputField.text.Length <= 10)
             {
                 playerName = playerNameInputField.text;
@@ -60,7 +59,7 @@ public class LobbyManager : MonoBehaviour
                 allowAnalyticsWarning.SetActive(false);
                 joinLobbyUI.SetActive(true);
                 createLobbyUI.SetActive(true);
-                networkManager.GetComponent<AnalyticsManager>().SetPlayerConsent(true);
+                networkManager.GetComponent<AnalyticsManager>().SetPlayerConsent(allowAnalyticsToggle.isOn);
             }
             else
                 StartCoroutine(ShowTemp(playerNameError, 3f));

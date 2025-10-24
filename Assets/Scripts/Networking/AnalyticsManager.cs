@@ -11,15 +11,12 @@ public class AnalyticsManager : MonoBehaviour
 
     public void SetPlayerConsent(bool consent)
     {
-        AnalyticsService.Instance.StartDataCollection();
+        if (consent)
+            AnalyticsService.Instance.StartDataCollection();
+        Debug.Log("Starting Data Collection: " + consent);
     }
 
-    public void StartAnalyticsDataCollection()
-    {
-        AnalyticsService.Instance.StartDataCollection();
-    }
-
-    public void PushAnalyticsEvent(CustomEvent analyticsEvent)
+    public void PushAnalyticsEvent(StatsEvent analyticsEvent)
     {
         AnalyticsService.Instance.RecordEvent(analyticsEvent);
         AnalyticsService.Instance.Flush();

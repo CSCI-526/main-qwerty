@@ -24,6 +24,8 @@ public class GameManager : NetworkBehaviour
     public TypingEffectManager typingEffectManager => FindFirstObjectByType<TypingEffectManager>();
     public NetworkManager networkManager => NetworkManager.Singleton;
     private SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>();
+    public GameLoopManager gameLoopManager => FindFirstObjectByType<GameLoopManager>();
+    public AnalyticsManager analyticsManager => FindFirstObjectByType<AnalyticsManager>();
 
     public ulong projectileTargetingIdCounter = 0;
 
@@ -99,7 +101,7 @@ public class GameManager : NetworkBehaviour
 
     public void SpawnEnemy()
     {
-        sharedCanvas.RequestSpawnEnemyIconOwnerRpc();
+        sharedCanvas.RequestSpawnEnemyIconOwnerRpc(gameLoopManager.GetEnemyHealthMultiplier(), gameLoopManager.GetEnemyAttackCooldownMultiplier());
     }
 
     [Rpc(SendTo.Everyone)]
@@ -179,8 +181,6 @@ public class GameManager : NetworkBehaviour
 
     public TargetableController GetTargetFromWord(string word)
     {
-        Debug.Log("Searching for target with word: " + word);
-
         foreach (var enemy in enemies)
         {
             if (enemy.IsDead()) continue;
@@ -215,7 +215,7 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.SpecifiedInParams)]
     public void AddRandomCurseBuffEffectRpc(RpcParams rpcParams)
     {
-        int randomBuff = Random.Range(0, 6);
+        int randomBuff = Random.Range(0, 5);
         int randomCurse = Random.Range(0, 6);
         while (randomBuff == randomCurse)
         {
@@ -248,10 +248,12 @@ public class GameManager : NetworkBehaviour
         {
             randomBuffData = typingEffectManager.AllLowercase();
         }
+        /*
         else if (randomBuff == 5)
         {
             localPlayer.ModifyCurrentHealth(50);
         }
+        */
 
         // Curse
         if (randomCurse == 0)
@@ -279,7 +281,6 @@ public class GameManager : NetworkBehaviour
             randomCurseData = typingEffectManager.ForceDoubling(randomChar);
         }
 
-        // StartCoroutine(ShowCurseText(randomCurse, randomChar, 5f));
         StartCoroutine(ShowCurseBuffText(randomBuffData, randomCurseData, 5f));
     }
 
@@ -299,17 +300,6 @@ public class GameManager : NetworkBehaviour
         yield return new WaitForSeconds(duration);
         curseText.gameObject.SetActive(false);
     }
-
-    // public IEnumerator ShowCurseText(int curseType, char character, float duration)
-    // {
-    //     curseText.gameObject.SetActive(true);
-    //     if (curseType == 0)
-    //         curseText.text = "You've been cursed!\nAll letters \'" + character + "\' must be capitalized!";
-    //     else
-    //         curseText.text = "You've been cursed!\n\'" + character + "\' can no longer be used!";
-    //     yield return new WaitForSeconds(duration);
-    //     curseText.gameObject.SetActive(false);
-    // }
 
     #endregion
 

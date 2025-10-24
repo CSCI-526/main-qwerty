@@ -29,7 +29,7 @@ public class SharedCanvasController : NetworkBehaviour
     }
 
     [Rpc(SendTo.Owner)]
-    public void RequestSpawnEnemyIconOwnerRpc()
+    public void RequestSpawnEnemyIconOwnerRpc(float maxHealthMultiplier, float attackCooldownMultiplier)
     {
         GameObject go = Instantiate(enemyPrefab.gameObject);
         NetworkObject no = go.GetComponent<NetworkObject>();
@@ -37,6 +37,8 @@ public class SharedCanvasController : NetworkBehaviour
         go.transform.SetParent(enemyPanel);
         EnemyController ec = go.GetComponent<EnemyController>();
         ec.SetTargetingIdEveryoneRpc(++enemyIdCounter);
+        ec.SetMaxHealth(maxHealthMultiplier);
+        ec.SetAttackCooldown(attackCooldownMultiplier);
         gameManager.AddEnemyRpc(ec.targetingId);
     }
 }

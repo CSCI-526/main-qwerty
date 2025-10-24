@@ -1,11 +1,12 @@
-using UnityEngine;
-using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
+using TMPro;
+using Unity.Services.Analytics;
+using Unity.VisualScripting;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using System.Net;
-using Unity.VisualScripting;
 
 public class TypeTracker : MonoBehaviour
 {
@@ -32,6 +33,12 @@ public class TypeTracker : MonoBehaviour
     private float caretTimer = 0f;
     private bool caretVisible = true;
 
+    private int numSubmissions = 0;
+    private float averageWPM = 0f;
+    private float averageAccuracy = 0f;
+    private int damageDealt = 0;
+    private int healingDone = 0;
+
     private TargetableController currentTarget;
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
@@ -47,6 +54,43 @@ public class TypeTracker : MonoBehaviour
             caretRect.gameObject.SetActive(false);
 
         FocusInputField();
+    }
+
+    public void OnEnable()
+    {
+        resetState();
+        EnterTargetPhase();
+        ResetMetrics();
+    }
+
+    public void OnDisable()
+    {
+        ReportStats();
+    }
+
+    private void ReportStats()
+    {
+        if(numSubmissions == 0)
+            return;
+
+        StatsEvent statsEvent = new StatsEvent
+        {
+            NumSubmissions = numSubmissions,
+            AverageWPM = averageWPM,
+            AverageAccuracy = averageAccuracy,
+            DamageDealt = damageDealt,
+            HealingDone = healingDone
+        };
+        gameManager.analyticsManager.PushAnalyticsEvent(statsEvent);
+    }
+
+    private void ResetMetrics()
+    {
+        numSubmissions = 0;
+        averageWPM = 0f;
+        averageAccuracy = 0f;
+        damageDealt = 0;
+        healingDone = 0;
     }
 
     private void Update()
@@ -289,16 +333,22 @@ public class TypeTracker : MonoBehaviour
             accuracy = 0f;
         }
 
+        numSubmissions++;
+        averageWPM = ((averageWPM * (numSubmissions - 1)) + netWPM) / numSubmissions;
+        averageAccuracy = ((averageAccuracy * (numSubmissions - 1)) + accuracy) / numSubmissions;
+
         int healthModifier = (int)((netWPM / 5) * (accuracy / 100f));
         if (mode == 1)
         {
             int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
             currentTarget.ModifyCurrentHealth(mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
+            damageDealt -= mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2;
         }
         else if (mode == 2)
         {
             int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
             currentTarget.ModifyCurrentHealth(mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
+            healingDone += mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2;
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;
@@ -354,7 +404,7 @@ public class TypeTracker : MonoBehaviour
         startTime = 0;
         errors = 0;
         activeErrors.Clear();
-        awaitingTarget = false;
+        awaitingTarget = true;
         promptText.color = Color.white;
 
         FocusInputField();
