@@ -46,8 +46,13 @@ public class ProjectileController : TargetableController
         }
         else
         {
+            int mod = 0;
+            if (target.targetingId == gameManager.localPlayer.targetingId)
+            {
+                mod = gameManager.typingEffectManager.ApplyEffectOnMod()[3];
+            }
             Vector3 direction = (target.transform.position - transform.position).normalized;
-            transform.Translate(direction * wordSpeed * Time.deltaTime);
+            transform.Translate(direction * (mod == 0 ? wordSpeed : mod == 1 ? 10 : 3) * Time.deltaTime);
         }
     }
 

@@ -100,7 +100,7 @@ public class GameLoopManager : NetworkBehaviour
         if (!IsOwner) return;
         foreach (ulong clientID in gameManager.networkManager.ConnectedClientsIds)
         {
-            gameManager.AddRandomTypingEffectRpc(RpcTarget.Single(clientID, RpcTargetUse.Temp));
+            gameManager.AddRandomCurseBuffEffectRpc(RpcTarget.Single(clientID, RpcTargetUse.Temp));
         }
     }
 }

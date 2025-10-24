@@ -1,15 +1,20 @@
-public class ForceCapitalizeCurseData : TypingEffectBase
-{
-    private char capitalizedLetter;
+using System.Text;
 
-    public void Initialize(char capitalizedLetter)
+public class AllLowercaseBuffData : TypingEffectBase
+{
+    public void Initialize()
     {
-        this.capitalizedLetter = char.ToLower(capitalizedLetter);
+        return;
     }
 
     public override string ApplyEffectOnPrompt(ref string prompt)
     {
-        return prompt.Replace(capitalizedLetter, char.ToUpper(capitalizedLetter));
+        var stringBuilder = new StringBuilder();
+        foreach (char c in prompt)
+        {
+            stringBuilder.Append(char.ToLower(c));
+        }
+        return stringBuilder.ToString();
     }
 
     public override void OnEndTyping(ref int errors)
@@ -25,21 +30,21 @@ public class ForceCapitalizeCurseData : TypingEffectBase
         }
         else
         {
-            return $"Capslock on Letter {char.ToUpper(capitalizedLetter)}";
+            return $"No uppercase letters";
         }
     }
 
     // Curses of same forced capitalized letters are equal
     public override bool Equals(object obj)
     {
-        if (obj is ForceCapitalizeCurseData other)
+        if (obj is AllLowercaseBuffData other)
         {
-            return this.capitalizedLetter == other.capitalizedLetter;
+            return true;
         }
         return false;
     }
     public override int GetHashCode()
     {
-        return capitalizedLetter.GetHashCode();
+        return "AllLowercaseBuffData".GetHashCode();
     }
 }
