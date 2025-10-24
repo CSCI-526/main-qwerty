@@ -155,6 +155,7 @@ public class TypeTracker : MonoBehaviour
                 }
 
                 prompt = promptText.text; // For comparisons
+                promptText.color = Color.gray;
                 instructionText.text = "Type the prompt below!";
 
                 inputField.text = "";
@@ -212,6 +213,7 @@ public class TypeTracker : MonoBehaviour
 
         // For user feedback
         string outputText = "";
+        promptText.color = Color.white;
 
         string newPrompt = NormalizeText(prompt);
         string newInput = NormalizeText(input);
@@ -224,7 +226,7 @@ public class TypeTracker : MonoBehaviour
             if (newInput[i] != newPrompt[i])
             {
                 newErrors.Add(i);
-                outputText += $"<mark=#FF0000>{prompt[i]}</mark>";
+                outputText += $"<mark=#FF0000>{input[i]}</mark>";
 
                 if (!activeErrors.Contains(i))
                 {
@@ -356,6 +358,7 @@ public class TypeTracker : MonoBehaviour
         errors = 0;
         activeErrors.Clear();
         awaitingTarget = false;
+        promptText.color = Color.white;
 
         FocusInputField();
     }
@@ -406,10 +409,8 @@ public class TypeTracker : MonoBehaviour
         if (activeText == null)
             return;
 
-        // Make sure mesh data is up to date
         activeText.ForceMeshUpdate();
 
-        // TMP_InputField sometimes delays mesh rebuilds — ensure it updates now
         if (activeText is TMP_Text && activeText.textInfo.characterCount == 0)
         {
             Canvas.ForceUpdateCanvases(); // force layout refresh
@@ -421,11 +422,10 @@ public class TypeTracker : MonoBehaviour
 
         Vector3 localPos;
 
-        // Fallback: if still no chars, anchor caret at start of text box
         if (charCount == 0)
         {
             var rt = activeText.rectTransform;
-            localPos = new Vector3(rt.rect.xMin + 4f, rt.rect.yMin * -.5f, 0f);
+            localPos = new Vector3(rt.rect.xMin + 4f, rt.rect.yMin * -.65f, 0f);
         }
         else
         {
