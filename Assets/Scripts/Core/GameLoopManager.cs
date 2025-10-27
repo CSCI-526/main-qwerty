@@ -75,6 +75,7 @@ public class GameLoopManager : NetworkBehaviour
     {
         CreatePlayers();
         gameManager.SpawnEnemy();
+        startBattleButton.SetActive(false);
         yield return new WaitForSeconds(2f);
         ToggleTypingElementsRpc(true);
         inCombat = true;
