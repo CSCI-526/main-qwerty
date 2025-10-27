@@ -95,7 +95,8 @@ public class GameLoopManager : NetworkBehaviour
     public void ToggleTypingElementsRpc(bool state)
     {
         typingElements.SetActive(state);
-        startBattleButton.SetActive(!state);
+        if(IsOwner)
+            startBattleButton.SetActive(!state);
 
     }
 
