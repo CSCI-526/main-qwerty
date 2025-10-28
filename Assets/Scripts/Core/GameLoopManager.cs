@@ -96,7 +96,11 @@ public class GameLoopManager : NetworkBehaviour
     public void ToggleElementsRpc(bool typingElementsState, bool startBattleButtonState, bool cursePanelState)
     {
         typingElements.SetActive(typingElementsState);
-        startBattleButton.SetActive(startBattleButtonState);
+        Debug.Log("Is Owner: " + gameManager.sharedCanvas.IsOwner);
+        if (!startBattleButtonState || gameManager.sharedCanvas.IsOwner)
+            startBattleButton.SetActive(startBattleButtonState);
+        else
+            startBattleButton.SetActive(false);
         cursePanel.SetActive(cursePanelState);
     }
 

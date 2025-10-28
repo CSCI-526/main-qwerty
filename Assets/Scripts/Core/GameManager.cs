@@ -26,7 +26,7 @@ public class GameManager : NetworkBehaviour
     [DoNotSerialize]
     public TypingEffectManager typingEffectManager => FindFirstObjectByType<TypingEffectManager>();
     public NetworkManager networkManager => NetworkManager.Singleton;
-    private SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>();
+    public SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>();
     public GameLoopManager gameLoopManager => FindFirstObjectByType<GameLoopManager>();
     public AnalyticsManager analyticsManager => FindFirstObjectByType<AnalyticsManager>();
 
@@ -302,7 +302,8 @@ public class GameManager : NetworkBehaviour
         typingEffectManager.AddTypingEffect(buff);
         typingEffectManager.AddTypingEffect(curse);
         cursePanel.SetActive(false);
-        startBattleButton.SetActive(true);
+        if(IsOwner)
+            startBattleButton.SetActive(true);
 
         Transform parent = cursePanel.GetComponent<RectTransform>();
         foreach (Transform child in parent)
