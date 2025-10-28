@@ -7,6 +7,7 @@ using Unity.Netcode;
 using Unity.Services.Core;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
 {
@@ -18,7 +19,9 @@ public class GameManager : NetworkBehaviour
 
     [Header("GameObjects")]
     [SerializeField] private GameObject projectileParent;
-    [SerializeField] private TextMeshProUGUI curseText;
+    [SerializeField] private GameObject startBattleButton;
+    [SerializeField] private GameObject cursePanel;
+    [SerializeField] private GameObject curseMsgPrefab;
 
     [DoNotSerialize]
     public TypingEffectManager typingEffectManager => FindFirstObjectByType<TypingEffectManager>();
@@ -215,90 +218,97 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.SpecifiedInParams)]
     public void AddRandomCurseBuffEffectRpc(RpcParams rpcParams)
     {
-        int randomBuff = Random.Range(0, 5);
-        int randomCurse = Random.Range(0, 6);
-        while (randomBuff == randomCurse)
+        const int NUM_CHOICES = 3;
+        const int NUM_BUFF = 5;
+        const int NUM_CURSE = 6;
+
+        List<Vector2Int> allViablePairs = new();
+        for (int x1 = 0; x1 < NUM_BUFF; ++x1)
         {
-            randomCurse = Random.Range(0, 6);
+            for (int x2 = 0; x2 < NUM_CURSE; ++x2)
+            {
+                if (x1 != x2)
+                {
+                    allViablePairs.Add(new Vector2Int(x1, x2));
+                }
+            }
         }
 
-        char randomChar = (char)Random.Range(65, 91); // ASCII A-Z
-
-        TypingEffectBase randomBuffData = null;
-        TypingEffectBase randomCurseData = null;
-
-        // Buff
-        if (randomBuff == 0)
+        List<Vector2Int> selectedPairs;
+        if (NUM_CHOICES <= allViablePairs.Count)
         {
-            randomBuffData = typingEffectManager.PunishmentMod(-1);
+            // random.sample (non-repeating, without replacement)
+            for (int i = 0; i < NUM_CHOICES; ++i)
+            {
+                int j = Random.Range(i, allViablePairs.Count);
+                (allViablePairs[i], allViablePairs[j]) = (allViablePairs[j], allViablePairs[i]);
+            }
+            selectedPairs = allViablePairs.GetRange(0, NUM_CHOICES);
         }
-        else if (randomBuff == 1)
+        else
         {
-            randomBuffData = typingEffectManager.HealMod(-1);
-        }
-        else if (randomBuff == 2)
-        {
-            randomBuffData = typingEffectManager.DamageMod(-1);
-        }
-        else if (randomBuff == 3)
-        {
-            randomBuffData = typingEffectManager.BulletSpeedMod(-1);
-        }
-        else if (randomBuff == 4)
-        {
-            randomBuffData = typingEffectManager.AllLowercase();
-        }
-        /*
-        else if (randomBuff == 5)
-        {
-            localPlayer.ModifyCurrentHealth(50);
-        }
-        */
-
-        // Curse
-        if (randomCurse == 0)
-        {
-            randomCurseData = typingEffectManager.PunishmentMod(1);
-        }
-        else if (randomCurse == 1)
-        {
-            randomCurseData = typingEffectManager.HealMod(1);
-        }
-        else if (randomCurse == 2)
-        {
-            randomCurseData = typingEffectManager.DamageMod(1);
-        }
-        else if (randomCurse == 3)
-        {
-            randomCurseData = typingEffectManager.BulletSpeedMod(1);
-        }
-        else if (randomCurse == 4)
-        {
-            randomCurseData = typingEffectManager.ForceCapitalize(randomChar);
-        }
-        else if (randomCurse == 5)
-        {
-            randomCurseData = typingEffectManager.ForceDoubling(randomChar);
+            // random.choices (possible repeating, with replacement)
+            selectedPairs = new List<Vector2Int>();
+            for (int i = 0; i < NUM_CHOICES; ++i)
+            {
+                int j = Random.Range(0, allViablePairs.Count);
+                selectedPairs.Add(allViablePairs[j]);
+            }
         }
 
-        StartCoroutine(ShowCurseBuffText(randomBuffData, randomCurseData, 5f));
+        foreach (var pair in selectedPairs)
+        {
+            TypingEffectBase randomBuffData = pair.x switch
+            {
+                0 => typingEffectManager.PunishmentMod(-1),
+                1 => typingEffectManager.HealMod(-1),
+                2 => typingEffectManager.DamageMod(-1),
+                3 => typingEffectManager.BulletSpeedMod(-1),
+                4 => typingEffectManager.AllLowercase(),
+                // 5 => localPlayer.ModifyCurrentHealth(50),
+                _ => null,
+            };
+            TypingEffectBase randomCurseData = pair.y switch
+            {
+                0 => typingEffectManager.PunishmentMod(1),
+                1 => typingEffectManager.HealMod(1),
+                2 => typingEffectManager.DamageMod(1),
+                3 => typingEffectManager.BulletSpeedMod(1),
+                4 => typingEffectManager.ForceCapitalize((char)Random.Range(65, 91)),
+                5 => typingEffectManager.ForceDoubling((char)Random.Range(65, 91)), // TODO: maybe vowels only
+                _ => null,
+            };
+
+            GameObject go = Instantiate(curseMsgPrefab);
+            go.transform.SetParent(cursePanel.GetComponent<RectTransform>());
+
+            string newCurseText = "";
+            if (randomBuffData != null)
+            {
+                newCurseText += "New Buff:\n" + randomBuffData.GetEffectDescription() + "\n";
+            }
+            if (randomCurseData != null)
+            {
+                newCurseText += "New Curse:\n" + randomCurseData.GetEffectDescription() + "\n";
+            }
+            go.GetComponent<TextMeshProUGUI>().text = newCurseText;
+
+            Button btn = go.GetComponent<Button>();
+            btn.onClick.AddListener(() => OnBuffCurseSelect(randomBuffData, randomCurseData));
+        }
     }
-
-    public IEnumerator ShowCurseBuffText(TypingEffectBase buff, TypingEffectBase curse, float duration)
+    private void OnBuffCurseSelect(TypingEffectBase buff, TypingEffectBase curse)
     {
-        curseText.gameObject.SetActive(true);
-        string newCurseText = "";
-        if (buff != null)
+        typingEffectManager.AddTypingEffect(buff);
+        typingEffectManager.AddTypingEffect(curse);
+        cursePanel.SetActive(false);
+        startBattleButton.SetActive(true);
+
+        Transform parent = cursePanel.GetComponent<RectTransform>();
+        foreach (Transform child in parent)
         {
-            newCurseText += "New Buff:\n" + buff.GetEffectDescription() + "\n";
+            Destroy(child.gameObject);
         }
-        if (curse != null)
-        {
-            newCurseText += "New Curse:\n" + curse.GetEffectDescription() + "\n";
-        }
-        curseText.text = newCurseText;
-        yield return new WaitForSeconds(duration);
-        curseText.gameObject.SetActive(false);
     }
 
     #endregion
