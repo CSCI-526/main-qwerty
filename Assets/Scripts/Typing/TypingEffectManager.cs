@@ -89,7 +89,7 @@ public class TypingEffectManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Interface for adding effect.
+    /// Interface for creating effect.
     /// </summary>
     /// <param name="typingEffect">The effect to be added.</param>
     public void AddTypingEffect(TypingEffectBase typingEffect)
@@ -115,7 +115,7 @@ public class TypingEffectManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Shorthand for adding ForceCapitalize Curse.
+    /// Shorthand for creating ForceCapitalize Curse.
     /// </summary>
     /// <param name="letter">The letter that is forced capitalized.</param>
     /// <returns>Effect data</returns>
@@ -123,12 +123,12 @@ public class TypingEffectManager : MonoBehaviour
     {
         var effect = ScriptableObject.CreateInstance<ForceCapitalizeCurseData>();
         effect.Initialize(letter);
-        AddTypingEffect(effect);
+        // AddTypingEffect(effect);
         return effect;
     }
 
     /// <summary>
-    /// Shorthand for adding ForceDoubling Curse.
+    /// Shorthand for creating ForceDoubling Curse.
     /// </summary>
     /// <param name="letter">The letter that is forced doubled.</param>
     /// <param name="isCaseSensitive">Is the provided letter case sensitive or not. (case-insensitive by default)</param>
@@ -137,24 +137,24 @@ public class TypingEffectManager : MonoBehaviour
     {
         var effect = ScriptableObject.CreateInstance<ForceDoublingCurseData>();
         effect.Initialize(letter, isCaseSensitive);
-        AddTypingEffect(effect);
+        // AddTypingEffect(effect);
         return effect;
     }
 
     /// <summary>
-    /// Shorthand for adding AllLowercase Buff (for all letters).
+    /// Shorthand for creating AllLowercase Buff (for all letters).
     /// </summary>
     /// <returns>Effect data</returns>
     public TypingEffectBase AllLowercase()
     {
         var effect = ScriptableObject.CreateInstance<AllLowercaseBuffData>();
         // effect.Initialize();
-        AddTypingEffect(effect);
+        // AddTypingEffect(effect);
         return effect;
     }
 
     /// <summary>
-    /// Shorthand for adding DisableLetter Curse.
+    /// (Deprecated) Shorthand for creating DisableLetter Curse.
     /// </summary>
     /// <param name="letter">The letter to be disabled (case sensitive or not).</param>
     /// <param name="isCaseSensitive">Is the provided letter case sensitive or not. (case-insensitive by default)</param>
@@ -163,26 +163,26 @@ public class TypingEffectManager : MonoBehaviour
     {
         var effect = ScriptableObject.CreateInstance<DisableLetterCurseData>();
         effect.Initialize(letter, isCaseSensitive);
-        AddTypingEffect(effect);
+        // AddTypingEffect(effect);
         return effect;
     }
 
     /// <summary>
-    /// Shorthand for adding AutoCorrect Buff.
+    /// (Deprecated) Shorthand for creating AutoCorrect Buff.
     /// </summary>
     /// <param name="count">The autocorrect quota to be added.</param>
     /// <returns>Effect data</returns>
-    public TypingEffectBase AddAutoCorrect(int count)
+    public TypingEffectBase AutoCorrect(int count)
     {
         var effect = ScriptableObject.CreateInstance<AutoCorrectBuffData>();
         effect.Initialize(count);
-        AddTypingEffect(effect);
+        // AddTypingEffect(effect);
         return effect;
     }
 
 
     /// <summary>
-    /// Shorthand for adding Punishment Buff/Curse.
+    /// Shorthand for creating Punishment Buff/Curse.
     /// </summary>
     /// <param name="curse">It is a curse (1 - take double damage) or buff (-1 - take half damage).</param>
     /// <returns>Effect data</returns>
@@ -190,12 +190,12 @@ public class TypingEffectManager : MonoBehaviour
     {
         var effect = ScriptableObject.CreateInstance<ModBuffCurse>();
         effect.Initialize(curse, 0, 0, 0);
-        AddTypingEffect(effect);
+        // AddTypingEffect(effect);
         return effect;
     }
 
     /// <summary>
-    /// Shorthand for adding Damage Buff/Curse.
+    /// Shorthand for creating Damage Buff/Curse.
     /// </summary>
     /// <param name="curse">It is a curse (1 - damage halved) or buff (-1 - damage doubled).</param>
     /// <returns>Effect data</returns>
@@ -203,12 +203,12 @@ public class TypingEffectManager : MonoBehaviour
     {
         var effect = ScriptableObject.CreateInstance<ModBuffCurse>();
         effect.Initialize(0, 0, curse, 0);
-        AddTypingEffect(effect);
+        // AddTypingEffect(effect);
         return effect;
     }
 
     /// <summary>
-    /// Shorthand for adding Heal Buff/Curse.
+    /// Shorthand for creating Heal Buff/Curse.
     /// </summary>
     /// <param name="curse">It is a curse (1 - heal halved) or buff (-1 - heal doubled).</param>
     /// <returns>Effect data</returns>
@@ -216,12 +216,12 @@ public class TypingEffectManager : MonoBehaviour
     {
         var effect = ScriptableObject.CreateInstance<ModBuffCurse>();
         effect.Initialize(0, curse, 0, 0);
-        AddTypingEffect(effect);
+        // AddTypingEffect(effect);
         return effect;
     }
 
     /// <summary>
-    /// Shorthand for adding Bullet Speed Buff/Curse.
+    /// Shorthand for creating Bullet Speed Buff/Curse.
     /// </summary>
     /// <param name="curse">It is a curse (1 - speed doubled) or buff (-1 - speed halved).</param>
     /// <returns>Effect data</returns>
@@ -229,7 +229,7 @@ public class TypingEffectManager : MonoBehaviour
     {
         var effect = ScriptableObject.CreateInstance<ModBuffCurse>();
         effect.Initialize(0, 0, 0, curse);
-        AddTypingEffect(effect);
+        // AddTypingEffect(effect);
         return effect;
     }
 }
