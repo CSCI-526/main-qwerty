@@ -977,7 +977,7 @@ MonoBehaviour:
   instructionText: {fileID: 671757061}
   ability1: {fileID: 950605041}
   ability2: {fileID: 936877545}
-  damageScreen: {fileID: 0}
+  damageScreen: {fileID: 1899402355}
   typingEffectManager: {fileID: 823922491}
   caretRect: {fileID: 1745397677}
   caretBlinkRate: 0.5
@@ -2802,7 +2802,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1899402356
 RectTransform:
   m_ObjectHideFlags: 0
