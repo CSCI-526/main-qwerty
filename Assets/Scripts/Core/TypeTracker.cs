@@ -139,6 +139,7 @@ public class TypeTracker : MonoBehaviour
                         currentTarget.ModifyCurrentHealth(10);
                     }
                     currentTarget = null;
+                    inputField.text = "";
                     EnterTargetPhase();
                     return;
                 }
