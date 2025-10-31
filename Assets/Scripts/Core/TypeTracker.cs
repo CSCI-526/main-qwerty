@@ -1,12 +1,14 @@
+using UnityEngine;
+using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using System.Net;
+using System.Threading.Tasks;
 using TMPro;
 using Unity.Services.Analytics;
 using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class TypeTracker : MonoBehaviour
 {
@@ -16,6 +18,7 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private TMP_Text promptText;       // Displayed prompt
     [SerializeField] private TMP_Text instructionText;       // Displayed prompt
     [SerializeField] private Image ability1, ability2;
+    [SerializeField] private GameObject damageScreen;
 
     [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
 
@@ -29,15 +32,9 @@ public class TypeTracker : MonoBehaviour
     private HashSet<int> activeErrors = new HashSet<int>();
 
     [SerializeField] private RectTransform caretRect;
-    [SerializeField] private float caretBlinkRate = 0.5f; 
+    [SerializeField] private float caretBlinkRate = 0.5f;
     private float caretTimer = 0f;
     private bool caretVisible = true;
-
-    private int numSubmissions = 0;
-    private float averageWPM = 0f;
-    private float averageAccuracy = 0f;
-    private int damageDealt = 0;
-    private int healingDone = 0;
 
     private TargetableController currentTarget;
     GameManager gameManager => FindFirstObjectByType<GameManager>();
@@ -54,43 +51,6 @@ public class TypeTracker : MonoBehaviour
             caretRect.gameObject.SetActive(false);
 
         FocusInputField();
-    }
-
-    public void OnEnable()
-    {
-        resetState();
-        EnterTargetPhase();
-        ResetMetrics();
-    }
-
-    public void OnDisable()
-    {
-        ReportStats();
-    }
-
-    private void ReportStats()
-    {
-        if(numSubmissions == 0)
-            return;
-
-        StatsEvent statsEvent = new StatsEvent
-        {
-            NumSubmissions = numSubmissions,
-            AverageWPM = averageWPM,
-            AverageAccuracy = averageAccuracy,
-            DamageDealt = damageDealt,
-            HealingDone = healingDone
-        };
-        gameManager.analyticsManager.PushAnalyticsEvent(statsEvent);
-    }
-
-    private void ResetMetrics()
-    {
-        numSubmissions = 0;
-        averageWPM = 0f;
-        averageAccuracy = 0f;
-        damageDealt = 0;
-        healingDone = 0;
     }
 
     private void Update()
@@ -133,7 +93,7 @@ public class TypeTracker : MonoBehaviour
         mode = newMode;
 
         if (mode == 1)
-        { 
+        {
             ability1.color = new Color(0f, 1f, 0f, 1f); // Green at 100% opacity
             ability2.color = new Color(0f, 0f, 0f, 0.3f); // Black at 30% opacity
         }
@@ -169,6 +129,7 @@ public class TypeTracker : MonoBehaviour
 
                 if (currentTarget is ProjectileController)
                 {
+                    inputField.text = "";
                     if (mode == 1)
                     {
                         currentTarget.ModifyCurrentHealth(-10);
@@ -179,8 +140,6 @@ public class TypeTracker : MonoBehaviour
                     }
                     currentTarget = null;
                     EnterTargetPhase();
-                    inputField.text = "";
-                    promptText.text = "";
                     return;
                 }
                 else if (mode == 1)
@@ -272,6 +231,7 @@ public class TypeTracker : MonoBehaviour
                     errors++;
                     int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
                     gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -5 : mod == 1 ? -10 : -2);
+                    StartCoroutine(flashDamageScreen(0.5f));
                 }
             }
             else
@@ -294,6 +254,7 @@ public class TypeTracker : MonoBehaviour
             {
                 errors++;
                 gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
+                StartCoroutine(flashDamageScreen(0.5f));
             }
         }
 
@@ -333,22 +294,16 @@ public class TypeTracker : MonoBehaviour
             accuracy = 0f;
         }
 
-        numSubmissions++;
-        averageWPM = ((averageWPM * (numSubmissions - 1)) + netWPM) / numSubmissions;
-        averageAccuracy = ((averageAccuracy * (numSubmissions - 1)) + accuracy) / numSubmissions;
-
         int healthModifier = (int)((netWPM / 5) * (accuracy / 100f));
+        //int healthModifier = (int)(grossWPM / 5f) * Mathf.Pow(accuracy / 100f, 1.25f);
+
         if (mode == 1)
         {
-            int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-            currentTarget.ModifyCurrentHealth(mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
-            damageDealt -= mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2;
+            currentTarget.ModifyCurrentHealth(-healthModifier);
         }
         else if (mode == 2)
         {
-            int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
-            currentTarget.ModifyCurrentHealth(mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
-            healingDone += mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2;
+            currentTarget.ModifyCurrentHealth(healthModifier);
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;
@@ -362,7 +317,7 @@ public class TypeTracker : MonoBehaviour
     // Dummy function to test targeting
     private bool IsValidTarget(string target)
     {
-        if(target == "Hello")
+        if (target == "Hello")
         {
             Debug.Log("Valid Target Entered\n");
             FocusInputField();
@@ -404,7 +359,7 @@ public class TypeTracker : MonoBehaviour
         startTime = 0;
         errors = 0;
         activeErrors.Clear();
-        awaitingTarget = true;
+        awaitingTarget = false;
         promptText.color = Color.white;
 
         FocusInputField();
@@ -455,8 +410,8 @@ public class TypeTracker : MonoBehaviour
         TMP_Text activeText = promptText;
 
         if (activeText == null)
-        {  
-            return; 
+        {
+            return;
         }
 
         activeText.ForceMeshUpdate();
@@ -512,4 +467,16 @@ public class TypeTracker : MonoBehaviour
 
         caretRect.anchoredPosition += new Vector2(0, caretRect.sizeDelta.y * 0.3f);
     }
+
+    private IEnumerator flashDamageScreen(float duration = 0.5f)
+    {
+        if (damageScreen == null)
+            yield break;
+
+        damageScreen.SetActive(true); // Instantly show the image
+        yield return new WaitForSeconds(duration);
+        damageScreen.SetActive(false); // Instantly hide it
+    }
+
+
 }
