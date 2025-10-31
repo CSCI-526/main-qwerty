@@ -113,12 +113,12 @@ public class GameLoopManager : NetworkBehaviour
     public float GetEnemyHealthMultiplier()
     {
         if (!IsOwner) return 0f;
-        return (1f + (battleCount * 0.4f)) * (1f + ((gameManager.networkManager.ConnectedClients.Count - 1) * 0.2f));
+        return (1f + (battleCount * 0.4f)) * (1f + ((gameManager.networkManager.ConnectedClients.Count - 1) * 0.3f));
     }
 
     public float GetEnemyAttackCooldownMultiplier()
     {
         if (!IsOwner) return 0f;
-        return Mathf.Pow(0.9f, battleCount) * Mathf.Pow(0.85f, gameManager.networkManager.ConnectedClients.Count - 1);
+        return Mathf.Pow(0.9f, battleCount) * Mathf.Pow(0.8f, gameManager.networkManager.ConnectedClients.Count - 1);
     }
 }
