@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | TeamQWERTY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
@@ -106,6 +107,8 @@
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
         canvas.style.width = "1280px";
         canvas.style.height = "720px";
+        canvas.width = window.innerWidth * 1.5;
+        canvas.height = window.innerHeight * 1.5;
       }
 
       document.querySelector("#unity-loading-bar").style.display = "block";
