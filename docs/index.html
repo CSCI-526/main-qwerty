@@ -88,6 +88,8 @@
       // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
       // expected to change.
 
+      const SCALE = 1.5;
+      
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         // Mobile device style: fill the whole browser client area with the game canvas:
 
@@ -106,17 +108,17 @@
       } else {
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
         function setCanvasScaleDesktop() {
-          // Always fit canvas to browser window
-          canvas.style.width = window.innerWidth + "px";
-          canvas.style.height = window.innerHeight + "px";
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
+          // Compute the reduced size
+          let scaledWidth = window.innerWidth / SCALE;
+          let scaledHeight = window.innerHeight / SCALE;
         
-          // Visually scale everything up 1.5x, anchored at top-left
-          canvas.style.transform = "scale(1.5)";
+          canvas.style.width = scaledWidth + "px";
+          canvas.style.height = scaledHeight + "px";
+          canvas.width = scaledWidth;
+          canvas.height = scaledHeight;
+        
+          canvas.style.transform = `scale(${SCALE})`;
           canvas.style.transformOrigin = "top left";
-        
-          // Prevent scrollbars and extra margins
           canvas.style.margin = "0";
           canvas.style.display = "block";
         }
