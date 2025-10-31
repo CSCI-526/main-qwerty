@@ -2,6 +2,7 @@ using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SharedCanvasController : NetworkBehaviour
 {
@@ -26,6 +27,7 @@ public class SharedCanvasController : NetworkBehaviour
         pc.SetPlayerName(playerName.ToString());
         pc.SetTargetingIdEveryoneRpc(requesterClientId);
         gameManager.AddPlayerRpc(pc.targetingId);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(playerPanel);
     }
 
     [Rpc(SendTo.Owner)]
@@ -40,5 +42,6 @@ public class SharedCanvasController : NetworkBehaviour
         ec.SetMaxHealthRpc(maxHealthMultiplier);
         ec.SetAttackCooldown(attackCooldownMultiplier);
         gameManager.AddEnemyRpc(ec.targetingId);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(enemyPanel);
     }
 }
