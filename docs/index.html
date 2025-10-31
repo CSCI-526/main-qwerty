@@ -7,29 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-    <style>
-    body, html {
-      width: 100vw;
-      height: 100vh;
-      margin: 0; padding: 0;
-      overflow: hidden;
-    }
-    #unity-container {
-      width: 100vw; height: 100vh;
-      display: flex;
-      align-items: center; justify-content: center;
-    }
-    #unity-canvas {
-      display: block;
-      margin: auto;
-      background: #111; /* or whatever */
-    }
-</style>
-
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" tabindex="-1"></canvas>
+      <canvas id="unity-canvas" width=1280 height=720 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
