@@ -280,7 +280,8 @@ public class GameManager : NetworkBehaviour
             };
 
             GameObject go = Instantiate(curseMsgPrefab);
-            go.transform.SetParent(cursePanel.GetComponent<RectTransform>());
+            // go.transform.SetParent(cursePanel.GetComponent<RectTransform>());
+            go.transform.SetParent(cursePanel.transform);
 
             string newCurseText = "";
             if (randomBuffData != null)
