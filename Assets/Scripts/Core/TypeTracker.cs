@@ -279,7 +279,7 @@ public class TypeTracker : MonoBehaviour
                     errors++;
                     int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
                     gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod == 1 ? -4 : -1);
-                    StartCoroutine(flashDamageScreen(0.2f));
+                    StartCoroutine(flashDamageScreen(0.1f));
                 }
             }
             else

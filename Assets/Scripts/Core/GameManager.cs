@@ -291,7 +291,7 @@ public class GameManager : NetworkBehaviour
             {
                 newCurseText += "New Curse:\n" + randomCurseData.GetEffectDescription() + "\n";
             }
-            go.GetComponent<TextMeshProUGUI>().text = newCurseText;
+            go.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = newCurseText;
 
             Button btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => OnBuffCurseSelect(randomBuffData, randomCurseData));
