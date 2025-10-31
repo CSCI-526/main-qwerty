@@ -108,6 +108,24 @@
         canvas.style.height = "720px";
       }
 
+      window.onload = function() {
+      var canvas = document.getElementById('unity-canvas');
+      const SCALE = 1.5;
+    
+      function scaleCanvasContent() {
+        // Set internal Unity buffer
+        canvas.width = 1280;
+        canvas.height = 720;
+        // Set CSS size to fixed box
+        canvas.style.width = "1280px";
+        canvas.style.height = "720px";
+        // Visually scale up content, but box stays at 1280x720
+        canvas.style.transform = "scale(" + SCALE + ")";
+        canvas.style.transformOrigin = "center center";
+      }
+    
+      scaleCanvasContent();
+
       document.querySelector("#unity-loading-bar").style.display = "block";
 
       var script = document.createElement("script");
