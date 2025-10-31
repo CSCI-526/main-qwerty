@@ -7,10 +7,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
+    <style>
+    body, html {
+      width: 100vw;
+      height: 100vh;
+      margin: 0; padding: 0;
+      overflow: hidden;
+    }
+    #unity-container {
+      width: 100vw; height: 100vh;
+      display: flex;
+      align-items: center; justify-content: center;
+    }
+    #unity-canvas {
+      display: block;
+      margin: auto;
+      background: #111; /* or whatever */
+    }
+</style>
+
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=1280 height=720 tabindex="-1"></canvas>
+      <canvas id="unity-canvas" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -89,6 +108,8 @@
       // expected to change.
 
       const SCALE = 1.5;
+      const REF_WIDTH = 1280;
+      const REF_HEIGHT = 720;
       
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         // Mobile device style: fill the whole browser client area with the game canvas:
@@ -107,21 +128,26 @@
 
       } else {
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-        function setCanvasScaleDesktop() {
-          // Compute the reduced size
-          let scaledWidth = window.innerWidth / SCALE;
-          let scaledHeight = window.innerHeight / SCALE;
+        function resizeAndScaleCanvas() {
+          let windowWidth = window.innerWidth;
+          let windowHeight = window.innerHeight;
         
-          canvas.style.width = scaledWidth + "px";
-          canvas.style.height = scaledHeight + "px";
-          canvas.width = scaledWidth;
-          canvas.height = scaledHeight;
+          // Compute the max scale that keeps the whole canvas visible and maintains the aspect ratio
+          let scale = Math.min(windowWidth / REF_WIDTH, windowHeight / REF_HEIGHT);
         
-          canvas.style.transform = `scale(${SCALE})`;
-          canvas.style.transformOrigin = "top left";
-          canvas.style.margin = "0";
-          canvas.style.display = "block";
-        }
+          let displayWidth = REF_WIDTH * scale;
+          let displayHeight = REF_HEIGHT * scale;
+        
+          // Set the canvas drawing buffer to the reference
+          canvas.width = REF_WIDTH;
+          canvas.height = REF_HEIGHT;
+        
+          // Set CSS size to scaled display size
+          canvas.style.width = displayWidth + "px";
+          canvas.style.height = displayHeight + "px";
+        
+          // Center canvas in viewport (already handled by CSS flexbox!)
+      }
 
         setCanvasScaleDesktop();
         window.addEventListener('resize', setCanvasScaleDesktop);
