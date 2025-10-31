@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using TMPro;
 using Unity.Services.Analytics;
 using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class TypeTracker : MonoBehaviour
 {
@@ -36,8 +39,51 @@ public class TypeTracker : MonoBehaviour
     private float caretTimer = 0f;
     private bool caretVisible = true;
 
+    private int numSubmissions = 0;
+    private float averageWPM = 0f;
+    private float averageAccuracy = 0f;
+    private int damageDealt = 0;
+    private int healingDone = 0;
+
     private TargetableController currentTarget;
     GameManager gameManager => FindFirstObjectByType<GameManager>();
+
+    public void OnEnable()
+    {
+        resetState();
+        EnterTargetPhase();
+        ResetMetrics();
+    }
+
+    public void OnDisable()
+    {
+        ReportStats();
+    }
+
+    private void ReportStats()
+    {
+        if (numSubmissions == 0)
+            return;
+
+        StatsEvent statsEvent = new StatsEvent
+        {
+            NumSubmissions = numSubmissions,
+            AverageWPM = averageWPM,
+            AverageAccuracy = averageAccuracy,
+            DamageDealt = damageDealt,
+            HealingDone = healingDone
+        };
+        gameManager.analyticsManager.PushAnalyticsEvent(statsEvent);
+    }
+
+    private void ResetMetrics()
+    {
+        numSubmissions = 0;
+        averageWPM = 0f;
+        averageAccuracy = 0f;
+        damageDealt = 0;
+        healingDone = 0;
+    }
 
     private void Start()
     {
@@ -139,6 +185,7 @@ public class TypeTracker : MonoBehaviour
                         currentTarget.ModifyCurrentHealth(10);
                     }
                     currentTarget = null;
+                    promptText.text = "";
                     inputField.text = "";
                     EnterTargetPhase();
                     return;
@@ -231,7 +278,7 @@ public class TypeTracker : MonoBehaviour
                 {
                     errors++;
                     int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
-                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -5 : mod == 1 ? -10 : -2);
+                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod == 1 ? -4 : -1);
                     StartCoroutine(flashDamageScreen(0.5f));
                 }
             }
@@ -295,21 +342,26 @@ public class TypeTracker : MonoBehaviour
             accuracy = 0f;
         }
 
-        int healthModifier = (int)((netWPM / 5) * (accuracy / 100f));
-        //int healthModifier = (int)(grossWPM / 5f) * Mathf.Pow(accuracy / 100f, 1.25f);
+        numSubmissions++;
+        averageWPM = ((averageWPM * (numSubmissions - 1)) + grossWPM) / numSubmissions;
+        averageAccuracy = ((averageAccuracy * (numSubmissions - 1)) + accuracy) / numSubmissions;
+
+        int healthModifier = (int)((grossWPM / 5f) * Mathf.Pow(accuracy / 100f, 1.25f));
 
         if (mode == 1)
         {
-            currentTarget.ModifyCurrentHealth(-healthModifier);
+            int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
+            currentTarget.ModifyCurrentHealth(mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
+            damageDealt -= mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2;
         }
         else if (mode == 2)
         {
-            currentTarget.ModifyCurrentHealth(healthModifier);
+            int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
+            currentTarget.ModifyCurrentHealth(mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
+            healingDone += mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2;
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;
-        //Debug.Log($"Typing Test Ended (Enter pressed)");
-        //Debug.Log($"Time: {totalTime:F2}s | Gross WPM: {grossWPM:F1} | Net WPM: {netWPM:F1} | Accuracy: {accuracy:F1}% | Errors: {errors}");
 
         resetState();
         EnterTargetPhase();
@@ -360,7 +412,7 @@ public class TypeTracker : MonoBehaviour
         startTime = 0;
         errors = 0;
         activeErrors.Clear();
-        awaitingTarget = false;
+        awaitingTarget = true;
         promptText.color = Color.white;
 
         FocusInputField();

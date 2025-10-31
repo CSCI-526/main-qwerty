@@ -300,7 +300,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  maxHealth: 25
+  maxHealth: 20
   currentHealth:
     m_InternalValue: 25
   healthBar: {fileID: 5859295843241412433}
