@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | TeamQWERTY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
@@ -87,6 +88,10 @@
       // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
       // expected to change.
 
+      const SCALE = 1.5;
+      const REF_WIDTH = 1280;
+      const REF_HEIGHT = 720;
+      
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         // Mobile device style: fill the whole browser client area with the game canvas:
 
@@ -104,10 +109,33 @@
 
       } else {
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-        canvas.style.width = "1280px";
-        canvas.style.height = "720px";
+        function resizeAndScaleCanvas() {
+          let windowWidth = window.innerWidth;
+          let windowHeight = window.innerHeight;
+        
+          // Compute the max scale that keeps the whole canvas visible and maintains the aspect ratio
+          let scale = Math.min(windowWidth / REF_WIDTH, windowHeight / REF_HEIGHT);
+        
+          let displayWidth = REF_WIDTH * 1;
+          let displayHeight = REF_HEIGHT * 1;
+        
+          // Set the canvas drawing buffer to the reference
+          canvas.width = REF_WIDTH;
+          canvas.height = REF_HEIGHT;
+        
+          // Set CSS size to scaled display size
+          canvas.style.width = displayWidth + "px";
+          canvas.style.height = displayHeight + "px";
+        
+          // Center canvas in viewport (already handled by CSS flexbox!)
       }
 
+        resizeAndScaleCanvas();
+        window.addEventListener('resize', resizeAndScaleCanvas);
+
+      }
+
+      
       document.querySelector("#unity-loading-bar").style.display = "block";
 
       var script = document.createElement("script");
