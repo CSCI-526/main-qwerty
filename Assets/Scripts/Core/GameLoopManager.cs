@@ -8,6 +8,7 @@ public class GameLoopManager : NetworkBehaviour
     [Header("GameObjects")]
     [SerializeField] private GameObject typingElements;
     [SerializeField] private GameObject startBattleButton;
+    [SerializeField] private GameObject cursePanel;
 
     private bool inCombat = false;
     private int battleCount = 0;
@@ -16,7 +17,7 @@ public class GameLoopManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        ToggleTypingElementsRpc(false);
+        ToggleElementsRpc(false, true, false);
     }
 
     private void Update()
@@ -44,7 +45,7 @@ public class GameLoopManager : NetworkBehaviour
         gameManager.RemoveAllEnemiesRpc();
         gameManager.RemoveAllProjectilesRpc();
         battleCount = 0;
-        ToggleTypingElementsRpc(false);
+        ToggleElementsRpc(false, true, false);
     }
 
     public void CreatePlayers()
@@ -76,7 +77,7 @@ public class GameLoopManager : NetworkBehaviour
         CreatePlayers();
         gameManager.SpawnEnemy();
         yield return new WaitForSeconds(2f);
-        ToggleTypingElementsRpc(true);
+        ToggleElementsRpc(true, false, false);
         inCombat = true;
     }
 
@@ -86,17 +87,18 @@ public class GameLoopManager : NetworkBehaviour
         inCombat = false;
         gameManager.RemoveAllEnemiesRpc();
         gameManager.RemoveAllProjectilesRpc();
-        ToggleTypingElementsRpc(false);
         battleCount++;
         AssignRandomCurses();
+        ToggleElementsRpc(false, false, true);
     }
 
     [Rpc(SendTo.Everyone)]
-    public void ToggleTypingElementsRpc(bool state)
+    public void ToggleElementsRpc(bool typingElementsState, bool startBattleButtonState, bool cursePanelState)
     {
-        typingElements.SetActive(state);
-        startBattleButton.SetActive(!state);
-
+        typingElements.SetActive(typingElementsState);
+        if(IsOwner)
+            startBattleButton.SetActive(startBattleButtonState);
+        cursePanel.SetActive(cursePanelState);
     }
 
     public void AssignRandomCurses()
@@ -111,12 +113,12 @@ public class GameLoopManager : NetworkBehaviour
     public float GetEnemyHealthMultiplier()
     {
         if (!IsOwner) return 0f;
-        return (1f + (battleCount * 0.4f)) * (1f + ((gameManager.networkManager.ConnectedClients.Count - 1) * 0.2f));
+        return (1f + (battleCount * 0.4f)) * (1f + ((gameManager.networkManager.ConnectedClients.Count - 1) * 0.3f));
     }
 
     public float GetEnemyAttackCooldownMultiplier()
     {
         if (!IsOwner) return 0f;
-        return Mathf.Pow(0.9f, battleCount) * Mathf.Pow(0.85f, gameManager.networkManager.ConnectedClients.Count - 1);
+        return Mathf.Pow(0.9f, battleCount) * Mathf.Pow(0.8f, gameManager.networkManager.ConnectedClients.Count - 1);
     }
 }

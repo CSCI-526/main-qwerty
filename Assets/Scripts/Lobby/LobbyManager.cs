@@ -17,6 +17,9 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] TMP_InputField joinCodeInputField;
     [SerializeField] TMP_InputField playerNameInputField;
     [SerializeField] Toggle allowAnalyticsToggle;
+    [SerializeField] GameObject loadingScreen;
+    [SerializeField] Button joinLobbyButton;
+    [SerializeField] Button createLobbyButton;
 
     [Header("Warning UI Elements")]
     [SerializeField] GameObject playerNameError;
@@ -69,13 +72,17 @@ public class LobbyManager : MonoBehaviour
     public void CreateLobby()
     {
         networkManager.GetComponent<ConnectionManager>().StartLobby(playerName, createLobbyCode);
+        createLobbyButton.interactable = false;
     }
 
     public void JoinLobby()
     {
         string joinCode = joinCodeInputField.text.ToUpper();
         if(joinCode.Length == 6)
+        {
             networkManager.GetComponent<ConnectionManager>().StartLobby(playerName, joinCode);
+            joinLobbyButton.interactable = false;
+        }
         else
             StartCoroutine(ShowTemp(joinCodeError, 3f));
     }
