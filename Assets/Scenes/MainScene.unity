@@ -824,10 +824,10 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 409882287}
-  - {fileID: 1523692634}
   - {fileID: 1516233661}
   - {fileID: 1425677412}
   - {fileID: 81143535}
+  - {fileID: 1523692634}
   - {fileID: 1223125938}
   m_Father: {fileID: 6666535399192113493}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -872,10 +872,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damagePopupPrefab: {fileID: 7572367309109984837, guid: 9b3e2946567aea74cb6537392874885c, type: 3}
+  popupCanvas: {fileID: 2361072472446720449}
   damageScreen: {fileID: 409882286}
   damageColor: {r: 1, g: 0, b: 0, a: 1}
   healColor: {r: 0, g: 1, b: 0, a: 1}
-  popupOffset: {x: 0, y: 1.5, z: 0}
+  popupOffset: {x: 0, y: 1.5}
 --- !u!1 &780637015
 GameObject:
   m_ObjectHideFlags: 0
