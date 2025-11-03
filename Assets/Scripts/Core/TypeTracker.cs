@@ -24,6 +24,7 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private GameObject damageScreen;
 
     [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
+    [SerializeField] private DamageManager damageManager;
 
     private string prompt;
     private bool timerStarted = false;
@@ -278,8 +279,8 @@ public class TypeTracker : MonoBehaviour
                 {
                     errors++;
                     int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
-                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod == 1 ? -4 : -1);
-                    StartCoroutine(flashDamageScreen(0.1f));
+                    //gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod == 1 ? -4 : -1);
+                    damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod == 1 ? -4 : -1);
                 }
             }
             else
@@ -301,8 +302,9 @@ public class TypeTracker : MonoBehaviour
             if (!activeErrors.Contains(i))
             {
                 errors++;
-                gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
-                StartCoroutine(flashDamageScreen(0.5f));
+                int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
+                //gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
+                damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod == 1 ? -4 : -1);
             }
         }
 
@@ -351,13 +353,15 @@ public class TypeTracker : MonoBehaviour
         if (mode == 1)
         {
             int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-            currentTarget.ModifyCurrentHealth(mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
+            //currentTarget.ModifyCurrentHealth(mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
+            damageManager.applyHealthChange(currentTarget, mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
             damageDealt -= mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2;
         }
         else if (mode == 2)
         {
             int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
-            currentTarget.ModifyCurrentHealth(mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
+            //currentTarget.ModifyCurrentHealth(mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
+            damageManager.applyHealthChange(currentTarget, mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
             healingDone += mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2;
         }
         currentTarget.RandomizeTargetWord();
@@ -520,16 +524,4 @@ public class TypeTracker : MonoBehaviour
 
         caretRect.anchoredPosition += new Vector2(0, caretRect.sizeDelta.y * 0.3f);
     }
-
-    private IEnumerator flashDamageScreen(float duration = 0.5f)
-    {
-        if (damageScreen == null)
-            yield break;
-
-        damageScreen.SetActive(true); // Instantly show the image
-        yield return new WaitForSeconds(duration);
-        damageScreen.SetActive(false); // Instantly hide it
-    }
-
-
 }

@@ -803,6 +803,7 @@ GameObject:
   m_Component:
   - component: {fileID: 773131781}
   - component: {fileID: 773131782}
+  - component: {fileID: 773131783}
   m_Layer: 5
   m_Name: Typing Elements
   m_TagString: Untagged
@@ -855,8 +856,26 @@ MonoBehaviour:
   ability2: {fileID: 1867036286}
   damageScreen: {fileID: 409882286}
   typingEffectManager: {fileID: 922871282824396222}
+  damageManager: {fileID: 773131783}
   caretRect: {fileID: 1223125938}
   caretBlinkRate: 0.5
+--- !u!114 &773131783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 773131780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bc214ca6c4945546b66c92eee69c8c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damagePopupPrefab: {fileID: 7572367309109984837, guid: 9b3e2946567aea74cb6537392874885c, type: 3}
+  damageScreen: {fileID: 409882286}
+  damageColor: {r: 1, g: 0, b: 0, a: 1}
+  healColor: {r: 0, g: 1, b: 0, a: 1}
+  popupOffset: {x: 0, y: 1.5, z: 0}
 --- !u!1 &780637015
 GameObject:
   m_ObjectHideFlags: 0
