@@ -21,7 +21,7 @@ public class SharedCanvasController : NetworkBehaviour
         GameObject go = Instantiate(playerPrefab.gameObject);
         NetworkObject no = go.GetComponent<NetworkObject>();
         no.Spawn(true);
-        go.transform.SetParent(playerPanel);
+        playerPanel.GetComponent<CustomLayoutGroup>().AddToLayout(go.GetComponent<RectTransform>());
         PlayerController pc = go.GetComponent<PlayerController>();
         pc.SetPlayerIDRpc(requesterClientId);
         pc.SetPlayerName(playerName.ToString());
@@ -36,7 +36,7 @@ public class SharedCanvasController : NetworkBehaviour
         GameObject go = Instantiate(enemyPrefab.gameObject);
         NetworkObject no = go.GetComponent<NetworkObject>();
         no.Spawn(true);
-        go.transform.SetParent(enemyPanel);
+        enemyPanel.GetComponent<CustomLayoutGroup>().AddToLayout(go.GetComponent<RectTransform>());
         EnemyController ec = go.GetComponent<EnemyController>();
         ec.SetTargetingIdEveryoneRpc(++enemyIdCounter);
         ec.SetMaxHealthRpc(maxHealthMultiplier);

@@ -265,8 +265,8 @@ GameObject:
   m_Component:
   - component: {fileID: 75003975}
   - component: {fileID: 75003977}
-  - component: {fileID: 75003976}
   - component: {fileID: 75003978}
+  - component: {fileID: 75003979}
   m_Layer: 5
   m_Name: Curse Panel
   m_TagString: Untagged
@@ -293,32 +293,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 100}
   m_SizeDelta: {x: 1600, y: 540}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &75003976
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 75003974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 4
-  m_Spacing: 10
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!222 &75003977
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -418,6 +392,27 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &75003979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 75003974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a44aa9ac9f956f1469ce8a6959f44aa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  direction: 0
+  alignment: 1
+  spacing: 10
+  padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  reverseOrder: 0
 --- !u!1 &81143534
 GameObject:
   m_ObjectHideFlags: 0
@@ -2997,10 +2992,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1997162214}
-  - component: {fileID: 1997162215}
   - component: {fileID: 1997162216}
-  - component: {fileID: 1997162218}
-  - component: {fileID: 1997162219}
+  - component: {fileID: 1997162220}
   m_Layer: 5
   m_Name: Player Panel
   m_TagString: Untagged
@@ -3027,32 +3020,6 @@ RectTransform:
   m_AnchoredPosition: {x: 100, y: 175}
   m_SizeDelta: {x: 100, y: 650}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1997162215
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1997162213}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 4
-  m_Spacing: 10
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!114 &1997162216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3078,15 +3045,7 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!222 &1997162218
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1997162213}
-  m_CullTransparentMesh: 1
---- !u!114 &1997162219
+--- !u!114 &1997162220
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3095,27 +3054,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1997162213}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Script: {fileID: 11500000, guid: a44aa9ac9f956f1469ce8a6959f44aa2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0.734705, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  direction: 1
+  alignment: 1
+  spacing: 10
+  padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  reverseOrder: 0
 --- !u!1 &2006937935
 GameObject:
   m_ObjectHideFlags: 0
@@ -3201,8 +3151,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2120846188}
-  - component: {fileID: 2120846190}
   - component: {fileID: 2120846189}
+  - component: {fileID: 2120846190}
   m_Layer: 5
   m_Name: Enemy Panel
   m_TagString: Untagged
@@ -3263,23 +3213,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 2120846187}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Script: {fileID: 11500000, guid: a44aa9ac9f956f1469ce8a6959f44aa2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Padding:
+  direction: 1
+  alignment: 1
+  spacing: 10
+  padding:
     m_Left: 0
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 4
-  m_Spacing: 10
-  m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 1
-  m_ReverseArrangement: 0
+  reverseOrder: 0
 --- !u!114 &922871282824396222
 MonoBehaviour:
   m_ObjectHideFlags: 0
