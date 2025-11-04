@@ -158,7 +158,7 @@ public class TypeTracker : MonoBehaviour
     {
         awaitingTarget = true;
         string modeName = GetModeName();
-        instructionText.text = $"{modeName}. Enter <color=yellow>Target</color>:";
+        instructionText.text = $"{modeName}. Enter the <color=yellow>Target word</color>:";
         FocusInputField();
     }
 
@@ -214,7 +214,9 @@ public class TypeTracker : MonoBehaviour
             }
             else
             {
+
                 instructionText.text = "Invalid Target. Try Again.";
+              
                 inputField.text = "";
                 promptText.text = "";
 
@@ -235,6 +237,13 @@ public class TypeTracker : MonoBehaviour
     // Called when text changes (while typing)
     private void OnInputChanged(string currentText)
     {
+        if(mode == 0)
+        {
+            inputField.text = "";
+            instructionText.text = "Please select an ability first: 1 for Attack, 2 for Heal.";
+            return;
+        }
+
         // Prevent 1 or 2 from appearing if pressed (we handle those separately)
         if (currentText == "1" || currentText == "2")
         {
@@ -425,6 +434,7 @@ public class TypeTracker : MonoBehaviour
         FocusInputField();
     }
 
+    // Probably get rid of this eventually and just fix the prompts
     private string NormalizeText(string text)
     {
         if (text == null)
@@ -446,7 +456,7 @@ public class TypeTracker : MonoBehaviour
     }
 
 
-    // Ensures text field is always active
+    // Focuses the text field
     private void FocusInputField()
     {
         if (inputField == null) return;
@@ -460,6 +470,7 @@ public class TypeTracker : MonoBehaviour
         inputField.ActivateInputField();
     }
 
+    // Caret positioning settings
     private void positionCaret(int caretIndex)
     {
         if (caretRect == null)

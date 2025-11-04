@@ -31,7 +31,7 @@ public class DamageManager : MonoBehaviour
             showPopup(targetRect, amount);
         }
 
-        if (amount < 0 && damageScreen != null)
+        if (amount < 0 && damageScreen != null && target.tag != "Enemy")
         {
             StartCoroutine(FlashDamageScreen(0.2f));
         }
