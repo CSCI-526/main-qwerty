@@ -332,8 +332,6 @@ public class TypeTracker : MonoBehaviour
         float totalMinutes = Mathf.Max(0.0001f, totalTime / 60f);
 
         float grossWPM = (float)input.Length / 5f / totalMinutes;
-        float netWPM = grossWPM - (errors / totalMinutes);
-        netWPM = Mathf.Max(0, netWPM);
 
         if (input.Length > 0)
         {
@@ -350,7 +348,10 @@ public class TypeTracker : MonoBehaviour
         averageWPM = ((averageWPM * (numSubmissions - 1)) + grossWPM) / numSubmissions;
         averageAccuracy = ((averageAccuracy * (numSubmissions - 1)) + accuracy) / numSubmissions;
 
-        int healthModifier = (int)((grossWPM / 5f) * Mathf.Pow(accuracy / 100f, 1.25f));
+        // Damage calculation to make speed more forgiving and errors more penalizing. Also has a floor of 1 damage.
+        float wpmFactor = Mathf.Log10(grossWPM + 10) * 6f;
+        float accuracyFactor = Mathf.Pow(accuracy / 100f, 2f);
+        int healthModifier = (int)((wpmFactor*accuracyFactor);
 
         if (mode == 1)
         {
