@@ -29,6 +29,11 @@ public class ForceCapitalizeCurseData : TypingEffectBase
         }
     }
 
+    public override bool IsCurse()
+    {
+        return true;
+    }
+
     // Curses of same forced capitalized letters are equal
     public override bool Equals(object obj)
     {

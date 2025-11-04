@@ -57,6 +57,11 @@ public class ForceDoublingCurseData : TypingEffectBase
         }
     }
 
+    public override bool IsCurse()
+    {
+        return true;
+    }
+
     // Curses of same doubled letters are equal
     public override bool Equals(object obj)
     {

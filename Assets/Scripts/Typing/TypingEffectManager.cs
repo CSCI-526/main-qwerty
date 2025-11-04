@@ -33,7 +33,12 @@ public class TypingEffectManager : MonoBehaviour
     {
         if (effectText != null)
         {
-            string desc = string.Join(", ", activeTypingEffects.Select(e => e.GetEffectDescription()));
+            string desc = "Current Curses:\n";
+            desc += string.Join(", ", activeTypingEffects.Where(e => e.IsCurse()).Select(e => e.GetEffectDescription()));
+            desc += "\n";
+            desc += "Current Buffs:\n";
+            desc += string.Join(", ", activeTypingEffects.Where(e => !e.IsCurse()).Select(e => e.GetEffectDescription()));
+            desc += "\n";
             effectText.text = desc;
         }
     }

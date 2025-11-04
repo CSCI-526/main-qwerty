@@ -50,6 +50,11 @@ public class ModBuffCurse : TypingEffectBase
         }
     }
 
+    public override bool IsCurse()
+    {
+        return this.punishmentCurse > 0 || this.healCurse > 0 || this.damageCurse > 0 || this.bulletSpeedCurse > 0;
+    }
+
     public override int ApplyPunishmentMod()
     {
         return this.punishmentCurse;

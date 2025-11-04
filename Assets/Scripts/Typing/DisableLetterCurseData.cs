@@ -53,6 +53,11 @@ public class DisableLetterCurseData : TypingEffectBase
         }
     }
 
+    public override bool IsCurse()
+    {
+        return true;
+    }
+
     // Curses of same disabled letters are equal
     public override bool Equals(object obj)
     {
