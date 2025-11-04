@@ -27,7 +27,7 @@ public class SharedCanvasController : NetworkBehaviour
         pc.SetPlayerName(playerName.ToString());
         pc.SetTargetingIdEveryoneRpc(requesterClientId);
         gameManager.AddPlayerRpc(pc.targetingId);
-        LayoutRebuilder.ForceRebuildLayoutImmediate(playerPanel);
+        RefreshLayoutGroupEveryoneRpc();
     }
 
     [Rpc(SendTo.Owner)]
@@ -43,5 +43,13 @@ public class SharedCanvasController : NetworkBehaviour
         ec.SetAttackCooldown(attackCooldownMultiplier);
         gameManager.AddEnemyRpc(ec.targetingId);
         LayoutRebuilder.ForceRebuildLayoutImmediate(enemyPanel);
+        RefreshLayoutGroupEveryoneRpc();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void RefreshLayoutGroupEveryoneRpc()
+    {
+        playerPanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
+        enemyPanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
     }
 }

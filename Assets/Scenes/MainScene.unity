@@ -413,6 +413,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   reverseOrder: 0
+  stretchChildren: 0
 --- !u!1 &81143534
 GameObject:
   m_ObjectHideFlags: 0
@@ -3066,6 +3067,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   reverseOrder: 0
+  stretchChildren: 0
 --- !u!1 &2006937935
 GameObject:
   m_ObjectHideFlags: 0
@@ -3225,6 +3227,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   reverseOrder: 0
+  stretchChildren: 0
 --- !u!114 &922871282824396222
 MonoBehaviour:
   m_ObjectHideFlags: 0
