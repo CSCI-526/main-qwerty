@@ -351,7 +351,7 @@ public class TypeTracker : MonoBehaviour
         // Damage calculation to make speed more forgiving and errors more penalizing. Also has a floor of 1 damage.
         float wpmFactor = Mathf.Log10(grossWPM + 10) * 6f;
         float accuracyFactor = Mathf.Pow(accuracy / 100f, 2f);
-        int healthModifier = (int)((wpmFactor*accuracyFactor);
+        int healthModifier = (int)(wpmFactor*accuracyFactor);
 
         if (mode == 1)
         {
