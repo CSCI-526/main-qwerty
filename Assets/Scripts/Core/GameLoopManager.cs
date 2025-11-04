@@ -45,6 +45,7 @@ public class GameLoopManager : NetworkBehaviour
         gameManager.RemoveAllEnemiesRpc();
         gameManager.RemoveAllProjectilesRpc();
         battleCount = 0;
+        ResetCurses();
         ToggleElementsRpc(false, true, false);
     }
 
@@ -99,6 +100,15 @@ public class GameLoopManager : NetworkBehaviour
         if(IsOwner)
             startBattleButton.SetActive(startBattleButtonState);
         cursePanel.SetActive(cursePanelState);
+    }
+
+    public void ResetCurses()
+    {
+        if (!IsOwner) return;
+        foreach (ulong clientID in gameManager.networkManager.ConnectedClientsIds)
+        {
+            gameManager.ResetCurseBuffEffectRpc(RpcTarget.Single(clientID, RpcTargetUse.Temp));
+        }
     }
 
     public void AssignRandomCurses()

@@ -43,6 +43,12 @@ public class TypingEffectManager : MonoBehaviour
         }
     }
 
+    public void ResetTypingEffects()
+    {
+        activeTypingEffects = new();
+        UpdateEffectText();
+    }
+
     /// <summary>
     /// Apply active effects to the prompt. Effects are applied per-prompt instead of per-character.
     /// </summary>

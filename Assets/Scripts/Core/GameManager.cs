@@ -216,6 +216,12 @@ public class GameManager : NetworkBehaviour
     #region Typing Effect
 
     [Rpc(SendTo.SpecifiedInParams)]
+    public void ResetCurseBuffEffectRpc(RpcParams rpcParams)
+    {
+        typingEffectManager.ResetTypingEffects();
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
     public void AddRandomCurseBuffEffectRpc(RpcParams rpcParams)
     {
         const int NUM_CHOICES = 3;
