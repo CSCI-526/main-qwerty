@@ -64,22 +64,22 @@ public class TypingEffectManager : MonoBehaviour
         {
             if (typingEffect.ApplyPunishmentMod() != 0)
             {
-                output[0] = typingEffect.ApplyPunishmentMod();
+                output[0] += typingEffect.ApplyPunishmentMod();
             }
 
             if (typingEffect.ApplyHealMod() != 0)
             {
-                output[1] = typingEffect.ApplyHealMod();
+                output[1] += typingEffect.ApplyHealMod();
             }
 
             if (typingEffect.ApplyDamageMod() != 0)
             {
-                output[2] = typingEffect.ApplyDamageMod();
+                output[2] += typingEffect.ApplyDamageMod();
             }
 
             if (typingEffect.ApplyBulletSpeedMod() != 0)
             {
-                output[3] = typingEffect.ApplyBulletSpeedMod();
+                output[3] += typingEffect.ApplyBulletSpeedMod();
             }
         }
 

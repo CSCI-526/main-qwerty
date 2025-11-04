@@ -32,19 +32,19 @@ public class ModBuffCurse : TypingEffectBase
             string output = "";
             if (this.punishmentCurse != 0)
             {
-                output += "Punishment " + (this.punishmentCurse == 1 ? "doubled. " : "halved. ");
+                output += "Punishment " + (this.punishmentCurse == 1 ? "doubled" : "halved");
             }
             if (this.healCurse != 0)
             {
-                output += "Healing " + (this.healCurse == -1 ? "doubled. " : "halved. ");
+                output += "Healing " + (this.healCurse == -1 ? "doubled" : "halved");
             }
             if (this.damageCurse != 0)
             {
-                output += "Damage " + (this.damageCurse == -1 ? "doubled. " : "halved. ");
+                output += "Damage " + (this.damageCurse == -1 ? "doubled" : "halved");
             }
             if (this.bulletSpeedCurse != 0)
             {
-                output += "Bullet Speed " + (this.bulletSpeedCurse == 1 ? "doubled. " : "halved. ");
+                output += "Bullet Speed " + (this.bulletSpeedCurse == 1 ? "doubled" : "halved");
             }
             return output;
         }

@@ -12,6 +12,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System;
 
 public class TypeTracker : MonoBehaviour
 {
@@ -278,7 +279,7 @@ public class TypeTracker : MonoBehaviour
                 {
                     errors++;
                     int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
-                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod == 1 ? -4 : -1);
+                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(2, mod)) : -1);
                     StartCoroutine(flashDamageScreen(0.1f));
                 }
             }
@@ -351,14 +352,16 @@ public class TypeTracker : MonoBehaviour
         if (mode == 1)
         {
             int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-            currentTarget.ModifyCurrentHealth(mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
-            damageDealt -= mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2;
+            int delta = Math.Min((int)(-healthModifier / Math.Pow(2, mod)), -1);
+            currentTarget.ModifyCurrentHealth(delta);
+            damageDealt -= delta;
         }
         else if (mode == 2)
         {
             int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
-            currentTarget.ModifyCurrentHealth(mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
-            healingDone += mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2;
+            int delta = Math.Max((int)(healthModifier / Math.Pow(2, mod)), 1);
+            currentTarget.ModifyCurrentHealth(delta);
+            healingDone += delta;
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;
