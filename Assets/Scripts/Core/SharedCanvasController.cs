@@ -2,6 +2,7 @@ using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SharedCanvasController : NetworkBehaviour
 {
@@ -20,12 +21,13 @@ public class SharedCanvasController : NetworkBehaviour
         GameObject go = Instantiate(playerPrefab.gameObject);
         NetworkObject no = go.GetComponent<NetworkObject>();
         no.Spawn(true);
-        go.transform.SetParent(playerPanel);
+        playerPanel.GetComponent<CustomLayoutGroup>().AddToLayout(go.GetComponent<RectTransform>());
         PlayerController pc = go.GetComponent<PlayerController>();
         pc.SetPlayerIDRpc(requesterClientId);
         pc.SetPlayerName(playerName.ToString());
         pc.SetTargetingIdEveryoneRpc(requesterClientId);
         gameManager.AddPlayerRpc(pc.targetingId);
+        RefreshLayoutGroupEveryoneRpc();
     }
 
     [Rpc(SendTo.Owner)]
@@ -34,11 +36,20 @@ public class SharedCanvasController : NetworkBehaviour
         GameObject go = Instantiate(enemyPrefab.gameObject);
         NetworkObject no = go.GetComponent<NetworkObject>();
         no.Spawn(true);
-        go.transform.SetParent(enemyPanel);
+        enemyPanel.GetComponent<CustomLayoutGroup>().AddToLayout(go.GetComponent<RectTransform>());
         EnemyController ec = go.GetComponent<EnemyController>();
         ec.SetTargetingIdEveryoneRpc(++enemyIdCounter);
         ec.SetMaxHealthRpc(maxHealthMultiplier);
         ec.SetAttackCooldown(attackCooldownMultiplier);
         gameManager.AddEnemyRpc(ec.targetingId);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(enemyPanel);
+        RefreshLayoutGroupEveryoneRpc();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void RefreshLayoutGroupEveryoneRpc()
+    {
+        playerPanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
+        enemyPanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
     }
 }
