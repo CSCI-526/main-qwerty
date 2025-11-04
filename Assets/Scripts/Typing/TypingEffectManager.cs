@@ -6,12 +6,22 @@ using System.Linq;
 public class TypingEffectManager : MonoBehaviour
 {
     [SerializeField] private TMP_Text effectText; // list of current curses & buffs
+    [SerializeField] private GameObject effectPanel;
 
     private List<TypingEffectBase> activeTypingEffects = new(); // currently active curses & buffs
 
     private void Start()
     {
+        activeTypingEffects = new();
         UpdateEffectText();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            effectPanel.SetActive(!effectPanel.activeSelf);
+        }
     }
 
     private void OnEffectChange()
