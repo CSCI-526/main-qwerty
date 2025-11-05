@@ -41,9 +41,9 @@ public class GameLoopManager : NetworkBehaviour
     {
         if (!IsOwner) return;
         inCombat = false;
-        gameManager.RemoveAllPlayersRpc();
-        gameManager.RemoveAllEnemiesRpc();
-        gameManager.RemoveAllProjectilesRpc();
+        gameManager.RemoveAllPlayers();
+        gameManager.RemoveAllEnemies();
+        gameManager.RemoveAllProjectiles();
         battleCount = 0;
         ToggleElementsRpc(false, true, false);
     }
@@ -52,7 +52,7 @@ public class GameLoopManager : NetworkBehaviour
     {
         if (!IsOwner) return;
         if (gameManager.PlayersSpawned()) return;
-        gameManager.RemoveAllPlayersRpc();
+        gameManager.RemoveAllPlayers();
         foreach (ulong clientID in gameManager.networkManager.ConnectedClientsIds)
         {
             SpawnPlayerFromClientRpc(RpcTarget.Single(clientID, RpcTargetUse.Temp));
@@ -85,8 +85,8 @@ public class GameLoopManager : NetworkBehaviour
     {
         if (!inCombat || !IsOwner) return;
         inCombat = false;
-        gameManager.RemoveAllEnemiesRpc();
-        gameManager.RemoveAllProjectilesRpc();
+        gameManager.RemoveAllEnemies();
+        gameManager.RemoveAllProjectiles();
         battleCount++;
         AssignRandomCurses();
         ToggleElementsRpc(false, false, true);

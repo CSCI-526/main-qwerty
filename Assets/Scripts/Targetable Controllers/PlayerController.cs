@@ -5,7 +5,11 @@ using UnityEngine;
 public class PlayerController : TargetableController
 {
     [SerializeField] private PlayerIcon playerIcon;
-    private ulong playerId;
+    private NetworkVariable<ulong> playerId = new NetworkVariable<ulong>(
+        0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
 
     public override void OnNetworkSpawn()
     {
@@ -16,7 +20,7 @@ public class PlayerController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemovePlayerRpc(targetingId);
+        gameManager.RemovePlayer(targetingID.Value);
     }
 
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
@@ -25,9 +29,8 @@ public class PlayerController : TargetableController
     }
 
     #region Network Variable Methods
-    [Rpc(SendTo.Everyone)]
-    public void SetPlayerIDRpc(ulong id) => playerId = id;
-    public ulong GetPlayerID() { return playerId; }
+    public void SetPlayerID(ulong id) { playerId.Value = id; }
+    public ulong GetPlayerID() { return playerId.Value; }
 
     public void SetPlayerName(string name) { playerIcon.SetPlayerName(name); }
     #endregion

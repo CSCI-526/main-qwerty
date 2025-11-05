@@ -67,13 +67,11 @@ public abstract class TargetableController : NetworkBehaviour
     );
 
     [DoNotSerialize]
-    public NetworkVariable<ulong> networkedTargetingId = new NetworkVariable<ulong>(
+    public NetworkVariable<ulong> targetingID = new NetworkVariable<ulong>(
         0,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
-
-    public ulong targetingId;
 
     public TextMeshProUGUI targetWordText;
 
@@ -105,14 +103,6 @@ public abstract class TargetableController : NetworkBehaviour
     {
         string newWord = gameManager.GenerateWord();
         SetTargetWord(newWord);
-    }
-
-    [Rpc(SendTo.Everyone)]
-    public void SetTargetingIdEveryoneRpc(ulong id)
-    {
-        targetingId = id;
-        if(IsOwner)
-            networkedTargetingId.Value = id;
     }
 
     #endregion

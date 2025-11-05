@@ -28,7 +28,7 @@ public class ProjectileController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemoveProjectileRpc(targetingId);
+        gameManager.RemoveProjectile(targetingID.Value);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);
     }
@@ -47,7 +47,7 @@ public class ProjectileController : TargetableController
         else
         {
             int mod = 0;
-            if (target.targetingId == gameManager.localPlayer.targetingId)
+            if (target.targetingID.Value == gameManager.localPlayer.targetingID.Value)
             {
                 mod = gameManager.typingEffectManager.ApplyEffectOnMod()[3];
             }

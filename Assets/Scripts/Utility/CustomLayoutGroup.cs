@@ -17,7 +17,7 @@ public class CustomLayoutGroup : MonoBehaviour
     public bool reverseOrder = false;
     public bool stretchChildren = false;
 
-    private List<RectTransform> children = new List<RectTransform>();
+    public List<RectTransform> children = new List<RectTransform>();
 
     private void Awake() => RefreshLayout();
 #if UNITY_EDITOR
@@ -89,6 +89,8 @@ public class CustomLayoutGroup : MonoBehaviour
 
     private void ArrangeChildren()
     {
+        RefreshChildren();
+
         var parentRect = transform as RectTransform;
         if (parentRect == null || children.Count == 0) return;
 
@@ -100,6 +102,7 @@ public class CustomLayoutGroup : MonoBehaviour
         float totalChildrenSize = 0f;
         foreach (RectTransform child in children)
         {
+            Debug.Log("Checking RectTransform: " + child.name);
             totalChildrenSize += direction == LayoutDirection.Horizontal ? child.sizeDelta.x : child.sizeDelta.y;
         }
 

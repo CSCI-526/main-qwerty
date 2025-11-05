@@ -43,7 +43,7 @@ public class EnemyController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemoveEnemyRpc(targetingId);
+        gameManager.RemoveEnemy(targetingID.Value);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);
     }
@@ -87,9 +87,12 @@ public class EnemyController : TargetableController
         pc.SetTargetWord(word);
         pc.SetSpawner(this);
         pc.SetTarget(targetPlayer);
-        pc.SetTargetingIdEveryoneRpc(++gameManager.projectileTargetingIdCounter);
+        pc.targetingID.Value = ++gameManager.projectileTargetingIdCounter;
 
-        gameManager.AddProjectileRpc(pc.targetingId);
+        gameManager.AddProjectile(new ProjectileNetworkData
+        {
+            TargetingID = pc.targetingID.Value
+        });
 
         wordList.Add(word);
     }
