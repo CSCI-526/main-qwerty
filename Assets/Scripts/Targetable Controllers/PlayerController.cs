@@ -30,12 +30,7 @@ public class PlayerController : TargetableController
 
     protected override void OnTargetIDChanged(ulong oldID, ulong newID)
     {
-        gameManager.RemovePlayer(oldID);
-        gameManager.AddPlayer(new PlayerNetworkData
-        {
-            TargetingID = targetingID.Value,
-            PlayerName = playerIcon.PlayerName.ToString()
-        });
+        gameManager.RefreshPlayers();
     }
 
     #region Network Variable Methods

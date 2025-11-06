@@ -55,12 +55,7 @@ public class EnemyController : TargetableController
 
     protected override void OnTargetIDChanged(ulong oldID, ulong newID)
     {
-        gameManager.RemoveEnemy(oldID);
-        gameManager.AddEnemy(new EnemyNetworkData
-        {
-            TargetingID = targetingID.Value,
-            EnemyName = new FixedString128Bytes($"Enemy {targetingID.Value}")
-        });
+        gameManager.RefreshEnemies();
     }
 
     private void Update()

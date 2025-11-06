@@ -43,32 +43,9 @@ public class GameManager : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
-        foreach (PlayerNetworkData data in playerData)
-        {
-            OnPlayerDataChanged(new NetworkListEvent<PlayerNetworkData>
-            {
-                Type = NetworkListEvent<PlayerNetworkData>.EventType.Add,
-                Value = data
-            });
-        }
-
-        foreach (EnemyNetworkData data in enemyData)
-        {
-            OnEnemyDataChanged(new NetworkListEvent<EnemyNetworkData>
-            {
-                Type = NetworkListEvent<EnemyNetworkData>.EventType.Add,
-                Value = data
-            });
-        }
-
-        foreach (ProjectileNetworkData data in projectileData)
-        {
-            OnProjectileDataChanged(new NetworkListEvent<ProjectileNetworkData>
-            {
-                Type = NetworkListEvent<ProjectileNetworkData>.EventType.Add,
-                Value = data
-            });
-        }
+        RefreshPlayers();
+        RefreshEnemies();
+        RefreshProjectiles();
     }
 
     private void OnEnable()
@@ -157,6 +134,19 @@ public class GameManager : NetworkBehaviour
     public void RemoveAllPlayers()
     {
         playerData.Clear();
+    }
+
+    public void RefreshPlayers()
+    {
+        players.Clear();
+        foreach (PlayerNetworkData data in playerData)
+        {
+            OnPlayerDataChanged(new NetworkListEvent<PlayerNetworkData>
+            {
+                Type = NetworkListEvent<PlayerNetworkData>.EventType.Add,
+                Value = data
+            });
+        }
     }
 
     public PlayerController GetPlayerByClientId(ulong clientId)
@@ -260,6 +250,19 @@ public class GameManager : NetworkBehaviour
         enemyData.Clear();
     }
 
+    public void RefreshEnemies()
+    {
+        enemies.Clear();
+        foreach (EnemyNetworkData data in enemyData)
+        {
+            OnEnemyDataChanged(new NetworkListEvent<EnemyNetworkData>
+            {
+                Type = NetworkListEvent<EnemyNetworkData>.EventType.Add,
+                Value = data
+            });
+        }
+    }
+
     public EnemyController GetEnemyByTargetingId(ulong targetingId)
     {
         return enemies.TryGetValue(targetingId, out EnemyController enemy) ? enemy : null;
@@ -332,6 +335,19 @@ public class GameManager : NetworkBehaviour
     public void RemoveAllProjectiles()
     {
         projectileData.Clear();
+    }
+
+    public void RefreshProjectiles()
+    {
+        projectiles.Clear();
+        foreach (ProjectileNetworkData data in projectileData)
+        {
+            OnProjectileDataChanged(new NetworkListEvent<ProjectileNetworkData>
+            {
+                Type = NetworkListEvent<ProjectileNetworkData>.EventType.Add,
+                Value = data
+            });
+        }
     }
 
     public ProjectileController GetProjectileByTargetingId(ulong targetingId)

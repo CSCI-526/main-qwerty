@@ -42,11 +42,7 @@ public class ProjectileController : TargetableController
 
     protected override void OnTargetIDChanged(ulong oldID, ulong newID)
     {
-        gameManager.RemoveProjectile(oldID);
-        gameManager.AddProjectile(new ProjectileNetworkData
-        {
-            TargetingID = targetingID.Value
-        });
+        gameManager.RefreshProjectiles();
     }
 
     private void MoveTowardsTarget()
