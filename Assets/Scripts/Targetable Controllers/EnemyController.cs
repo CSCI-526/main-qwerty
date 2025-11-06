@@ -9,7 +9,6 @@ public class EnemyController : TargetableController
     [Header("Enemy Settings")]
     [SerializeField] private float attackCooldown = 10;
     private float attackCd = 0;
-    private bool tutorial = false;
 
     private List<string> wordList = new List<string>();
 
@@ -42,11 +41,6 @@ public class EnemyController : TargetableController
         attackCooldown *= multiplier;
     }
 
-    public void SetTutorial(bool flag)
-    {
-        tutorial = flag;
-    }
-
     protected override void Die()
     {
         gameManager.RemoveEnemyRpc(targetingId);
@@ -64,19 +58,15 @@ public class EnemyController : TargetableController
         if (!IsOwner) return;
         if (IsDead()) return;
 
-        if (!tutorial || currentHealth.Value != maxHealth)
+        if (attackCd <= 0)
         {
-            if (attackCd <= 0)
-            {
-                ShootWord(gameManager.GenerateWord());
-                attackCd = attackCooldown;
-            }
-            else
-            {
-                attackCd -= Time.deltaTime;
-            }
+            ShootWord(gameManager.GenerateWord());
+            attackCd = attackCooldown;
         }
-
+        else
+        {
+            attackCd -= Time.deltaTime;
+        }
     }
 
     private void ShootWord(string word)

@@ -31,7 +31,7 @@ public class SharedCanvasController : NetworkBehaviour
     }
 
     [Rpc(SendTo.Owner)]
-    public void RequestSpawnEnemyIconOwnerRpc(float maxHealthMultiplier, float attackCooldownMultiplier, bool tutorialState)
+    public void RequestSpawnEnemyIconOwnerRpc(float maxHealthMultiplier, float attackCooldownMultiplier)
     {
         GameObject go = Instantiate(enemyPrefab.gameObject);
         NetworkObject no = go.GetComponent<NetworkObject>();
@@ -41,7 +41,6 @@ public class SharedCanvasController : NetworkBehaviour
         ec.SetTargetingIdEveryoneRpc(++enemyIdCounter);
         ec.SetMaxHealthRpc(maxHealthMultiplier);
         ec.SetAttackCooldown(attackCooldownMultiplier);
-        ec.SetTutorial(tutorialState);
         gameManager.AddEnemyRpc(ec.targetingId);
         LayoutRebuilder.ForceRebuildLayoutImmediate(enemyPanel);
         RefreshLayoutGroupEveryoneRpc();
