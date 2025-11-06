@@ -30,7 +30,7 @@ public class ProjectileController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemoveProjectileRpc(targetingID.Value);
+        gameManager.RemoveProjectile(targetingID.Value);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);
     }
@@ -42,8 +42,8 @@ public class ProjectileController : TargetableController
 
     protected override void OnTargetIDChanged(ulong oldID, ulong newID)
     {
-        gameManager.RemoveProjectileRpc(oldID);
-        gameManager.AddProjectileRpc(new ProjectileNetworkData
+        gameManager.RemoveProjectile(oldID);
+        gameManager.AddProjectile(new ProjectileNetworkData
         {
             TargetingID = targetingID.Value
         });

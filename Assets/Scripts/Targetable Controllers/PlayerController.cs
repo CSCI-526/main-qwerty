@@ -20,7 +20,7 @@ public class PlayerController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemovePlayerRpc(targetingID.Value);
+        gameManager.RemovePlayer(targetingID.Value);
     }
 
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
@@ -30,8 +30,8 @@ public class PlayerController : TargetableController
 
     protected override void OnTargetIDChanged(ulong oldID, ulong newID)
     {
-        gameManager.RemovePlayerRpc(oldID);
-        gameManager.AddPlayerRpc(new PlayerNetworkData
+        gameManager.RemovePlayer(oldID);
+        gameManager.AddPlayer(new PlayerNetworkData
         {
             TargetingID = targetingID.Value,
             PlayerName = playerIcon.PlayerName.ToString()

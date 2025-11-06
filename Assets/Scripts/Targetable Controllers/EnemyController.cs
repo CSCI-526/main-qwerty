@@ -43,7 +43,7 @@ public class EnemyController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemoveEnemyRpc(targetingID.Value);
+        gameManager.RemoveEnemy(targetingID.Value);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);
     }
@@ -55,8 +55,8 @@ public class EnemyController : TargetableController
 
     protected override void OnTargetIDChanged(ulong oldID, ulong newID)
     {
-        gameManager.RemoveEnemyRpc(oldID);
-        gameManager.AddEnemyRpc(new EnemyNetworkData
+        gameManager.RemoveEnemy(oldID);
+        gameManager.AddEnemy(new EnemyNetworkData
         {
             TargetingID = targetingID.Value,
             EnemyName = new FixedString128Bytes($"Enemy {targetingID.Value}")
@@ -99,7 +99,7 @@ public class EnemyController : TargetableController
         pc.SetTarget(targetPlayer);
         pc.targetingID.Value = ++gameManager.projectileTargetingIdCounter;
 
-        gameManager.AddProjectileRpc(new ProjectileNetworkData
+        gameManager.AddProjectile(new ProjectileNetworkData
         {
             TargetingID = pc.targetingID.Value
         });

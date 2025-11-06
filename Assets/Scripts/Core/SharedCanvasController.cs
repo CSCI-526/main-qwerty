@@ -27,7 +27,7 @@ public class SharedCanvasController : NetworkBehaviour
         pc.SetPlayerID(requesterClientId);
         pc.SetPlayerName(playerName.ToString());
         pc.targetingID.Value = requesterClientId;
-        gameManager.AddPlayerRpc(new PlayerNetworkData
+        gameManager.AddPlayer(new PlayerNetworkData
         {
             TargetingID = requesterClientId,
             PlayerName = playerName
@@ -46,7 +46,7 @@ public class SharedCanvasController : NetworkBehaviour
         ec.targetingID.Value = ++enemyIdCounter;
         ec.SetMaxHealthRpc(maxHealthMultiplier);
         ec.SetAttackCooldown(attackCooldownMultiplier);
-        gameManager.AddEnemyRpc(new EnemyNetworkData
+        gameManager.AddEnemy(new EnemyNetworkData
         {
             TargetingID = ec.targetingID.Value,
             EnemyName = new FixedString128Bytes($"Enemy {enemyIdCounter}")
