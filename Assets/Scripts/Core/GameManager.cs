@@ -479,6 +479,98 @@ public class GameManager : NetworkBehaviour
 
     #endregion
 
+    #region Damage Calculation
+
+    [Rpc(SendTo.Owner)]
+    public void playerDealDamageRpc(ulong playerID, ulong targetType, ulong targetingID, int baseValue)
+    {
+        PlayerController player = GetPlayerByClientId(playerID);
+        TargetableController target = null;
+
+        switch (targetType)
+        {
+            case 0:
+                target = GetPlayerByTargetingId(targetingID);
+                break;
+            case 1:
+                target = GetEnemyByTargetingId(targetingID);
+                break;
+            case 2:
+                target = GetProjectileByTargetingId(targetingID);
+                break;
+        }
+
+        if (player == null || target == null) return; // guard against missing references
+
+        float damageModifier = player.calculateDamageModifier();
+        float leechModifier = player.calculateLeechModifier();
+        float damageTakenModifier = target.calculateDamageTakenModifier();
+        int finalValue = (int)(baseValue * damageModifier * damageTakenModifier);
+
+        target.ModifyCurrentHealth(finalValue);
+        player.ModifyCurrentHealth(-1 * (int)(finalValue * leechModifier));
+    }
+
+    #endregion
+
+    #region Heal Calculation
+
+    [Rpc(SendTo.Owner)]
+    public void playerHealRpc(ulong playerID, ulong targetType, ulong targetingID, int baseValue)
+    {
+        PlayerController player = GetPlayerByClientId(playerID);
+        TargetableController target = null;
+
+        switch (targetType)
+        {
+            case 0:
+                target = GetPlayerByTargetingId(targetingID);
+                break;
+            case 1:
+                target = GetEnemyByTargetingId(targetingID);
+                break;
+            case 2:
+                target = GetProjectileByTargetingId(targetingID);
+                break;
+        }
+
+        if (player == null || target == null) return;
+
+        float healModifier = player.calculateHealModifier();
+        int finalValue = (int)(baseValue * healModifier);
+        target.ModifyCurrentHealth(finalValue);
+    }
+
+    #endregion
+
+    #region Class Buffs/Debuffs
+
+    [Rpc(SendTo.Owner)]
+    public void addBuffDebuffToListRpc(ulong targetType, ulong targetingID, float modifier, int duration, FixedString128Bytes effectType)
+    {
+        TargetableController target = null;
+
+        switch (targetType)
+        {
+            case 0:
+                target = GetPlayerByTargetingId(targetingID);
+                break;
+            case 1:
+                target = GetEnemyByTargetingId(targetingID);
+                break;
+            case 2:
+                target = GetProjectileByTargetingId(targetingID);
+                break;
+        }
+
+        if (target == null) return;
+
+        // Use a public TargetableController method to add the buff (see TargetableController change below).
+        target.AddBuffDebuff(modifier, duration, effectType);
+    }
+
+    #endregion
+
     #region Misc
     public string GenerateWord()
     {
