@@ -68,7 +68,7 @@ public abstract class TargetableController : NetworkBehaviour
 
     [DoNotSerialize]
     public NetworkVariable<ulong> targetingID = new NetworkVariable<ulong>(
-        0,
+        ulong.MaxValue,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
@@ -85,6 +85,7 @@ public abstract class TargetableController : NetworkBehaviour
     {
         OnTargetWordChanged(new FixedString128Bytes(""), targetWord.Value);
         targetWord.OnValueChanged += OnTargetWordChanged;
+        targetingID.OnValueChanged += OnTargetIDChanged;
     }
 
     public virtual void SetTargetWord(string newWord)
@@ -93,6 +94,8 @@ public abstract class TargetableController : NetworkBehaviour
     }
 
     protected abstract void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord);
+
+    protected abstract void OnTargetIDChanged(ulong oldID, ulong newID);
 
     public string GetTargetWord()
     {

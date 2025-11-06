@@ -53,6 +53,16 @@ public class EnemyController : TargetableController
         targetWordText.text = newWord.ToString();
     }
 
+    protected override void OnTargetIDChanged(ulong oldID, ulong newID)
+    {
+        gameManager.RemoveEnemy(oldID);
+        gameManager.AddEnemy(new EnemyNetworkData
+        {
+            TargetingID = targetingID.Value,
+            EnemyName = new FixedString128Bytes($"Enemy {targetingID.Value}")
+        });
+    }
+
     private void Update()
     {
         if (!IsOwner) return;

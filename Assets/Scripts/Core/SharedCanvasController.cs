@@ -27,15 +27,9 @@ public class SharedCanvasController : NetworkBehaviour
         pc.SetPlayerID(requesterClientId);
         pc.SetPlayerName(playerName.ToString());
         pc.targetingID.Value = requesterClientId;
-        StartCoroutine(WaitForAddPlayer(requesterClientId, playerName.ToString()));
-    }
-
-    private IEnumerator WaitForAddPlayer(ulong targetingID, string playerName)
-    {
-        yield return new WaitForSeconds(0.5f);
         gameManager.AddPlayer(new PlayerNetworkData
         {
-            TargetingID = targetingID,
+            TargetingID = pc.targetingID.Value,
             PlayerName = playerName
         });
         RefreshLayoutGroupEveryoneRpc();
@@ -52,15 +46,9 @@ public class SharedCanvasController : NetworkBehaviour
         ec.targetingID.Value = ++enemyIdCounter;
         ec.SetMaxHealthRpc(maxHealthMultiplier);
         ec.SetAttackCooldown(attackCooldownMultiplier);
-        StartCoroutine(WaitForAddEnemy(enemyIdCounter));
-    }
-
-    private IEnumerator WaitForAddEnemy(ulong targetingID)
-    {
-        yield return new WaitForSeconds(0.5f);
         gameManager.AddEnemy(new EnemyNetworkData
         {
-            TargetingID = targetingID,
+            TargetingID = ec.targetingID.Value,
             EnemyName = new FixedString128Bytes($"Enemy {enemyIdCounter}")
         });
         RefreshLayoutGroupEveryoneRpc();

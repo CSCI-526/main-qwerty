@@ -28,6 +28,16 @@ public class PlayerController : TargetableController
         targetWordText.text = newWord.ToString();
     }
 
+    protected override void OnTargetIDChanged(ulong oldID, ulong newID)
+    {
+        gameManager.RemovePlayer(oldID);
+        gameManager.AddPlayer(new PlayerNetworkData
+        {
+            TargetingID = targetingID.Value,
+            PlayerName = playerIcon.PlayerName.ToString()
+        });
+    }
+
     #region Network Variable Methods
     public void SetPlayerID(ulong id) { playerId.Value = id; }
     public ulong GetPlayerID() { return playerId.Value; }

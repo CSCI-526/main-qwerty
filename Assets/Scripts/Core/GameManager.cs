@@ -91,10 +91,7 @@ public class GameManager : NetworkBehaviour
 
     private void OnPlayerDataChanged(NetworkListEvent<PlayerNetworkData> changeEvent)
     {
-        Debug.Log("Player Data Changed: " + changeEvent.Type.ToString() + " for " + changeEvent.Value.TargetingID);
-
         List<PlayerController> playerObjects = FindObjectsByType<PlayerController>(FindObjectsSortMode.None).ToList();
-        Debug.Log("Found Player: " + playerObjects.FirstOrDefault(e => e.targetingID.Value == changeEvent.Value.TargetingID));
         switch (changeEvent.Type)
         {
             case NetworkListEvent<PlayerNetworkData>.EventType.Add:
@@ -191,10 +188,7 @@ public class GameManager : NetworkBehaviour
 
     private void OnEnemyDataChanged(NetworkListEvent<EnemyNetworkData> changeEvent)
     {
-        Debug.Log("Enemy Data Changed: " + changeEvent.Type.ToString() + " for " + changeEvent.Value.TargetingID);
-
         List<EnemyController> enemyObjects = FindObjectsByType<EnemyController>(FindObjectsSortMode.None).ToList();
-        Debug.Log("Found Enemy: " + enemyObjects.FirstOrDefault(e => e.targetingID.Value == changeEvent.Value.TargetingID));
         switch (changeEvent.Type)
         {
             case NetworkListEvent<EnemyNetworkData>.EventType.Add:
@@ -269,10 +263,7 @@ public class GameManager : NetworkBehaviour
 
     private void OnProjectileDataChanged(NetworkListEvent<ProjectileNetworkData> changeEvent)
     {
-        Debug.Log("Projectile Data Changed: " + changeEvent.Type.ToString() + " for " + changeEvent.Value.TargetingID);
-
         List<ProjectileController> projectileObjects = FindObjectsByType<ProjectileController>(FindObjectsSortMode.None).ToList();
-        Debug.Log("Found Projectile: " + projectileObjects.FirstOrDefault(e => e.targetingID.Value == changeEvent.Value.TargetingID));
         switch (changeEvent.Type)
         {
             case NetworkListEvent<ProjectileNetworkData>.EventType.Add:
