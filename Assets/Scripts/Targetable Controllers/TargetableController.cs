@@ -86,6 +86,8 @@ public abstract class TargetableController : NetworkBehaviour
         OnTargetWordChanged(new FixedString128Bytes(""), targetWord.Value);
         targetWord.OnValueChanged += OnTargetWordChanged;
         targetingID.OnValueChanged += OnTargetIDChanged;
+        OnTargetWordChanged(new FixedString128Bytes(""), targetWord.Value);
+        OnTargetIDChanged(ulong.MaxValue, targetingID.Value);
     }
 
     public virtual void SetTargetWord(string newWord)

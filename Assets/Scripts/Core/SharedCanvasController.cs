@@ -29,7 +29,7 @@ public class SharedCanvasController : NetworkBehaviour
         pc.targetingID.Value = requesterClientId;
         gameManager.AddPlayer(new PlayerNetworkData
         {
-            TargetingID = pc.targetingID.Value,
+            TargetingID = requesterClientId,
             PlayerName = playerName
         });
         RefreshLayoutGroupEveryoneRpc();
