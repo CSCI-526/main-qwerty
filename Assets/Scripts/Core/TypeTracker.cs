@@ -87,7 +87,10 @@ public class TypeTracker : MonoBehaviour
 
     private void Start()
     {
-        instructionText.text = "Select ability: 1 for attack and 2 for healing.\n";
+        if (gameManager.gameLoopManager.GetTutorialState())
+            instructionText.text = "Try to press 1 for attacking mode, and press 2 for healing mode.\nYour goal is to take down the enemy while suriving in the playfield.\n";
+        else
+            instructionText.text = "Select ability: 1 for attack and 2 for healing.\n";
         promptText.text = "";
 
         inputField.text = "";
@@ -157,7 +160,11 @@ public class TypeTracker : MonoBehaviour
     {
         awaitingTarget = true;
         string modeName = GetModeName();
-        instructionText.text = $"{modeName}. Enter <color=yellow>Target</color>:";
+        instructionText.text = $"{modeName}. Enter <color=yellow>Target</color> (strings in yellow): ";
+        if (gameManager.gameLoopManager.GetTutorialState())
+        {
+            instructionText.text += "\nIn attack mode, you can attack projectiles or the enemy. In heal mode, you can heal the players.";
+        }
         FocusInputField();
     }
 
@@ -204,6 +211,10 @@ public class TypeTracker : MonoBehaviour
                 prompt = promptText.text; // For comparisons
                 promptText.color = Color.gray;
                 instructionText.text = "Type the prompt below!";
+                if (gameManager.gameLoopManager.GetTutorialState())
+                {
+                    instructionText.text += "\nThe faster and more accurate you type, the more effective this action will be.\nPlease be careful that any typo will be marked as red and you will take damage from it!";
+                }
 
                 inputField.text = "";
                 timerStarted = true; // will start when they begin typing
@@ -346,7 +357,7 @@ public class TypeTracker : MonoBehaviour
         averageWPM = ((averageWPM * (numSubmissions - 1)) + grossWPM) / numSubmissions;
         averageAccuracy = ((averageAccuracy * (numSubmissions - 1)) + accuracy) / numSubmissions;
 
-        int healthModifier = (int)((grossWPM / 5f) * Mathf.Pow(accuracy / 100f, 1.25f));
+        int healthModifier = Mathf.Max((int)((grossWPM / 5f) * Mathf.Pow(accuracy / 100f, 1.25f)), 1);
 
         if (mode == 1)
         {

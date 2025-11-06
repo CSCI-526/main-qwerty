@@ -104,7 +104,7 @@ public class GameManager : NetworkBehaviour
 
     public void SpawnEnemy()
     {
-        sharedCanvas.RequestSpawnEnemyIconOwnerRpc(gameLoopManager.GetEnemyHealthMultiplier(), gameLoopManager.GetEnemyAttackCooldownMultiplier());
+        sharedCanvas.RequestSpawnEnemyIconOwnerRpc(gameLoopManager.GetEnemyHealthMultiplier(), gameLoopManager.GetEnemyAttackCooldownMultiplier(), gameLoopManager.GetTutorialState());
     }
 
     [Rpc(SendTo.Everyone)]
