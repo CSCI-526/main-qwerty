@@ -34,6 +34,11 @@ public class AllLowercaseBuffData : TypingEffectBase
         }
     }
 
+    public override bool IsCurse()
+    {
+        return false;
+    }
+
     // Curses of same forced capitalized letters are equal
     public override bool Equals(object obj)
     {

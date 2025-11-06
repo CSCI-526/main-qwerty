@@ -376,10 +376,16 @@ public class GameManager : NetworkBehaviour
     #region Typing Effect
 
     [Rpc(SendTo.SpecifiedInParams)]
+    public void ResetCurseBuffEffectRpc(RpcParams rpcParams)
+    {
+        typingEffectManager.ResetTypingEffects();
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
     public void AddRandomCurseBuffEffectRpc(RpcParams rpcParams)
     {
         const int NUM_CHOICES = 3;
-        const int NUM_BUFF = 5;
+        const int NUM_BUFF = 4;
         const int NUM_CURSE = 6;
 
         List<Vector2Int> allViablePairs = new();
@@ -424,7 +430,7 @@ public class GameManager : NetworkBehaviour
                 1 => typingEffectManager.HealMod(-1),
                 2 => typingEffectManager.DamageMod(-1),
                 3 => typingEffectManager.BulletSpeedMod(-1),
-                4 => typingEffectManager.AllLowercase(),
+                // 4 => typingEffectManager.AllLowercase(),
                 // 5 => localPlayer.ModifyCurrentHealth(50),
                 _ => null,
             };

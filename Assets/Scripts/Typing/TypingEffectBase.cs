@@ -13,6 +13,11 @@ public abstract class TypingEffectBase : ScriptableObject
         return effectDescription;
     }
 
+    public virtual bool IsCurse()
+    {
+        return true;
+    }
+
     // 0 - Standard, 1 - Cursed, -1 - Buffed
     public virtual int ApplyPunishmentMod()
     {

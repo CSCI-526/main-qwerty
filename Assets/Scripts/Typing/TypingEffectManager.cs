@@ -6,12 +6,22 @@ using System.Linq;
 public class TypingEffectManager : MonoBehaviour
 {
     [SerializeField] private TMP_Text effectText; // list of current curses & buffs
+    [SerializeField] private GameObject effectPanel;
 
     private List<TypingEffectBase> activeTypingEffects = new(); // currently active curses & buffs
 
     private void Start()
     {
+        activeTypingEffects = new();
         UpdateEffectText();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            effectPanel.SetActive(!effectPanel.activeSelf);
+        }
     }
 
     private void OnEffectChange()
@@ -23,9 +33,20 @@ public class TypingEffectManager : MonoBehaviour
     {
         if (effectText != null)
         {
-            string desc = string.Join(", ", activeTypingEffects.Select(e => e.GetEffectDescription()));
+            string desc = "Current Curses:\n";
+            desc += string.Join(", ", activeTypingEffects.Where(e => e.IsCurse()).Select(e => e.GetEffectDescription()));
+            desc += "\n";
+            desc += "Current Buffs:\n";
+            desc += string.Join(", ", activeTypingEffects.Where(e => !e.IsCurse()).Select(e => e.GetEffectDescription()));
+            desc += "\n";
             effectText.text = desc;
         }
+    }
+
+    public void ResetTypingEffects()
+    {
+        activeTypingEffects = new();
+        UpdateEffectText();
     }
 
     /// <summary>
@@ -54,22 +75,22 @@ public class TypingEffectManager : MonoBehaviour
         {
             if (typingEffect.ApplyPunishmentMod() != 0)
             {
-                output[0] = typingEffect.ApplyPunishmentMod();
+                output[0] += typingEffect.ApplyPunishmentMod();
             }
 
             if (typingEffect.ApplyHealMod() != 0)
             {
-                output[1] = typingEffect.ApplyHealMod();
+                output[1] += typingEffect.ApplyHealMod();
             }
 
             if (typingEffect.ApplyDamageMod() != 0)
             {
-                output[2] = typingEffect.ApplyDamageMod();
+                output[2] += typingEffect.ApplyDamageMod();
             }
 
             if (typingEffect.ApplyBulletSpeedMod() != 0)
             {
-                output[3] = typingEffect.ApplyBulletSpeedMod();
+                output[3] += typingEffect.ApplyBulletSpeedMod();
             }
         }
 
