@@ -102,7 +102,6 @@ public class CustomLayoutGroup : MonoBehaviour
         float totalChildrenSize = 0f;
         foreach (RectTransform child in children)
         {
-            Debug.Log("Checking RectTransform: " + child.name);
             totalChildrenSize += direction == LayoutDirection.Horizontal ? child.sizeDelta.x : child.sizeDelta.y;
         }
 

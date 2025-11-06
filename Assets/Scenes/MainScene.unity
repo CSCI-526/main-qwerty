@@ -410,10 +410,11 @@ MonoBehaviour:
   padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 0
+    m_Top: 75
     m_Bottom: 0
   reverseOrder: 0
   stretchChildren: 0
+  children: []
 --- !u!1 &81143534
 GameObject:
   m_ObjectHideFlags: 0
@@ -1277,9 +1278,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  players: []
-  enemies: []
-  projectiles: []
   localPlayer: {fileID: 0}
   projectileParent: {fileID: 1462859614}
   startBattleButton: {fileID: 1020654710}
@@ -3496,6 +3494,7 @@ MonoBehaviour:
     m_Bottom: 0
   reverseOrder: 0
   stretchChildren: 0
+  children: []
 --- !u!1 &2006937935
 GameObject:
   m_ObjectHideFlags: 0
@@ -3656,6 +3655,7 @@ MonoBehaviour:
     m_Bottom: 0
   reverseOrder: 0
   stretchChildren: 0
+  children: []
 --- !u!114 &922871282824396222
 MonoBehaviour:
   m_ObjectHideFlags: 0
