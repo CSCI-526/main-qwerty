@@ -137,12 +137,14 @@ public class GameManager : NetworkBehaviour
         sharedCanvas.RequestSpawnPlayerIconOwnerRpc(requesterClientId, new FixedString128Bytes(playerName));
     }
 
-    public void AddPlayer(PlayerNetworkData data)
+    [Rpc(SendTo.Owner)]
+    public void AddPlayerRpc(PlayerNetworkData data)
     {
         playerData.Add(data);
     }
 
-    public void RemovePlayer(ulong targetingID)
+    [Rpc(SendTo.Owner)]
+    public void RemovePlayerRpc(ulong targetingID)
     {
         foreach (PlayerNetworkData player in playerData)
         {
@@ -154,7 +156,8 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void RemoveAllPlayers()
+    [Rpc(SendTo.Owner)]
+    public void RemoveAllPlayersRpc()
     {
         playerData.Clear();
     }
@@ -238,12 +241,14 @@ public class GameManager : NetworkBehaviour
         sharedCanvas.RequestSpawnEnemyIconOwnerRpc(gameLoopManager.GetEnemyHealthMultiplier(), gameLoopManager.GetEnemyAttackCooldownMultiplier());
     }
 
-    public void AddEnemy(EnemyNetworkData data)
+    [Rpc(SendTo.Owner)]
+    public void AddEnemyRpc(EnemyNetworkData data)
     {
         enemyData.Add(data);
     }
 
-    public void RemoveEnemy(ulong targetingID)
+    [Rpc(SendTo.Owner)]
+    public void RemoveEnemyRpc(ulong targetingID)
     {
         foreach (EnemyNetworkData enemy in enemyData)
         {
@@ -255,7 +260,8 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void RemoveAllEnemies()
+    [Rpc(SendTo.Owner)]
+    public void RemoveAllEnemiesRpc()
     {
         enemyData.Clear();
     }
@@ -312,12 +318,14 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void AddProjectile(ProjectileNetworkData data)
+    [Rpc(SendTo.Owner)]
+    public void AddProjectileRpc(ProjectileNetworkData data)
     {
         projectileData.Add(data);
     }
 
-    public void RemoveProjectile(ulong targetingID)
+    [Rpc(SendTo.Owner)]
+    public void RemoveProjectileRpc(ulong targetingID)
     {
         foreach (ProjectileNetworkData projectile in projectileData)
         {
@@ -329,7 +337,8 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void RemoveAllProjectiles()
+    [Rpc(SendTo.Owner)]
+    public void RemoveAllProjectilesRpc()
     {
         projectileData.Clear();
     }
