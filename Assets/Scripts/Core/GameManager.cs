@@ -164,6 +164,11 @@ public class GameManager : NetworkBehaviour
         return players.TryGetValue(clientId, out PlayerController player) ? player : null;
     }
 
+    public PlayerController GetPlayerByTargetingId(ulong targetingId)
+    {
+        return players.TryGetValue(targetingId, out PlayerController player) ? player : null;
+    }
+
     public PlayerController GetRandomPlayer()
     {
         if (players.Count == 0) return null;
@@ -252,6 +257,11 @@ public class GameManager : NetworkBehaviour
         enemyData.Clear();
     }
 
+    public EnemyController GetEnemyByTargetingId(ulong targetingId)
+    {
+        return enemies.TryGetValue(targetingId, out EnemyController enemy) ? enemy : null;
+    }
+
     public bool IsEnemiesDead()
     {
         return enemies.Count == 0;
@@ -319,6 +329,11 @@ public class GameManager : NetworkBehaviour
     public void RemoveAllProjectiles()
     {
         projectileData.Clear();
+    }
+
+    public ProjectileController GetProjectileByTargetingId(ulong targetingId)
+    {
+        return projectiles.TryGetValue(targetingId, out ProjectileController projectile) ? projectile : null;
     }
 
     public GameObject GetProjectileParent() { return projectileParent; }
