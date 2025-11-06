@@ -194,6 +194,9 @@ public class GameManager : NetworkBehaviour
     private void OnEnemyDataChanged(NetworkListEvent<EnemyNetworkData> changeEvent)
     {
         List<EnemyController> enemyObjects = FindObjectsByType<EnemyController>(FindObjectsSortMode.None).ToList();
+        
+        Debug.Log($"OnEnemyDataChanged called: {changeEvent.Type} for ID {changeEvent.Value.TargetingID}");
+
         switch (changeEvent.Type)
         {
             case NetworkListEvent<EnemyNetworkData>.EventType.Add:
