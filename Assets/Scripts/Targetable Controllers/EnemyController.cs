@@ -20,6 +20,8 @@ public class EnemyController : TargetableController
     private void Start()
     {
         attackCd = attackCooldown;
+        if(gameManager.gameLoopManager.GetTutorialState())
+            attackCd = 0.1f;
     }
 
     public override void OnNetworkSpawn()
@@ -81,7 +83,6 @@ public class EnemyController : TargetableController
                 attackCd -= Time.deltaTime;
             }
         }
-
     }
 
     private void ShootWord(string word)

@@ -48,6 +48,8 @@ public class TypeTracker : MonoBehaviour
     private int damageDealt = 0;
     private int healingDone = 0;
 
+    private int tutorial = 0;
+
     private TargetableController currentTarget;
 
     private ClassBase currentClass = new BalancedClass();
@@ -94,9 +96,10 @@ public class TypeTracker : MonoBehaviour
     private void Start()
     {
         if (gameManager.gameLoopManager.GetTutorialState())
-            instructionText.text = "Try to press 1 for attacking mode, and press 2 for healing mode.\nYour goal is to take down the enemy while suriving in the playfield.\n";
+            instructionText.text = "Select an ability 1-4. Let's try attacking with 1!";
         else
-            instructionText.text = "Select ability: 1 for attack and 2 for healing.\n";
+            instructionText.text = "Select an ability 1-4:\n";
+
         promptText.text = "";
 
         inputField.text = "";
@@ -184,11 +187,13 @@ public class TypeTracker : MonoBehaviour
     private void EnterTargetPhase()
     {
         awaitingTarget = true;
-        string modeName = GetModeName();
-        instructionText.text = $"{modeName}. Enter <color=yellow>Target</color> (strings in yellow): ";
+        instructionText.text = "Enter <color=yellow>Target</color>: ";
         if (gameManager.gameLoopManager.GetTutorialState())
         {
-            instructionText.text += "\nIn attack mode, you can attack projectiles or the enemy. In heal mode, you can heal the players.";
+            if(tutorial == 0)
+                instructionText.text = "Enter the enemy's <color=yellow>Target word</color> (word in yellow): ";
+            if (tutorial == 1)
+                instructionText.text = "You can target anything in yellow. Enter <color=yellow>Target word</color>: ";
         }
         FocusInputField();
     }
@@ -208,6 +213,10 @@ public class TypeTracker : MonoBehaviour
                 if (currentTarget is ProjectileController)
                 {
                     inputField.text = "";
+                    if(gameManager.gameLoopManager.GetTutorialState() && tutorial == 1)
+                    {
+                        tutorial++;
+                    }
                     if (mode == 1)
                     {
                         currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, 10);
@@ -255,9 +264,11 @@ public class TypeTracker : MonoBehaviour
                     prompt = promptText.text; // For comparisons
                 promptText.color = Color.gray;
                 instructionText.text = "Type the prompt below!";
-                if (gameManager.gameLoopManager.GetTutorialState())
+                if (gameManager.gameLoopManager.GetTutorialState() && tutorial == 0)
                 {
-                    instructionText.text += "\nThe faster and more accurate you type, the more effective this action will be.\nPlease be careful that any typo will be marked as red and you will take damage from it!";
+                    promptText.text = "Typing speed & accuracy determine effectiveness.";
+                    prompt = promptText.text;
+                    tutorial++;
                 }
 
                 inputField.text = "";
@@ -347,6 +358,7 @@ public class TypeTracker : MonoBehaviour
                     //Debug.Log("TypeTracker: " + gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).transform.position);
 
                     damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(modMultiplier, mod)) : -1);
+                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(modMultiplier, mod)) : -1);
                 }
             }
             else
@@ -371,6 +383,7 @@ public class TypeTracker : MonoBehaviour
                 int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
                 //gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
                 damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(modMultiplier, mod)) : -1);
+                gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(modMultiplier, mod)) : -1);
             }
         }
 
@@ -397,6 +410,11 @@ public class TypeTracker : MonoBehaviour
 
         float grossWPM = (float)input.Length / 5f / totalMinutes;
 
+        if(promptText.text.Length != input.Length)
+        {
+            errors += Math.Abs(promptText.text.Length - input.Length);
+        }
+
         if (input.Length > 0)
         {
             int correctCharacters = Mathf.Max(0, input.Length - errors);
@@ -416,6 +434,8 @@ public class TypeTracker : MonoBehaviour
         float wpmFactor = Mathf.Log10(grossWPM + 10) * 6f;
         float accuracyFactor = Mathf.Pow(accuracy / 100f, 2f);
         int healthModifier = (int)(wpmFactor*accuracyFactor);
+        if(gameManager.gameLoopManager.GetTutorialState())
+            healthModifier = 4;
 
         if (mode == 1)
         {
