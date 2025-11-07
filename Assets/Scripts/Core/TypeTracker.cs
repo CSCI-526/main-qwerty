@@ -25,6 +25,7 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private GameObject damageScreen;
 
     [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
+    [SerializeField] private DamageManager damageManager;
 
     private string prompt;
     private bool timerStarted = false;
@@ -225,7 +226,9 @@ public class TypeTracker : MonoBehaviour
             }
             else
             {
+
                 instructionText.text = "Invalid Target. Try Again.";
+              
                 inputField.text = "";
                 promptText.text = "";
 
@@ -246,6 +249,13 @@ public class TypeTracker : MonoBehaviour
     // Called when text changes (while typing)
     private void OnInputChanged(string currentText)
     {
+        if(mode == 0)
+        {
+            inputField.text = "";
+            instructionText.text = "Please select an ability first: 1 for Attack, 2 for Heal.";
+            return;
+        }
+
         // Prevent 1 or 2 from appearing if pressed (we handle those separately)
         if (currentText == "1" || currentText == "2")
         {
@@ -290,8 +300,10 @@ public class TypeTracker : MonoBehaviour
                 {
                     errors++;
                     int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
-                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(2, mod)) : -1);
-                    StartCoroutine(flashDamageScreen(0.1f));
+                    //gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod == 1 ? -4 : -1);
+                    //Debug.Log("TypeTracker: "+ gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).name);
+                    //Debug.Log("TypeTracker: " + gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).transform.position);
+                    damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(2, mod)) : -1);
                 }
             }
             else
@@ -313,8 +325,9 @@ public class TypeTracker : MonoBehaviour
             if (!activeErrors.Contains(i))
             {
                 errors++;
-                gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
-                StartCoroutine(flashDamageScreen(0.5f));
+                int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
+                //gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
+                damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod == 1 ? -4 : -1);
             }
         }
 
@@ -340,8 +353,6 @@ public class TypeTracker : MonoBehaviour
         float totalMinutes = Mathf.Max(0.0001f, totalTime / 60f);
 
         float grossWPM = (float)input.Length / 5f / totalMinutes;
-        float netWPM = grossWPM - (errors / totalMinutes);
-        netWPM = Mathf.Max(0, netWPM);
 
         if (input.Length > 0)
         {
@@ -358,20 +369,25 @@ public class TypeTracker : MonoBehaviour
         averageWPM = ((averageWPM * (numSubmissions - 1)) + grossWPM) / numSubmissions;
         averageAccuracy = ((averageAccuracy * (numSubmissions - 1)) + accuracy) / numSubmissions;
 
-        int healthModifier = Mathf.Max((int)((grossWPM / 5f) * Mathf.Pow(accuracy / 100f, 1.25f)), 1);
+        // Damage calculation to make speed more forgiving and errors more penalizing. Also has a floor of 1 damage.
+        float wpmFactor = Mathf.Log10(grossWPM + 10) * 6f;
+        float accuracyFactor = Mathf.Pow(accuracy / 100f, 2f);
+        int healthModifier = (int)(wpmFactor*accuracyFactor);
 
         if (mode == 1)
         {
             int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
+            //currentTarget.ModifyCurrentHealth(mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
             int delta = Math.Min((int)(-healthModifier / Math.Pow(2, mod)), -1);
-            currentTarget.ModifyCurrentHealth(delta);
+            damageManager.applyHealthChange(currentTarget, delta);
             damageDealt -= delta;
         }
         else if (mode == 2)
         {
             int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
+            //currentTarget.ModifyCurrentHealth(mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
             int delta = Math.Max((int)(healthModifier / Math.Pow(2, mod)), 1);
-            currentTarget.ModifyCurrentHealth(delta);
+            damageManager.applyHealthChange(currentTarget, delta);
             healingDone += delta;
         }
         currentTarget.RandomizeTargetWord();
@@ -432,6 +448,7 @@ public class TypeTracker : MonoBehaviour
         FocusInputField();
     }
 
+    // Probably get rid of this eventually and just fix the prompts
     private string NormalizeText(string text)
     {
         if (text == null)
@@ -453,7 +470,7 @@ public class TypeTracker : MonoBehaviour
     }
 
 
-    // Ensures text field is always active
+    // Focuses the text field
     private void FocusInputField()
     {
         if (inputField == null) return;
@@ -467,6 +484,7 @@ public class TypeTracker : MonoBehaviour
         inputField.ActivateInputField();
     }
 
+    // Caret positioning settings
     private void positionCaret(int caretIndex)
     {
         if (caretRect == null)
@@ -534,16 +552,4 @@ public class TypeTracker : MonoBehaviour
 
         caretRect.anchoredPosition += new Vector2(0, caretRect.sizeDelta.y * 0.3f);
     }
-
-    private IEnumerator flashDamageScreen(float duration = 0.5f)
-    {
-        if (damageScreen == null)
-            yield break;
-
-        damageScreen.SetActive(true); // Instantly show the image
-        yield return new WaitForSeconds(duration);
-        damageScreen.SetActive(false); // Instantly hide it
-    }
-
-
 }
