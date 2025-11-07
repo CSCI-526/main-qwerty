@@ -9,6 +9,7 @@ public class ProjectileController : TargetableController
     [Header("Projectile Settings")]
     [SerializeField] private int wordSpeed = 5;
     [SerializeField] private int wordSpeedMin = 1;
+    [SerializeField] private float modMultiplier = 1.2f;
     [SerializeField] private int damage = 50;
 
     private string word = "";
@@ -59,7 +60,7 @@ public class ProjectileController : TargetableController
                 mod = gameManager.typingEffectManager.ApplyEffectOnMod()[3];
             }
             Vector3 direction = (target.transform.position - transform.position).normalized;
-            transform.Translate(direction * (Math.Max(wordSpeed * (float)Math.Pow(2, mod), wordSpeedMin)) * Time.deltaTime);
+            transform.Translate(direction * (Math.Max(wordSpeed * (float)Math.Pow(modMultiplier, mod), wordSpeedMin)) * Time.deltaTime);
         }
     }
 

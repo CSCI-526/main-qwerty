@@ -5,13 +5,14 @@ using UnityEngine;
 
 public class BalancedClass : ClassBase
 {
+    private float modMultipler = 1.2f;
     public override void Ability1(ulong playerID, TargetableController target, int baseValue)
     {
         ulong targetType = DetermineTargetType(target);
         gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 0.9f, 1, "DamageBuff");
         gameManager.addBuffDebuffToListRpc(0, playerID, 0.2f, 1, "LeechBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-        int delta = Math.Min((int)(-baseValue / Math.Pow(2, mod)), -1);
+        int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
         LogAbility("BalancedClass", 1, "Quick strike (0.9x base attack)");
     }
@@ -34,7 +35,7 @@ public class BalancedClass : ClassBase
     {
         ulong targetType = DetermineTargetType(target);
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
-        int delta = Math.Max((int)(baseValue / Math.Pow(2, mod)), 1);
+        int delta = Math.Max((int)(baseValue / Math.Pow(modMultipler, mod)), 1);
         gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, delta);
         LogAbility("BalancedClass", 4, "Heal ally for 1.0x of base value");
     }
