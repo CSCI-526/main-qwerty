@@ -396,12 +396,13 @@ MonoBehaviour:
         byte0123: 0
         byte0124: 0
         byte0125: 0
-  networkedTargetingId:
-    m_InternalValue: 0
-  targetingId: 0
+  targetingID:
+    m_InternalValue: 18446744073709551615
   targetWordText: {fileID: 613936294155128085}
   wordSpeed: 75
-  damage: 25
+  wordSpeedMin: 1
+  modMultiplier: 1.2
+  damage: 10
 --- !u!61 &2631638884928488270
 BoxCollider2D:
   m_ObjectHideFlags: 0
