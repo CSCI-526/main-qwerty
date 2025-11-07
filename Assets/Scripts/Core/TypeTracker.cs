@@ -23,6 +23,7 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private TMP_Text instructionText;       // Displayed prompt
     [SerializeField] private Image ability1, ability2, ability3, ability4;
     [SerializeField] private GameObject damageScreen;
+    [SerializeField] private float modMultiplier = 1.2f;
 
     [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
     [SerializeField] private DamageManager damageManager;
@@ -355,8 +356,9 @@ public class TypeTracker : MonoBehaviour
                     //gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod == 1 ? -4 : -1);
                     //Debug.Log("TypeTracker: "+ gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).name);
                     //Debug.Log("TypeTracker: " + gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).transform.position);
-                    damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(2, mod)) : -1);
-                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(2, mod)) : -1);
+
+                    damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(modMultiplier, mod)) : -1);
+                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(modMultiplier, mod)) : -1);
                 }
             }
             else
@@ -380,8 +382,8 @@ public class TypeTracker : MonoBehaviour
                 errors++;
                 int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
                 //gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
-                damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod == 1 ? -4 : -1);
-                gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod == 1 ? -4 : -1);
+                damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(modMultiplier, mod)) : -1);
+                gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(modMultiplier, mod)) : -1);
             }
         }
 
