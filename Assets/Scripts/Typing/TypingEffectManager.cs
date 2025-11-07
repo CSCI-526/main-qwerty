@@ -1,12 +1,13 @@
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
-using System.Linq;
+using System;
 
 public class TypingEffectManager : MonoBehaviour
 {
     [SerializeField] private TMP_Text effectText; // list of current curses & buffs
     [SerializeField] private GameObject effectPanel;
+    [SerializeField] private float modMultiplier = 1.2f;
 
     private List<TypingEffectBase> activeTypingEffects = new(); // currently active curses & buffs
 
@@ -33,12 +34,47 @@ public class TypingEffectManager : MonoBehaviour
     {
         if (effectText != null)
         {
-            string desc = "Current Curses:\n";
-            desc += string.Join(", ", activeTypingEffects.Where(e => e.IsCurse()).Select(e => e.GetEffectDescription()));
-            desc += "\n";
-            desc += "Current Buffs:\n";
-            desc += string.Join(", ", activeTypingEffects.Where(e => !e.IsCurse()).Select(e => e.GetEffectDescription()));
-            desc += "\n";
+            List<string> curseDescs = new();
+            List<string> buffDescs = new();
+            int bulletSpeedModTotal = 0;
+            int damageModTotal = 0;
+            int healModTotal = 0;
+            int punishmentModTotal = 0;
+
+            foreach (var activeTypingEffect in activeTypingEffects)
+            {
+                int bulletSpeedMod = activeTypingEffect.ApplyBulletSpeedMod();
+                int damageMod = activeTypingEffect.ApplyDamageMod();
+                int healMod = activeTypingEffect.ApplyHealMod();
+                int punishmentMod = activeTypingEffect.ApplyPunishmentMod();
+                if (bulletSpeedMod != 0 || damageMod != 0 || healMod != 0 || punishmentMod != 0)
+                {
+                    bulletSpeedModTotal += bulletSpeedMod;
+                    damageModTotal += damageMod;
+                    healModTotal += healMod;
+                    punishmentModTotal += punishmentMod;
+                }
+                else
+                {
+                    if (activeTypingEffect.IsCurse())
+                    {
+                        curseDescs.Add(activeTypingEffect.GetEffectDescription());
+                    }
+                    else
+                    {
+                        buffDescs.Add(activeTypingEffect.GetEffectDescription());
+                    }
+                }
+            }
+
+            float bulletSpeedModPercentage = (float)Math.Pow(modMultiplier, bulletSpeedModTotal) * 100f;
+            float healModPercentage = 1.0f / (float)Math.Pow(modMultiplier, healModTotal) * 100f;
+            float damageModPercentage = 1.0f / (float)Math.Pow(modMultiplier, damageModTotal) * 100f;
+            float punishmentModPercentage = (float)Math.Pow(modMultiplier, punishmentModTotal) * 100f;
+
+            string desc = $"{damageModPercentage:F2}% damage, {healModPercentage:F2}% healing, \n{punishmentModPercentage:F2}% punishment, {bulletSpeedModPercentage:F2}% enemy bullet speed\n";
+            desc += "Current Curses:\n" + string.Join(", ", curseDescs) + "\n";
+            desc += "Current Buffs:\n" + string.Join(", ", buffDescs) + "\n";
             effectText.text = desc;
         }
     }
