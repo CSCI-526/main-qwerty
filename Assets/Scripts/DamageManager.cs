@@ -23,8 +23,6 @@ public class DamageManager : MonoBehaviour
     {
         if (target == null) return;
 
-        target.ModifyCurrentHealth(amount);
-
         RectTransform targetRect = target.GetComponent<RectTransform>();
         if (targetRect != null)
         {
@@ -72,7 +70,7 @@ public class DamageManager : MonoBehaviour
                 popupScript.text.color = damageColor;
                 popupScript.Setup(amount);
             }
-            else
+            else if (amount > 0)
             {
                 popupScript.text.color = healColor;
                 popupScript.Setup(amount);

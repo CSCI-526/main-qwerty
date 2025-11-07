@@ -8,6 +8,7 @@ using Unity.Services.Core;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class GameManager : NetworkBehaviour
 {
@@ -34,6 +35,7 @@ public class GameManager : NetworkBehaviour
     public SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>();
     public GameLoopManager gameLoopManager => FindFirstObjectByType<GameLoopManager>();
     public AnalyticsManager analyticsManager => FindFirstObjectByType<AnalyticsManager>();
+    public DamageManager damageManager => FindFirstObjectByType<DamageManager>();
 
     public ulong projectileTargetingIdCounter = 0;
 
@@ -531,9 +533,38 @@ public class GameManager : NetworkBehaviour
         float leechModifier = player.calculateLeechModifier();
         float damageTakenModifier = target.calculateDamageTakenModifier();
         int finalValue = (int)(baseValue * damageModifier * damageTakenModifier);
+        int leechValue = (int)(finalValue * leechModifier);
 
         target.ModifyCurrentHealth(finalValue);
-        player.ModifyCurrentHealth(-1 * (int)(finalValue * leechModifier));
+        player.ModifyCurrentHealth(-1 * leechValue);
+
+        Debug.Log("Pre-Buff/Debuff: " + baseValue + ", Damage Mod: " + damageModifier + ", Damage Taken Mod: " + damageTakenModifier + ", Final Damage: " + finalValue + ", Leech Mod: " + leechModifier + ", Leech Value: " + leechValue);
+
+        showDamageRpc(targetType, targetingID, finalValue, leechValue, RpcTarget.Single(playerID, RpcTargetUse.Temp));
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void showDamageRpc(ulong targetType, ulong targetingID, int damage, int leechValue, RpcParams rpcParams)
+    {
+        PlayerController player = GetPlayerByClientId(networkManager.LocalClientId);
+        TargetableController target = null;
+        switch (targetType)
+        {
+            case 0:
+                target = GetPlayerByTargetingId(targetingID);
+                break;
+            case 1:
+                target = GetEnemyByTargetingId(targetingID);
+                break;
+            case 2:
+                target = GetProjectileByTargetingId(targetingID);
+                break;
+        }
+
+        if (player == null || target == null) return;
+
+        damageManager.applyHealthChange(target, damage);
+        damageManager.applyHealthChange(player, -1 * leechValue);
     }
 
     #endregion
@@ -564,6 +595,7 @@ public class GameManager : NetworkBehaviour
         float healModifier = player.calculateHealModifier();
         int finalValue = (int)(baseValue * healModifier);
         target.ModifyCurrentHealth(finalValue);
+        showDamageRpc(targetType, targetingID, finalValue, 0, RpcTarget.Single(playerID, RpcTargetUse.Temp));
     }
 
     #endregion

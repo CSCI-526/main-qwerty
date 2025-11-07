@@ -408,9 +408,9 @@ MonoBehaviour:
   alignment: 1
   spacing: 10
   padding:
-    m_Left: 0
+    m_Left: 325
     m_Right: 0
-    m_Top: 75
+    m_Top: 150
     m_Bottom: 0
   reverseOrder: 0
   stretchChildren: 0
@@ -3936,7 +3936,7 @@ MonoBehaviour:
   alignment: 1
   spacing: 10
   padding:
-    m_Left: 0
+    m_Left: 50
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
@@ -4097,7 +4097,7 @@ MonoBehaviour:
   alignment: 1
   spacing: 10
   padding:
-    m_Left: 0
+    m_Left: 50
     m_Right: 0
     m_Top: 0
     m_Bottom: 0

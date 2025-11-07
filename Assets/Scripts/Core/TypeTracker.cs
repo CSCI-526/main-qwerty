@@ -48,6 +48,9 @@ public class TypeTracker : MonoBehaviour
     private int healingDone = 0;
 
     private TargetableController currentTarget;
+
+    private ClassBase currentClass = new BalancedClass();
+
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
     public void OnEnable()
@@ -116,6 +119,14 @@ public class TypeTracker : MonoBehaviour
         {
             changeMode(2);
         }
+        if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false)
+        {
+            changeMode(3);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false)
+        {
+            changeMode(4);
+        }
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
@@ -143,15 +154,26 @@ public class TypeTracker : MonoBehaviour
 
         mode = newMode;
 
+        ability1.color = new Color(0f, 0f, 0f, 0.3f);
+        ability2.color = new Color(0f, 0f, 0f, 0.3f);
+        ability3.color = new Color(0f, 0f, 0f, 0.3f);
+        ability4.color = new Color(0f, 0f, 0f, 0.3f);
+
         if (mode == 1)
         {
             ability1.color = new Color(0f, 1f, 0f, 1f); // Green at 100% opacity
-            ability2.color = new Color(0f, 0f, 0f, 0.3f); // Black at 30% opacity
         }
         if (mode == 2)
         {
-            ability1.color = new Color(0f, 0f, 0f, 0.3f); // Green at 100% opacity
-            ability2.color = new Color(0f, 1f, 0f, 1f); // Black at 30% opacity
+            ability2.color = new Color(0f, 1f, 0f, 1f); // Green at 100% opacity
+        }
+        if (mode == 3)
+        {
+            ability3.color = new Color(0f, 1f, 0f, 1f); // Green at 100% opacity
+        }
+        if (mode == 4)
+        {
+            ability4.color = new Color(0f, 1f, 0f, 1f); // Green at 100% opacity
         }
 
         resetState();
@@ -187,11 +209,19 @@ public class TypeTracker : MonoBehaviour
                     inputField.text = "";
                     if (mode == 1)
                     {
-                        currentTarget.ModifyCurrentHealth(-10);
+                        currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, 10);
                     }
                     else if (mode == 2)
                     {
-                        currentTarget.ModifyCurrentHealth(10);
+                        currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                    }
+                    else if (mode == 3)
+                    {
+                        currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                    }
+                    else if (mode == 4)
+                    {
+                        currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, 10);
                     }
                     currentTarget = null;
                     promptText.text = "";
@@ -201,16 +231,27 @@ public class TypeTracker : MonoBehaviour
                 }
                 else if (mode == 1)
                 {
-                    string temp = promptGenerator.GetRandomSentence("Attack");
+                    Debug.Log(currentClass.promptFileNames);
+                    string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[0]);
                     promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
                 }
                 else if (mode == 2)
                 {
-                    string temp = promptGenerator.GetRandomSentence("Heal");
+                    string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[1]);
+                    promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
+                }
+                else if (mode == 3)
+                {
+                    string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[2]);
+                    promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
+                }
+                else if (mode == 4)
+                {
+                    string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[3]);
                     promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
                 }
 
-                prompt = promptText.text; // For comparisons
+                    prompt = promptText.text; // For comparisons
                 promptText.color = Color.gray;
                 instructionText.text = "Type the prompt below!";
                 if (gameManager.gameLoopManager.GetTutorialState())
@@ -257,7 +298,7 @@ public class TypeTracker : MonoBehaviour
         }
 
         // Prevent 1 or 2 from appearing if pressed (we handle those separately)
-        if (currentText == "1" || currentText == "2")
+        if (currentText == "1" || currentText == "2" || currentText == "3" || currentText == "4")
         {
             inputField.text = "";
             return;
@@ -376,19 +417,21 @@ public class TypeTracker : MonoBehaviour
 
         if (mode == 1)
         {
-            int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-            //currentTarget.ModifyCurrentHealth(mod == 0 ? -healthModifier : mod == 1 ? -healthModifier / 2 : -healthModifier * 2);
-            int delta = Math.Min((int)(-healthModifier / Math.Pow(2, mod)), -1);
-            damageManager.applyHealthChange(currentTarget, delta);
-            damageDealt -= delta;
+            currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            // damageManager.applyHealthChange(currentTarget, delta);
+            // damageDealt -= delta;
         }
         else if (mode == 2)
         {
-            int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
-            //currentTarget.ModifyCurrentHealth(mod == 0 ? healthModifier : mod == 1 ? healthModifier / 2 : healthModifier * 2);
-            int delta = Math.Max((int)(healthModifier / Math.Pow(2, mod)), 1);
-            damageManager.applyHealthChange(currentTarget, delta);
-            healingDone += delta;
+            currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+        }
+        else if (mode == 3)
+        {
+            currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+        }
+        else if (mode == 4)
+        {
+            currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;

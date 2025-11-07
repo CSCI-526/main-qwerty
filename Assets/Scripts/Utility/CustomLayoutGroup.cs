@@ -171,8 +171,8 @@ public class CustomLayoutGroup : MonoBehaviour
                 offset -= (child.sizeDelta.y + spacing);
             }
 
-            child.anchorMin = child.anchorMax = new Vector2(0, 1); // Top-left anchor
-            child.pivot = new Vector2(0, 1);
+            child.anchorMin = child.anchorMax = new Vector2(0f, 1f); // Top-left anchor
+            child.pivot = new Vector2(0.5f, 0.5f);
             child.anchoredPosition = pos;
         }
     }
