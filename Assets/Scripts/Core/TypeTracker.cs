@@ -356,6 +356,7 @@ public class TypeTracker : MonoBehaviour
                     //Debug.Log("TypeTracker: "+ gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).name);
                     //Debug.Log("TypeTracker: " + gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).transform.position);
                     damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(2, mod)) : -1);
+                    gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(2, mod)) : -1);
                 }
             }
             else
@@ -380,6 +381,7 @@ public class TypeTracker : MonoBehaviour
                 int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[0];
                 //gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(-5);
                 damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod == 1 ? -4 : -1);
+                gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod == 1 ? -4 : -1);
             }
         }
 
@@ -405,6 +407,11 @@ public class TypeTracker : MonoBehaviour
         float totalMinutes = Mathf.Max(0.0001f, totalTime / 60f);
 
         float grossWPM = (float)input.Length / 5f / totalMinutes;
+
+        if(promptText.text.Length != input.Length)
+        {
+            errors += Math.Abs(promptText.text.Length - input.Length);
+        }
 
         if (input.Length > 0)
         {
