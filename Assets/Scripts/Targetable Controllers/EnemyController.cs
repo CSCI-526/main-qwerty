@@ -83,15 +83,6 @@ public class EnemyController : TargetableController
                 attackCd -= Time.deltaTime;
             }
         }
-
-        if(tutorial)
-        {
-            if(currentHealth.Value != maxHealth)
-            {
-                
-            }
-        }
-
     }
 
     private void ShootWord(string word)
