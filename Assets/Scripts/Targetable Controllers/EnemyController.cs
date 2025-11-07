@@ -20,6 +20,8 @@ public class EnemyController : TargetableController
     private void Start()
     {
         attackCd = attackCooldown;
+        if(gameManager.gameLoopManager.GetTutorialState())
+            attackCd = 0.1f;
     }
 
     public override void OnNetworkSpawn()
@@ -79,6 +81,14 @@ public class EnemyController : TargetableController
             else
             {
                 attackCd -= Time.deltaTime;
+            }
+        }
+
+        if(tutorial)
+        {
+            if(currentHealth.Value != maxHealth)
+            {
+                
             }
         }
 
