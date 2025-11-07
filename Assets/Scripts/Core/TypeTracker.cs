@@ -21,7 +21,7 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private TMP_InputField inputField; // Player input
     [SerializeField] private TMP_Text promptText;       // Displayed prompt
     [SerializeField] private TMP_Text instructionText;       // Displayed prompt
-    [SerializeField] private Image ability1, ability2;
+    [SerializeField] private Image ability1, ability2, ability3, ability4;
     [SerializeField] private GameObject damageScreen;
 
     [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
