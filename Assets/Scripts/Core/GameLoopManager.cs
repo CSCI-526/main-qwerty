@@ -10,6 +10,8 @@ public class GameLoopManager : NetworkBehaviour
     [SerializeField] private GameObject startBattleButton;
     [SerializeField] private GameObject cursePanel;
 
+    private bool tutorial = true;
+    private bool tutorialStage = true;
     private bool inCombat = false;
     private int battleCount = 0;
 
@@ -17,7 +19,7 @@ public class GameLoopManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        ToggleElementsRpc(false, true, false);
+        ToggleElementsRpc(false, true, false, tutorial);
     }
 
     private void Update()
@@ -78,7 +80,7 @@ public class GameLoopManager : NetworkBehaviour
         CreatePlayers();
         gameManager.SpawnEnemy();
         yield return new WaitForSeconds(2f);
-        ToggleElementsRpc(true, false, false);
+        ToggleElementsRpc(true, false, false, tutorial);
         inCombat = true;
     }
 
@@ -94,12 +96,22 @@ public class GameLoopManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.Everyone)]
-    public void ToggleElementsRpc(bool typingElementsState, bool startBattleButtonState, bool cursePanelState)
+    public void ToggleElementsRpc(bool typingElementsState, bool startBattleButtonState, bool cursePanelState, bool tutorialState = false)
     {
         typingElements.SetActive(typingElementsState);
         if(IsOwner)
             startBattleButton.SetActive(startBattleButtonState);
         cursePanel.SetActive(cursePanelState);
+        Debug.Log(tutorialState);
+        if (tutorialState)
+        {
+            tutorialStage = true;
+        }
+        else
+        {
+            tutorial = false;
+            tutorialStage = false;
+        }
     }
 
     public void ResetCurses()
@@ -130,5 +142,10 @@ public class GameLoopManager : NetworkBehaviour
     {
         if (!IsOwner) return 0f;
         return Mathf.Pow(0.9f, battleCount) * Mathf.Pow(0.8f, gameManager.networkManager.ConnectedClients.Count - 1);
+    }
+
+    public bool GetTutorialState()
+    {
+        return tutorialStage;
     }
 }
