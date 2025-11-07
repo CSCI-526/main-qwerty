@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using System.Collections.Generic;
 
 public abstract class TargetableController : NetworkBehaviour
 {
@@ -108,6 +109,128 @@ public abstract class TargetableController : NetworkBehaviour
     {
         string newWord = gameManager.GenerateWord();
         SetTargetWord(newWord);
+    }
+
+    #endregion
+
+    #region Buff/Debuff
+
+    public struct BuffDebuffData {
+        public float modifier;
+        public int duration;
+        public FixedString128Bytes effectType;
+
+        public void assignBuffDebuffData(float Modifier, int Duration, FixedString128Bytes EffectType)
+        {
+            modifier = Modifier;
+            duration = Duration;
+            effectType = EffectType;
+        }
+    }
+
+    List<BuffDebuffData> BuffDebuffList = new List<BuffDebuffData>();
+
+    public float calculateDamageModifier()
+    {
+        float modifier = 1.0f;
+        for (int i = BuffDebuffList.Count - 1; i >= 0; i--)
+        {
+            var effect = BuffDebuffList[i];
+            if (effect.effectType.ToString().Equals("DamageBuff"))
+            {
+                modifier *= effect.modifier;
+                effect.duration--;
+                if (effect.duration <= 0)
+                {
+                    BuffDebuffList.RemoveAt(i);
+                }
+                else
+                {
+                    BuffDebuffList[i] = effect; // write back the mutated struct
+                }
+            }
+        }
+        return modifier;
+    }
+
+    public float calculateHealModifier()
+    {
+        float modifier = 1.0f;
+        for (int i = BuffDebuffList.Count - 1; i >= 0; i--)
+        {
+            var effect = BuffDebuffList[i];
+            if (effect.effectType.ToString().Equals("HealBuff"))
+            {
+                modifier *= effect.modifier;
+                effect.duration--;
+                if (effect.duration <= 0)
+                {
+                    BuffDebuffList.RemoveAt(i);
+                }
+                else
+                {
+                    BuffDebuffList[i] = effect; // write back the mutated struct
+                }
+            }
+        }
+        return modifier;
+    }
+
+    public float calculateLeechModifier()
+    {
+        float modifier = 0.0f;
+        for (int i = BuffDebuffList.Count - 1; i >= 0; i--)
+        {
+            var effect = BuffDebuffList[i];
+            if (effect.effectType.ToString().Equals("LeechBuff"))
+            {
+                modifier += effect.modifier;
+                effect.duration--;
+                if (effect.duration <= 0)
+                {
+                    BuffDebuffList.RemoveAt(i);
+                }
+                else
+                {
+                    BuffDebuffList[i] = effect;
+                }
+            }
+        }
+        return modifier;
+    }
+
+    public float calculateDamageTakenModifier()
+    {
+        float modifier = 1.0f;
+        for (int i = BuffDebuffList.Count - 1; i >= 0; i--)
+        {
+            var effect = BuffDebuffList[i];
+            if (effect.effectType.ToString().Equals("DamageTakenDebuff"))
+            {
+                modifier *= (float)effect.modifier;
+                effect.duration--;
+                if (effect.duration <= 0)
+                {
+                    BuffDebuffList.RemoveAt(i);
+                }
+                else
+                {
+                    BuffDebuffList[i] = effect;
+                }
+            }
+        }
+        return modifier;
+    }
+
+    public void AddBuffDebuff(float modifier, int duration, FixedString128Bytes effectType)
+    {
+        BuffDebuffData data = new BuffDebuffData
+        {
+            modifier = modifier,
+            duration = duration,
+            effectType = effectType
+        };
+        BuffDebuffList.Add(data);
     }
 
     #endregion
