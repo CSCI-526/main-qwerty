@@ -540,7 +540,8 @@ public class GameManager : NetworkBehaviour
 
         Debug.Log("Pre-Buff/Debuff: " + baseValue + ", Damage Mod: " + damageModifier + ", Damage Taken Mod: " + damageTakenModifier + ", Final Damage: " + finalValue + ", Leech Mod: " + leechModifier + ", Leech Value: " + leechValue);
 
-        showDamageRpc(targetType, targetingID, finalValue, leechValue, RpcTarget.Single(playerID, RpcTargetUse.Temp));
+        if(targetType != 2)
+            showDamageRpc(targetType, targetingID, finalValue, leechValue, RpcTarget.Single(playerID, RpcTargetUse.Temp));
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
