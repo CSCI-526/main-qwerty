@@ -26,6 +26,11 @@ public class AutoCorrectBuffData : TypingEffectBase
         }
     }
 
+    public override bool IsCurse()
+    {
+        return false;
+    }
+
     public override void OnEndTyping(ref int errors)
     {
         errors = Mathf.Max(0, errors - autoCorrectCount);

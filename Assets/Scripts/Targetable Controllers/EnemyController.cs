@@ -9,6 +9,7 @@ public class EnemyController : TargetableController
     [Header("Enemy Settings")]
     [SerializeField] private float attackCooldown = 10;
     private float attackCd = 0;
+    private bool tutorial = false;
 
     private List<string> wordList = new List<string>();
 
@@ -41,9 +42,14 @@ public class EnemyController : TargetableController
         attackCooldown *= multiplier;
     }
 
+    public void SetTutorial(bool flag)
+    {
+        tutorial = flag;
+    }
+
     protected override void Die()
     {
-        gameManager.RemoveEnemyRpc(targetingId);
+        gameManager.RemoveEnemy(targetingID.Value);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);
     }
@@ -53,20 +59,29 @@ public class EnemyController : TargetableController
         targetWordText.text = newWord.ToString();
     }
 
+    protected override void OnTargetIDChanged(ulong oldID, ulong newID)
+    {
+        gameManager.RefreshEnemies();
+    }
+
     private void Update()
     {
         if (!IsOwner) return;
         if (IsDead()) return;
 
-        if (attackCd <= 0)
+        if (!tutorial || currentHealth.Value != maxHealth)
         {
-            ShootWord(gameManager.GenerateWord());
-            attackCd = attackCooldown;
+            if (attackCd <= 0)
+            {
+                ShootWord(gameManager.GenerateWord());
+                attackCd = attackCooldown;
+            }
+            else
+            {
+                attackCd -= Time.deltaTime;
+            }
         }
-        else
-        {
-            attackCd -= Time.deltaTime;
-        }
+
     }
 
     private void ShootWord(string word)
@@ -87,9 +102,12 @@ public class EnemyController : TargetableController
         pc.SetTargetWord(word);
         pc.SetSpawner(this);
         pc.SetTarget(targetPlayer);
-        pc.SetTargetingIdEveryoneRpc(++gameManager.projectileTargetingIdCounter);
+        pc.targetingID.Value = ++gameManager.projectileTargetingIdCounter;
 
-        gameManager.AddProjectileRpc(pc.targetingId);
+        gameManager.AddProjectile(new ProjectileNetworkData
+        {
+            TargetingID = pc.targetingID.Value
+        });
 
         wordList.Add(word);
     }

@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -7,6 +8,7 @@ public class ProjectileController : TargetableController
 {
     [Header("Projectile Settings")]
     [SerializeField] private int wordSpeed = 5;
+    [SerializeField] private int wordSpeedMin = 1;
     [SerializeField] private int damage = 50;
 
     private string word = "";
@@ -28,7 +30,7 @@ public class ProjectileController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemoveProjectileRpc(targetingId);
+        gameManager.RemoveProjectile(targetingID.Value);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);
     }
@@ -36,6 +38,11 @@ public class ProjectileController : TargetableController
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
     {
         targetWordText.text = newWord.ToString();
+    }
+
+    protected override void OnTargetIDChanged(ulong oldID, ulong newID)
+    {
+        gameManager.RefreshProjectiles();
     }
 
     private void MoveTowardsTarget()
@@ -47,12 +54,12 @@ public class ProjectileController : TargetableController
         else
         {
             int mod = 0;
-            if (target.targetingId == gameManager.localPlayer.targetingId)
+            if (target.targetingID.Value == gameManager.localPlayer.targetingID.Value)
             {
                 mod = gameManager.typingEffectManager.ApplyEffectOnMod()[3];
             }
             Vector3 direction = (target.transform.position - transform.position).normalized;
-            transform.Translate(direction * (mod == 0 ? wordSpeed : mod == 1 ? wordSpeed * 2 : wordSpeed / 2) * Time.deltaTime);
+            transform.Translate(direction * (Math.Max(wordSpeed * (float)Math.Pow(2, mod), wordSpeedMin)) * Time.deltaTime);
         }
     }
 

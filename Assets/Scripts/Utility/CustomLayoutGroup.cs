@@ -17,7 +17,7 @@ public class CustomLayoutGroup : MonoBehaviour
     public bool reverseOrder = false;
     public bool stretchChildren = false;
 
-    private List<RectTransform> children = new List<RectTransform>();
+    public List<RectTransform> children = new List<RectTransform>();
 
     private void Awake() => RefreshLayout();
 #if UNITY_EDITOR
@@ -89,6 +89,8 @@ public class CustomLayoutGroup : MonoBehaviour
 
     private void ArrangeChildren()
     {
+        RefreshChildren();
+
         var parentRect = transform as RectTransform;
         if (parentRect == null || children.Count == 0) return;
 
@@ -169,8 +171,8 @@ public class CustomLayoutGroup : MonoBehaviour
                 offset -= (child.sizeDelta.y + spacing);
             }
 
-            child.anchorMin = child.anchorMax = new Vector2(0, 1); // Top-left anchor
-            child.pivot = new Vector2(0, 1);
+            child.anchorMin = child.anchorMax = new Vector2(0f, 1f); // Top-left anchor
+            child.pivot = new Vector2(0.5f, 0.5f);
             child.anchoredPosition = pos;
         }
     }

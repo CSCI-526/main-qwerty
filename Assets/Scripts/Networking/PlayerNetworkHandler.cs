@@ -12,7 +12,7 @@ public class PlayerNetworkHandler : NetworkBehaviour
         {
             if (gameManager != null)
             {
-                gameManager.SyncListsRpc(gameManager.networkManager.LocalClientId);
+                // TODO: Check if needed
             }
         }
     }

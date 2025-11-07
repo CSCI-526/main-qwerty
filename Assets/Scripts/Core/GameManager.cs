@@ -8,14 +8,20 @@ using Unity.Services.Core;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class GameManager : NetworkBehaviour
 {
-    [Header("Controllers")]
-    [SerializeField] private List<PlayerController> players = new List<PlayerController>();
-    [SerializeField] private List<EnemyController> enemies = new List<EnemyController>();
-    [SerializeField] private List<ProjectileController> projectiles = new List<ProjectileController>();
+    [Header("Controller Index Lists")]
+    [SerializeField] private NetworkList<PlayerNetworkData> playerData = new NetworkList<PlayerNetworkData>();
+    [SerializeField] private NetworkList<EnemyNetworkData> enemyData = new NetworkList<EnemyNetworkData>();
+    [SerializeField] private NetworkList<ProjectileNetworkData> projectileData = new NetworkList<ProjectileNetworkData>();
     public PlayerController localPlayer;
+
+    [Header("Controllers")]
+    [SerializeField] private Dictionary<ulong, PlayerController> players = new Dictionary<ulong, PlayerController>();
+    [SerializeField] private Dictionary<ulong, EnemyController> enemies = new Dictionary<ulong, EnemyController>();
+    [SerializeField] private Dictionary<ulong, ProjectileController> projectiles = new Dictionary<ulong, ProjectileController>();
 
     [Header("GameObjects")]
     [SerializeField] private GameObject projectileParent;
@@ -29,68 +35,143 @@ public class GameManager : NetworkBehaviour
     public SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>();
     public GameLoopManager gameLoopManager => FindFirstObjectByType<GameLoopManager>();
     public AnalyticsManager analyticsManager => FindFirstObjectByType<AnalyticsManager>();
+    public DamageManager damageManager => FindFirstObjectByType<DamageManager>();
 
     public ulong projectileTargetingIdCounter = 0;
 
+    #region Unity Methods
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        RefreshPlayers();
+        RefreshEnemies();
+        RefreshProjectiles();
+    }
+
+    private void OnEnable()
+    {
+        playerData.OnListChanged += OnPlayerDataChanged;
+        enemyData.OnListChanged += OnEnemyDataChanged;
+        projectileData.OnListChanged += OnProjectileDataChanged;
+    }
+
+    private void OnDisable()
+    {
+        playerData.OnListChanged -= OnPlayerDataChanged;
+        enemyData.OnListChanged -= OnEnemyDataChanged;
+        projectileData.OnListChanged -= OnProjectileDataChanged;
+    }
+
+    #endregion
+
     #region Players
+
+    private void OnPlayerDataChanged(NetworkListEvent<PlayerNetworkData> changeEvent)
+    {
+        List<PlayerController> playerObjects = FindObjectsByType<PlayerController>(FindObjectsSortMode.None).ToList();
+        switch (changeEvent.Type)
+        {
+            case NetworkListEvent<PlayerNetworkData>.EventType.Add:
+            case NetworkListEvent<PlayerNetworkData>.EventType.Value:
+                PlayerNetworkData addedData = changeEvent.Value;
+                if (!players.ContainsKey(addedData.TargetingID))
+                {
+                    PlayerController player = playerObjects.FirstOrDefault(p => p.targetingID.Value == addedData.TargetingID);
+                    if (player != null)
+                    {
+                        players.Add(addedData.TargetingID, player);
+                        if(player.GetPlayerID() == NetworkManager.Singleton.LocalClientId)
+                        {
+                            localPlayer = player;
+                        }
+                    }
+                }
+                break;
+            case NetworkListEvent<PlayerNetworkData>.EventType.Remove:
+                PlayerNetworkData removedData = changeEvent.Value;
+                players.Remove(removedData.TargetingID);
+                break;
+            case NetworkListEvent<PlayerNetworkData>.EventType.Clear:
+                foreach (PlayerController player in playerObjects)
+                {
+                    if (player != null && player.gameObject != null)
+                    {
+                        if (player.IsOwner)
+                        {
+                            player.gameObject.GetComponent<NetworkObject>().Despawn(false);
+                            Destroy(player.gameObject);
+                        }
+                    }
+                }
+                sharedCanvas.playerPanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
+                players.Clear();
+                break;
+        }
+    }
 
     public void SpawnPlayer(ulong requesterClientId, string playerName)
     {
         sharedCanvas.RequestSpawnPlayerIconOwnerRpc(requesterClientId, new FixedString128Bytes(playerName));
-        StartCoroutine(SetLocalPlayer(requesterClientId));
     }
 
-    [Rpc(SendTo.Everyone)]
-    public void AddPlayerRpc(ulong targetingID)
+    public void AddPlayer(PlayerNetworkData data)
     {
-        players.Add(FindObjectsByType<PlayerController>(FindObjectsSortMode.None).FirstOrDefault(p => p.targetingId == targetingID));
+        playerData.Add(data);
     }
 
-    [Rpc(SendTo.Everyone)]
-    public void RemovePlayerRpc(ulong targetingID)
+    public void RemovePlayer(ulong targetingID)
     {
-        int index = players.FindIndex(players => players.targetingId == targetingID);
-        players.RemoveAt(index);
+        foreach (PlayerNetworkData player in playerData)
+        {
+            if (player.TargetingID == targetingID)
+            {
+                playerData.Remove(player);
+                break;
+            }
+        }
+    }
+
+    public void RemoveAllPlayers()
+    {
+        playerData.Clear();
+    }
+
+    public void RefreshPlayers()
+    {
+        players.Clear();
+        foreach (PlayerNetworkData data in playerData)
+        {
+            OnPlayerDataChanged(new NetworkListEvent<PlayerNetworkData>
+            {
+                Type = NetworkListEvent<PlayerNetworkData>.EventType.Add,
+                Value = data
+            });
+        }
     }
 
     public PlayerController GetPlayerByClientId(ulong clientId)
     {
-        return players.FirstOrDefault(p => p.GetPlayerID() == clientId);
+        return players.TryGetValue(clientId, out PlayerController player) ? player : null;
+    }
+
+    public PlayerController GetPlayerByTargetingId(ulong targetingId)
+    {
+        return players.TryGetValue(targetingId, out PlayerController player) ? player : null;
     }
 
     public PlayerController GetRandomPlayer()
     {
         if (players.Count == 0) return null;
-        int randomIndex = Random.Range(0, players.Count);
-        return players[randomIndex];
-    }
-
-    [Rpc(SendTo.Everyone)]
-    public void RemoveAllPlayersRpc()
-    {
-        foreach (var player in FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
-        {
-            if (player != null && player.gameObject != null)
-            {
-                if (player.IsOwner)
-                {
-                    player.gameObject.GetComponent<NetworkObject>().Despawn(false);
-                    Destroy(player.gameObject);
-                }
-            }
-        }
-        players.Clear();
+        List<PlayerController> playerList = players.Values.ToList();
+        int randomIndex = Random.Range(0, playerList.Count);
+        return playerList[randomIndex];
     }
 
     public bool IsPlayersDead()
     {
         return players.Count == 0;
-    }
-
-    public IEnumerator SetLocalPlayer(ulong clientId)
-    {
-        yield return new WaitForSeconds(2f);
-        localPlayer = GetPlayerByClientId(clientId);
     }
 
     public bool PlayersSpawned()
@@ -102,22 +183,91 @@ public class GameManager : NetworkBehaviour
 
     #region Enemies
 
+    private void OnEnemyDataChanged(NetworkListEvent<EnemyNetworkData> changeEvent)
+    {
+        List<EnemyController> enemyObjects = FindObjectsByType<EnemyController>(FindObjectsSortMode.None).ToList();
+        
+        Debug.Log($"OnEnemyDataChanged called: {changeEvent.Type} for ID {changeEvent.Value.TargetingID}");
+
+        switch (changeEvent.Type)
+        {
+            case NetworkListEvent<EnemyNetworkData>.EventType.Add:
+            case NetworkListEvent<EnemyNetworkData>.EventType.Value:
+                EnemyNetworkData addedData = changeEvent.Value;
+                if (!enemies.ContainsKey(addedData.TargetingID))
+                {
+                    EnemyController enemy = enemyObjects.FirstOrDefault(e => e.targetingID.Value == addedData.TargetingID);
+                    if (enemy != null)
+                    {
+                        enemies.Add(addedData.TargetingID, enemy);
+                    }
+                }
+                break;
+            case NetworkListEvent<EnemyNetworkData>.EventType.Remove:
+                EnemyNetworkData removedData = changeEvent.Value;
+                enemies.Remove(removedData.TargetingID);
+                break;
+            case NetworkListEvent<EnemyNetworkData>.EventType.Clear:
+                foreach (EnemyController enemy in enemyObjects)
+                {
+                    if (enemy != null && enemy.gameObject != null)
+                    {
+                        if (enemy.IsOwner)
+                        {
+                            enemy.gameObject.GetComponent<NetworkObject>().Despawn(false);
+                            Destroy(enemy.gameObject);
+                        }
+                    }
+                }
+                sharedCanvas.enemyPanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
+                enemies.Clear();
+                break;
+        }
+    }
+
     public void SpawnEnemy()
     {
-        sharedCanvas.RequestSpawnEnemyIconOwnerRpc(gameLoopManager.GetEnemyHealthMultiplier(), gameLoopManager.GetEnemyAttackCooldownMultiplier());
+        sharedCanvas.RequestSpawnEnemyIconOwnerRpc(gameLoopManager.GetEnemyHealthMultiplier(), gameLoopManager.GetEnemyAttackCooldownMultiplier(), gameLoopManager.GetTutorialState());
     }
 
-    [Rpc(SendTo.Everyone)]
-    public void AddEnemyRpc(ulong targetingID)
+    public void AddEnemy(EnemyNetworkData data)
     {
-        enemies.Add(FindObjectsByType<EnemyController>(FindObjectsSortMode.None).FirstOrDefault(e => e.targetingId == targetingID));
+        enemyData.Add(data);
     }
 
-    [Rpc(SendTo.Everyone)]
-    public void RemoveEnemyRpc(ulong targetingID)
+    public void RemoveEnemy(ulong targetingID)
     {
-        int index = enemies.FindIndex(e => e.targetingId == targetingID);
-        enemies.RemoveAt(index);
+        foreach (EnemyNetworkData enemy in enemyData)
+        {
+            if (enemy.TargetingID == targetingID)
+            {
+                enemyData.Remove(enemy);
+                break;
+            }
+        }
+    }
+
+    public void RemoveAllEnemies()
+    {
+        enemyData.Clear();
+    }
+
+    public void RefreshEnemies()
+    {
+        enemies.Clear();
+        foreach (EnemyNetworkData data in enemyData)
+        {
+            OnEnemyDataChanged(new NetworkListEvent<EnemyNetworkData>
+            {
+                Type = NetworkListEvent<EnemyNetworkData>.EventType.Add,
+                Value = data
+            });
+        }
+    }
+
+    public EnemyController GetEnemyByTargetingId(ulong targetingId)
+    {
+        return enemies.TryGetValue(targetingId, out EnemyController enemy) ? enemy : null;
     }
 
     public bool IsEnemiesDead()
@@ -125,55 +275,86 @@ public class GameManager : NetworkBehaviour
         return enemies.Count == 0;
     }
 
-    [Rpc(SendTo.Everyone)]
-    public void RemoveAllEnemiesRpc()
-    {
-        foreach (var enemy in FindObjectsByType<EnemyController>(FindObjectsSortMode.None))
-        {
-            if (enemy != null && enemy.gameObject != null)
-            {
-                if (enemy.IsOwner)
-                {
-                    enemy.gameObject.GetComponent<NetworkObject>().Despawn(false);
-                    Destroy(enemy.gameObject);
-                }
-            }
-        }
-        enemies.Clear();
-    }
-
     #endregion
 
     #region Projectiles
 
-    [Rpc(SendTo.Everyone)]
-    public void AddProjectileRpc(ulong targetingID)
+    private void OnProjectileDataChanged(NetworkListEvent<ProjectileNetworkData> changeEvent)
     {
-        projectiles.Add(FindObjectsByType<ProjectileController>(FindObjectsSortMode.None).FirstOrDefault(p => p.targetingId == targetingID));
-    }
-
-    [Rpc(SendTo.Everyone)]
-    public void RemoveProjectileRpc(ulong targetingID)
-    {
-        int index = projectiles.FindIndex(p => p.targetingId == targetingID);
-        projectiles.RemoveAt(index);
-    }
-
-    [Rpc(SendTo.Everyone)]
-    public void RemoveAllProjectilesRpc()
-    {
-        foreach (var projectile in FindObjectsByType<ProjectileController>(FindObjectsSortMode.None))
+        List<ProjectileController> projectileObjects = FindObjectsByType<ProjectileController>(FindObjectsSortMode.None).ToList();
+        switch (changeEvent.Type)
         {
-            if (projectile != null && projectile.gameObject != null)
-            {
-                if (projectile.IsOwner)
+            case NetworkListEvent<ProjectileNetworkData>.EventType.Add:
+            case NetworkListEvent<ProjectileNetworkData>.EventType.Value:
+                ProjectileNetworkData addedData = changeEvent.Value;
+                if (!projectiles.ContainsKey(addedData.TargetingID))
                 {
-                    projectile.gameObject.GetComponent<NetworkObject>().Despawn(false);
-                    Destroy(projectile.gameObject);
+                    ProjectileController projectile = projectileObjects.FirstOrDefault(p => p.targetingID.Value == addedData.TargetingID);
+                    if (projectile != null)
+                    {
+                        projectiles.Add(addedData.TargetingID, projectile);
+                    }
                 }
+                break;
+            case NetworkListEvent<ProjectileNetworkData>.EventType.Remove:
+                ProjectileNetworkData removedData = changeEvent.Value;
+                projectiles.Remove(removedData.TargetingID);
+                break;
+            case NetworkListEvent<ProjectileNetworkData>.EventType.Clear:
+                foreach (ProjectileController projectile in projectileObjects)
+                {
+                    if (projectile != null && projectile.gameObject != null)
+                    {
+                        if (projectile.IsOwner)
+                        {
+                            projectile.gameObject.GetComponent<NetworkObject>().Despawn(false);
+                            Destroy(projectile.gameObject);
+                        }
+                    }
+                }
+                projectiles.Clear();
+                break;
+        }
+    }
+
+    public void AddProjectile(ProjectileNetworkData data)
+    {
+        projectileData.Add(data);
+    }
+
+    public void RemoveProjectile(ulong targetingID)
+    {
+        foreach (ProjectileNetworkData projectile in projectileData)
+        {
+            if (projectile.TargetingID == targetingID)
+            {
+                projectileData.Remove(projectile);
+                break;
             }
         }
+    }
+
+    public void RemoveAllProjectiles()
+    {
+        projectileData.Clear();
+    }
+
+    public void RefreshProjectiles()
+    {
         projectiles.Clear();
+        foreach (ProjectileNetworkData data in projectileData)
+        {
+            OnProjectileDataChanged(new NetworkListEvent<ProjectileNetworkData>
+            {
+                Type = NetworkListEvent<ProjectileNetworkData>.EventType.Add,
+                Value = data
+            });
+        }
+    }
+
+    public ProjectileController GetProjectileByTargetingId(ulong targetingId)
+    {
+        return projectiles.TryGetValue(targetingId, out ProjectileController projectile) ? projectile : null;
     }
 
     public GameObject GetProjectileParent() { return projectileParent; }
@@ -186,26 +367,26 @@ public class GameManager : NetworkBehaviour
     {
         foreach (var enemy in enemies)
         {
-            if (enemy.IsDead()) continue;
-            if (enemy.GetTargetWord().Equals(word))
+            if (enemy.Value.IsDead()) continue;
+            if (enemy.Value.GetTargetWord().Equals(word))
             {
-                return enemy;
+                return enemy.Value;
             }
         }
         foreach (var player in players)
         {
-            if (player.IsDead()) continue;
-            if (player.GetTargetWord().Equals(word))
+            if (player.Value.IsDead()) continue;
+            if (player.Value.GetTargetWord().Equals(word))
             {
-                return player;
+                return player.Value;
             }
         }
         foreach (var projectile in projectiles)
         {
-            if (projectile.IsDead()) continue;
-            if (projectile.GetTargetWord().Equals(word))
+            if (projectile.Value.IsDead()) continue;
+            if (projectile.Value.GetTargetWord().Equals(word))
             {
-                return projectile;
+                return projectile.Value;
             }
         }
         return null;
@@ -216,10 +397,16 @@ public class GameManager : NetworkBehaviour
     #region Typing Effect
 
     [Rpc(SendTo.SpecifiedInParams)]
+    public void ResetCurseBuffEffectRpc(RpcParams rpcParams)
+    {
+        typingEffectManager.ResetTypingEffects();
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
     public void AddRandomCurseBuffEffectRpc(RpcParams rpcParams)
     {
         const int NUM_CHOICES = 3;
-        const int NUM_BUFF = 5;
+        const int NUM_BUFF = 4;
         const int NUM_CURSE = 6;
 
         List<Vector2Int> allViablePairs = new();
@@ -264,7 +451,7 @@ public class GameManager : NetworkBehaviour
                 1 => typingEffectManager.HealMod(-1),
                 2 => typingEffectManager.DamageMod(-1),
                 3 => typingEffectManager.BulletSpeedMod(-1),
-                4 => typingEffectManager.AllLowercase(),
+                // 4 => typingEffectManager.AllLowercase(),
                 // 5 => localPlayer.ModifyCurrentHealth(50),
                 _ => null,
             };
@@ -280,7 +467,6 @@ public class GameManager : NetworkBehaviour
             };
 
             GameObject go = Instantiate(curseMsgPrefab);
-            // go.transform.SetParent(cursePanel.GetComponent<RectTransform>());
             go.transform.SetParent(cursePanel.transform);
 
             string newCurseText = "";
@@ -297,6 +483,10 @@ public class GameManager : NetworkBehaviour
             Button btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => OnBuffCurseSelect(randomBuffData, randomCurseData));
         }
+
+        CustomLayoutGroup layoutGroup = cursePanel.GetComponent<CustomLayoutGroup>();
+        layoutGroup.RefreshLayout();
+
     }
     private void OnBuffCurseSelect(TypingEffectBase buff, TypingEffectBase curse)
     {
@@ -311,6 +501,130 @@ public class GameManager : NetworkBehaviour
         {
             Destroy(child.gameObject);
         }
+        cursePanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
+    }
+
+    #endregion
+
+    #region Damage Calculation
+
+    [Rpc(SendTo.Owner)]
+    public void playerDealDamageRpc(ulong playerID, ulong targetType, ulong targetingID, int baseValue)
+    {
+        PlayerController player = GetPlayerByClientId(playerID);
+        TargetableController target = null;
+
+        switch (targetType)
+        {
+            case 0:
+                target = GetPlayerByTargetingId(targetingID);
+                break;
+            case 1:
+                target = GetEnemyByTargetingId(targetingID);
+                break;
+            case 2:
+                target = GetProjectileByTargetingId(targetingID);
+                break;
+        }
+
+        if (player == null || target == null) return; // guard against missing references
+
+        float damageModifier = player.calculateDamageModifier();
+        float leechModifier = player.calculateLeechModifier();
+        float damageTakenModifier = target.calculateDamageTakenModifier();
+        int finalValue = (int)(baseValue * damageModifier * damageTakenModifier);
+        int leechValue = (int)(finalValue * leechModifier);
+
+        target.ModifyCurrentHealth(finalValue);
+        player.ModifyCurrentHealth(-1 * leechValue);
+
+        Debug.Log("Pre-Buff/Debuff: " + baseValue + ", Damage Mod: " + damageModifier + ", Damage Taken Mod: " + damageTakenModifier + ", Final Damage: " + finalValue + ", Leech Mod: " + leechModifier + ", Leech Value: " + leechValue);
+
+        if(targetType != 2)
+            showDamageRpc(targetType, targetingID, finalValue, leechValue, RpcTarget.Single(playerID, RpcTargetUse.Temp));
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void showDamageRpc(ulong targetType, ulong targetingID, int damage, int leechValue, RpcParams rpcParams)
+    {
+        PlayerController player = GetPlayerByClientId(networkManager.LocalClientId);
+        TargetableController target = null;
+        switch (targetType)
+        {
+            case 0:
+                target = GetPlayerByTargetingId(targetingID);
+                break;
+            case 1:
+                target = GetEnemyByTargetingId(targetingID);
+                break;
+            case 2:
+                target = GetProjectileByTargetingId(targetingID);
+                break;
+        }
+
+        if (player == null || target == null) return;
+
+        damageManager.applyHealthChange(target, damage);
+        damageManager.applyHealthChange(player, -1 * leechValue);
+    }
+
+    #endregion
+
+    #region Heal Calculation
+
+    [Rpc(SendTo.Owner)]
+    public void playerHealRpc(ulong playerID, ulong targetType, ulong targetingID, int baseValue)
+    {
+        PlayerController player = GetPlayerByClientId(playerID);
+        TargetableController target = null;
+
+        switch (targetType)
+        {
+            case 0:
+                target = GetPlayerByTargetingId(targetingID);
+                break;
+            case 1:
+                target = GetEnemyByTargetingId(targetingID);
+                break;
+            case 2:
+                target = GetProjectileByTargetingId(targetingID);
+                break;
+        }
+
+        if (player == null || target == null) return;
+
+        float healModifier = player.calculateHealModifier();
+        int finalValue = (int)(baseValue * healModifier);
+        target.ModifyCurrentHealth(finalValue);
+        showDamageRpc(targetType, targetingID, finalValue, 0, RpcTarget.Single(playerID, RpcTargetUse.Temp));
+    }
+
+    #endregion
+
+    #region Class Buffs/Debuffs
+
+    [Rpc(SendTo.Owner)]
+    public void addBuffDebuffToListRpc(ulong targetType, ulong targetingID, float modifier, int duration, FixedString128Bytes effectType)
+    {
+        TargetableController target = null;
+
+        switch (targetType)
+        {
+            case 0:
+                target = GetPlayerByTargetingId(targetingID);
+                break;
+            case 1:
+                target = GetEnemyByTargetingId(targetingID);
+                break;
+            case 2:
+                target = GetProjectileByTargetingId(targetingID);
+                break;
+        }
+
+        if (target == null) return;
+
+        // Use a public TargetableController method to add the buff (see TargetableController change below).
+        target.AddBuffDebuff(modifier, duration, effectType);
     }
 
     #endregion
@@ -361,41 +675,6 @@ public class GameManager : NetworkBehaviour
         }
 
         return word;
-    }
-
-    [Rpc(SendTo.Owner)]
-    public void SyncListsRpc(ulong requesterClientId)
-    {
-        foreach (var player in players)
-        {
-            SyncPlayersRpc(player.targetingId, RpcTarget.Single(requesterClientId, RpcTargetUse.Temp));
-        }
-        foreach (var enemy in enemies)
-        {
-            SyncEnemiesRpc(enemy.targetingId, RpcTarget.Single(requesterClientId, RpcTargetUse.Temp));
-        }
-        foreach (var projectile in projectiles)
-        {
-            SyncProjectilesRpc(projectile.targetingId, RpcTarget.Single(requesterClientId, RpcTargetUse.Temp));
-        }
-    }
-
-    [Rpc(SendTo.SpecifiedInParams)]
-    public void SyncPlayersRpc(ulong targetingID, RpcParams clientId)
-    {
-        players.Add(FindObjectsByType<PlayerController>(FindObjectsSortMode.None).FirstOrDefault(p => p.networkedTargetingId.Value == targetingID));
-    }
-
-    [Rpc(SendTo.SpecifiedInParams)]
-    public void SyncEnemiesRpc(ulong targetingID, RpcParams clientId)
-    {
-        enemies.Add(FindObjectsByType<EnemyController>(FindObjectsSortMode.None).FirstOrDefault(e => e.networkedTargetingId.Value == targetingID));
-    }
-
-    [Rpc(SendTo.SpecifiedInParams)]
-    public void SyncProjectilesRpc(ulong targetingID, RpcParams clientId)
-    {
-        projectiles.Add(FindObjectsByType<ProjectileController>(FindObjectsSortMode.None).FirstOrDefault(p => p.networkedTargetingId.Value == targetingID));
     }
 
     #endregion
