@@ -241,7 +241,6 @@ public class TypeTracker : MonoBehaviour
                 }
                 else if (mode == 1)
                 {
-                    Debug.Log(currentClass.promptFileNames);
                     string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[0]);
                     promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
                 }

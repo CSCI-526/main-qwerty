@@ -8,6 +8,7 @@ public class GameLoopManager : NetworkBehaviour
     [Header("GameObjects")]
     [SerializeField] private GameObject typingElements;
     [SerializeField] private GameObject startBattleButton;
+    [SerializeField] private GameObject notReadyWarning;
     [SerializeField] private GameObject cursePanel;
 
     private bool tutorial = true;
@@ -71,17 +72,30 @@ public class GameLoopManager : NetworkBehaviour
     [Rpc(SendTo.Owner)]
     public void StartBattleRpc()
     {
-        if(inCombat) return;
-        StartCoroutine(StartBattle());
+        if (inCombat) return;
+        if (!gameManager.AllReady())
+        {
+            StartCoroutine(ShowNotReadyWarning(3f));
+        }
+        else
+            StartCoroutine(StartBattle());
+    }
+
+    private IEnumerator ShowNotReadyWarning(float delay)
+    {
+        notReadyWarning.SetActive(true);
+        yield return new WaitForSeconds(delay);
+        notReadyWarning.SetActive(false);
     }
 
     public IEnumerator StartBattle()
     {
         CreatePlayers();
         gameManager.SpawnEnemy();
-        yield return new WaitForSeconds(2f);
         ToggleElementsRpc(true, false, false, tutorial);
+        yield return new WaitForSeconds(2f);
         inCombat = true;
+        gameManager.ResetReadyStatusRpc();
     }
 
     public void EndBattle()
@@ -102,7 +116,6 @@ public class GameLoopManager : NetworkBehaviour
         if(IsOwner)
             startBattleButton.SetActive(startBattleButtonState);
         cursePanel.SetActive(cursePanelState);
-        Debug.Log(tutorialState);
         if (tutorialState)
         {
             tutorialStage = true;
