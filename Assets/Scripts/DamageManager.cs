@@ -22,8 +22,6 @@ public class DamageManager : MonoBehaviour
 
     public void applyHealthChange(TargetableController target, int amount)
     {
-        if (target == null) return;
-
         if (target == gameManager.localPlayer)
         {
             if (amount < 0)
@@ -43,7 +41,9 @@ public class DamageManager : MonoBehaviour
             }
         }
 
-            RectTransform targetRect = target.GetComponent<RectTransform>();
+        if (target == null) return;
+
+        RectTransform targetRect = target.GetComponent<RectTransform>();
         if (targetRect != null)
         {
             showPopup(targetRect, amount);

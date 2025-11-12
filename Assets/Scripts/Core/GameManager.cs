@@ -561,7 +561,9 @@ public class GameManager : NetworkBehaviour
         player.ModifyCurrentHealth(-1 * leechValue);
 
         if(targetType != 2)
+        {
             showDamageRpc(targetType, targetingID, finalValue, leechValue, RpcTarget.Single(playerID, RpcTargetUse.Temp));
+        }   
     }
 
     [Rpc(SendTo.SpecifiedInParams)]

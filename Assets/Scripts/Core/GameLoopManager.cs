@@ -183,6 +183,12 @@ public class GameLoopManager : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     private void SendAnalyticsRpc()
     {
+        StartCoroutine(WaitAnalyticsCollection());
+    }
+
+    private IEnumerator WaitAnalyticsCollection()
+    {
+        yield return new WaitForSeconds(2f);
         gameManager.analyticsManager.PushAnalyticsEvent();
     }
 }
