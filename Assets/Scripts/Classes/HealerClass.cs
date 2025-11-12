@@ -40,4 +40,32 @@ public class HealerClass : ClassBase
         "ClassASkill3",
         "ClassASkill4"
     };
+
+    public override List<string> instructionText { get; } = new List<string>
+    {
+        "Each class has 4 abilities. Press 1 to try out the first one.",
+        "This ability attacks projectiles and enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
+        "Enemy targeted, type the prompt below.",
+        "Let's try the 2nd ability now. Press 2.",
+        "This ability buffs allies. Enter a player's <color=yellow>Target Word</color>:",
+        "Player targeted, type the prompt below.",
+        "Let's try the 3rd ability. Press 3.",
+        "This debuffs an enemy. Enter an enemy's <color=yellow>Target Word</color>:",
+        "Enemy targeted, type the prompt below.",
+        "Let's try the 4th ability. Press 4.",
+        "This heals a player. Enter a player's <color=yellow>Target Word</color>:",
+        "Player targeted, type the prompt below.",
+        "Now everyone finish off the enemy. Select an ability.",
+        "Enter a <color=yellow>Target Word</color>:",
+        "Type the prompt below."
+    };
+
+    public override List<string> promptText { get; } = new List<string>
+    {
+        "This damages the enemy and leeches 30% health.",
+        "This increases an ally's attack by 50%",
+        "This decreases an enemy's attack by 30%:",
+        "Speed & accuracy determines an ability's effectiveness.",
+        "Press Tab if you forget what the abilities do."
+    };
 }

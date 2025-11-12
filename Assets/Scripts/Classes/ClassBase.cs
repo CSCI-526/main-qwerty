@@ -21,6 +21,10 @@ public abstract class ClassBase : MonoBehaviour
 
     public abstract List<string> promptFileNames { get; }
 
+    public abstract List<string> instructionText { get; }
+
+    public abstract List<string> promptText { get; }
+
     // Optional: you can include shared utility methods here
     protected void LogAbility(string className, int abilityNumber, string description)
     {

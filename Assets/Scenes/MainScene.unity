@@ -933,6 +933,7 @@ MonoBehaviour:
   ability3: {fileID: 367321972}
   ability4: {fileID: 1944131937}
   damageScreen: {fileID: 409882286}
+  modMultiplier: 1.2
   typingEffectManager: {fileID: 922871282824396222}
   damageManager: {fileID: 773131783}
   caretRect: {fileID: 1223125938}
@@ -2922,14 +2923,14 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSizeBase: 20
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 20
+  m_fontSizeMax: 36
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -4118,6 +4119,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectText: {fileID: 1357705509}
   effectPanel: {fileID: 803755974}
+  modMultiplier: 1.2
 --- !u!1001 &1019155473020742496
 PrefabInstance:
   m_ObjectHideFlags: 0
