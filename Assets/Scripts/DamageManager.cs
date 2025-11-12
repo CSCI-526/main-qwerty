@@ -18,12 +18,32 @@ public class DamageManager : MonoBehaviour
     [SerializeField] private Color healColor = Color.green;
     [SerializeField] private Vector2 popupOffset = new Vector2(0, 50); // Offset in canvas units
 
+    private GameManager gameManager => FindFirstObjectByType<GameManager>();
 
     public void applyHealthChange(TargetableController target, int amount)
     {
         if (target == null) return;
 
-        RectTransform targetRect = target.GetComponent<RectTransform>();
+        if (target == gameManager.localPlayer)
+        {
+            if (amount < 0)
+            {
+                gameManager.analyticsManager.addDamageTaken(amount);
+            }
+        }
+        else
+        {
+            if (amount < 0)
+            {
+                gameManager.analyticsManager.addDamageDealt(-amount);
+            }
+            else if (amount > 0)
+            {
+                gameManager.analyticsManager.addHealingDone(amount);
+            }
+        }
+
+            RectTransform targetRect = target.GetComponent<RectTransform>();
         if (targetRect != null)
         {
             showPopup(targetRect, amount);

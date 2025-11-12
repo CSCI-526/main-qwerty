@@ -42,12 +42,6 @@ public class TypeTracker : MonoBehaviour
     private float caretTimer = 0f;
     private bool caretVisible = true;
 
-    private int numSubmissions = 0;
-    private float averageWPM = 0f;
-    private float averageAccuracy = 0f;
-    private int damageDealt = 0;
-    private int healingDone = 0;
-
     private int tutorial = 0;
 
     private TargetableController currentTarget;
@@ -60,37 +54,6 @@ public class TypeTracker : MonoBehaviour
     {
         resetState();
         EnterTargetPhase();
-        ResetMetrics();
-    }
-
-    public void OnDisable()
-    {
-        ReportStats();
-    }
-
-    private void ReportStats()
-    {
-        if (numSubmissions == 0)
-            return;
-
-        StatsEvent statsEvent = new StatsEvent
-        {
-            NumSubmissions = numSubmissions,
-            AverageWPM = averageWPM,
-            AverageAccuracy = averageAccuracy,
-            DamageDealt = damageDealt,
-            HealingDone = healingDone
-        };
-        gameManager.analyticsManager.PushAnalyticsEvent(statsEvent);
-    }
-
-    private void ResetMetrics()
-    {
-        numSubmissions = 0;
-        averageWPM = 0f;
-        averageAccuracy = 0f;
-        damageDealt = 0;
-        healingDone = 0;
     }
 
     private void Start()
@@ -260,7 +223,7 @@ public class TypeTracker : MonoBehaviour
                     promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
                 }
 
-                    prompt = promptText.text; // For comparisons
+                prompt = promptText.text; // For comparisons
                 promptText.color = Color.gray;
                 instructionText.text = "Type the prompt below!";
                 if (gameManager.gameLoopManager.GetTutorialState() && tutorial == 0)
@@ -425,10 +388,6 @@ public class TypeTracker : MonoBehaviour
             accuracy = 0f;
         }
 
-        numSubmissions++;
-        averageWPM = ((averageWPM * (numSubmissions - 1)) + grossWPM) / numSubmissions;
-        averageAccuracy = ((averageAccuracy * (numSubmissions - 1)) + accuracy) / numSubmissions;
-
         // Damage calculation to make speed more forgiving and errors more penalizing. Also has a floor of 1 damage.
         float wpmFactor = Mathf.Log10(grossWPM + 10) * 6f;
         float accuracyFactor = Mathf.Pow(accuracy / 100f, 2f);
@@ -436,23 +395,29 @@ public class TypeTracker : MonoBehaviour
         if(gameManager.gameLoopManager.GetTutorialState())
             healthModifier = 4;
 
+        gameManager.analyticsManager.addNumSubmissions(1);
+        gameManager.analyticsManager.addAverageWPM(grossWPM);
+        gameManager.analyticsManager.addAverageAccuracy(accuracy);
+
         if (mode == 1)
         {
             currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
-            // damageManager.applyHealthChange(currentTarget, delta);
-            // damageDealt -= delta;
+            gameManager.analyticsManager.addAbility1Uses(1);
         }
         else if (mode == 2)
         {
             currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            gameManager.analyticsManager.addAbility2Uses(1);
         }
         else if (mode == 3)
         {
             currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            gameManager.analyticsManager.addAbility3Uses(1);
         }
         else if (mode == 4)
         {
             currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            gameManager.analyticsManager.addAbility4Uses(1);
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;

@@ -7,7 +7,7 @@ using UnityEngine;
 public class EnemyController : TargetableController
 {
     [Header("Enemy Settings")]
-    [SerializeField] private float attackCooldown = 10;
+    [SerializeField] public float attackCooldown = 10;
     private float attackCd = 0;
     private bool tutorial = false;
 
@@ -39,7 +39,8 @@ public class EnemyController : TargetableController
         OnHealthChanged(currentHealth.Value, maxHealth);
     }
 
-    public void SetAttackCooldown(float multiplier)
+    [Rpc(SendTo.Everyone)]
+    public void SetAttackCooldownRpc(float multiplier)
     {
         attackCooldown *= multiplier;
     }

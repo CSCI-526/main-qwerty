@@ -96,6 +96,7 @@ public class GameLoopManager : NetworkBehaviour
         yield return new WaitForSeconds(2f);
         inCombat = true;
         gameManager.ResetReadyStatusRpc();
+        ShareRoundStats();
     }
 
     public void EndBattle()
@@ -105,6 +106,7 @@ public class GameLoopManager : NetworkBehaviour
         gameManager.RemoveAllEnemies();
         gameManager.RemoveAllProjectiles();
         battleCount++;
+        SendAnalyticsRpc();
         AssignRandomCurses();
         ToggleElementsRpc(false, false, true);
     }
@@ -160,5 +162,27 @@ public class GameLoopManager : NetworkBehaviour
     public bool GetTutorialState()
     {
         return tutorialStage;
+    }
+
+    private void ShareRoundStats()
+    {
+        if (!IsOwner) return;
+        ShareRoundStatsRpc(battleCount);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void ShareRoundStatsRpc(int roundNumber)
+    {
+        gameManager.analyticsManager.setRoundNumber(roundNumber);
+        gameManager.analyticsManager.setEnemyHealth(FindFirstObjectByType<EnemyController>().maxHealth);
+        gameManager.analyticsManager.setEnemyAttackSpeed(FindFirstObjectByType<EnemyController>().attackCooldown);
+        gameManager.analyticsManager.setNumPlayers(gameManager.networkManager.ConnectedClients.Count);
+        gameManager.analyticsManager.setDifficultyLevel(1);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void SendAnalyticsRpc()
+    {
+        gameManager.analyticsManager.PushAnalyticsEvent();
     }
 }
