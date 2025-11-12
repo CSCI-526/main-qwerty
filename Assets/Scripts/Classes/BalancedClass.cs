@@ -60,7 +60,7 @@ public class BalancedClass : ClassBase
         "This ability attacks projectiles and enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
         "Enemy targeted, type the prompt below.",
         "Let's try the 2nd ability now. Press 2.",
-        "This ability buffs allies. Enter a player's <color=yellow>Target Word</color>:",
+        "This ability buffs a player. Enter a player's <color=yellow>Target Word</color>:",
         "Player targeted, type the prompt below.",
         "Let's try the 3rd ability. Press 3.",
         "This debuffs an enemy. Enter an enemy's <color=yellow>Target Word</color>:",
@@ -68,19 +68,20 @@ public class BalancedClass : ClassBase
         "Let's try the 4th ability. Press 4.",
         "This heals a player. Enter a player's <color=yellow>Target Word</color>:",
         "Player targeted, type the prompt below.",
-        "Oh no the enemy is attacking. Defend yourself from its attacks (press 1):",
+        "Destroy enemy projecticles with an attack (press 1):",
         "Enter the projectile's <color=yellow>Target Word</color>:",
-        "Now that you got the hang of it. Finish off the enemy.",
+        "Now finish off the enemy. Select any ability.",
         "Enter a <color=yellow>Target Word</color>:",
         "Type the prompt below."
     };
 
     public override List<string> promptText { get; } = new List<string>
     {
-        "This damages the enemy and leeches 30% health.",
-        "This increases an ally's attack by 50%",
+        "This damages the enemy and heals for 30% of damage dealt.",
+        "This increases a player's attack by 50%",
         "This makes an enemy take 30% more damage.",
         "Speed & accuracy determines an ability's effectiveness.",
-        "Press \"Tab\" if you forget what your abilities do."
+        "Press \"Tab\" if you forget what your abilities do.",
+        "Oh and typos cause damage."
     };
 }

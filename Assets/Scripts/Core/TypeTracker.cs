@@ -120,18 +120,54 @@ public class TypeTracker : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false  && phase != 2)
         {
+            if(gameManager.gameLoopManager.GetTutorialState())
+            {
+                if((tutorialStep >= 2 && tutorialStep < 12))
+                {
+                    Debug.Log("Returning from pressing 1");
+                    return;
+                }
+                changeMode(1);
+            }
             changeMode(1);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false && phase != 2)
         {
+            if (gameManager.gameLoopManager.GetTutorialState())
+            {
+                if ((tutorialStep < 3 || tutorialStep > 5)  && tutorialStep < 14)
+                {
+                    Debug.Log("Returning from pressing 2");
+                    return;
+                }
+                changeMode(2);
+            }
             changeMode(2);
         }
         if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false && phase != 2)
         {
-            changeMode(3);
+            if (gameManager.gameLoopManager.GetTutorialState())
+            {
+                if ((tutorialStep < 6 || tutorialStep > 8) && tutorialStep < 14)
+                {
+                    Debug.Log("Returning from pressing 3");
+                    return;
+                }
+                changeMode(3);
+            }
+                changeMode(3);
         }
         if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false && phase != 2)
         {
+            if (gameManager.gameLoopManager.GetTutorialState())
+            {
+                if ((tutorialStep < 9 || tutorialStep > 11) && tutorialStep < 14)
+                {
+                    Debug.Log("Returning from pressing 4");
+                    return;
+                }
+                changeMode(4);
+            }
             changeMode(4);
         }
 
@@ -212,6 +248,7 @@ public class TypeTracker : MonoBehaviour
                 if (currentTarget is ProjectileController)
                 {
                     inputField.text = "";
+
                     if (mode == 1)
                     {
                         currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, 10);
@@ -231,7 +268,20 @@ public class TypeTracker : MonoBehaviour
                     currentTarget = null;
                     promptText.text = "";
                     inputField.text = "";
-                    EnterTargetPhase();
+
+                    if (gameManager.gameLoopManager.GetTutorialState())
+                    {
+                        Debug.Log("In current target projectile");
+                        phase = 0;
+                        mode = 0;
+                        awaitingTarget = true;
+                        promptText.color = Color.white;
+                        getInstructions();
+                    }
+                    else
+                    { 
+                        EnterTargetPhase();
+                    }
                     return;
                 }
 
@@ -245,11 +295,6 @@ public class TypeTracker : MonoBehaviour
             {
 
                 instructionText.text = "Invalid Target. Try Again.";
-
-                if(gameManager.gameLoopManager.GetTutorialState())
-                {
-                    tutorialStep--;
-                }
               
                 inputField.text = "";
                 promptText.text = "";
@@ -271,6 +316,56 @@ public class TypeTracker : MonoBehaviour
     // Called when text changes (while typing)
     private void OnInputChanged(string currentText)
     {
+        if (phase == 0)
+        {
+
+            // Restrict only during tutorial
+            if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep < 14)
+            {
+                bool valid = false;
+
+                if ((tutorialStep <= 2 || tutorialStep >= 12 || tutorialStep >= 13) && currentText == "1")
+                {
+                    valid = true;
+                }
+                else if (((tutorialStep >= 3 && tutorialStep <= 5) || tutorialStep >= 13) && currentText == "2")
+                {
+                    valid = true;
+                }
+                else if (((tutorialStep >= 6 && tutorialStep <= 8) || tutorialStep >= 13) && currentText == "3")
+                {
+                    valid = true;
+                }
+                else if (((tutorialStep >= 9 && tutorialStep <= 11) || tutorialStep >= 13) && currentText == "4")
+                {
+                    valid = true;
+                }
+
+                // If invalid input during tutorial
+                if (!valid)
+                {
+
+                    inputField.text = "";
+                    instructionText.text = currentClass.instructionText[tutorialStep-1];
+                    return;
+                }
+            }
+            else if(tutorialStep >= 14)
+            {
+                // General rule outside tutorial: Only allow 1–4
+                if (currentText != "1" && currentText != "2" && currentText != "3" && currentText != "4")
+                {
+                    inputField.text = "";
+                    getInstructions();
+                    return;
+                }
+            }
+
+            // Clear text after pressing a valid number
+            inputField.text = "";
+            return;
+        }
+
         if (mode == 0)
         {
             inputField.text = "";
@@ -484,7 +579,7 @@ public class TypeTracker : MonoBehaviour
         awaitingTarget = true;
         promptText.color = Color.white;
 
-        if(gameManager.gameLoopManager.GetTutorialState() && phase == 2)
+        if(gameManager.gameLoopManager.GetTutorialState() && phase == 2 && tutorialStep < 14)
         {
             phase = 0;
             mode = 0;
@@ -631,7 +726,7 @@ public class TypeTracker : MonoBehaviour
     private void getPrompt()
     {
         phase = 2;
-        if (gameManager.gameLoopManager.GetTutorialState() && promptStep <= 4)
+        if (gameManager.gameLoopManager.GetTutorialState() && promptStep <= 5)
         {
             promptText.text = currentClass.promptText[promptStep];
             prompt = promptText.text; // For comparisons
