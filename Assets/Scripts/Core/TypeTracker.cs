@@ -28,6 +28,7 @@ public class TypeTracker : MonoBehaviour
 
     [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
     [SerializeField] private DamageManager damageManager;
+    [SerializeField] private ClassInfoManager classInfoManager;
 
     private string prompt;
     private bool timerStarted = false;
@@ -49,6 +50,7 @@ public class TypeTracker : MonoBehaviour
     private int damageDealt = 0;
     private int healingDone = 0;
 
+    private int tutorialLength = 0;
     private int tutorialStep = 0;
     private int promptStep = 0;
     private int phase = 0;
@@ -101,6 +103,9 @@ public class TypeTracker : MonoBehaviour
 
     private void Start()
     {
+        classInfoManager.updateUI(currentClass);
+        tutorialLength = currentClass.instructionText.Count - 1;
+
         getInstructions();
         promptText.text = "";
 
@@ -134,7 +139,7 @@ public class TypeTracker : MonoBehaviour
         {
             if (gameManager.gameLoopManager.GetTutorialState())
             {
-                if ((tutorialStep < 3 || tutorialStep > 5)  && tutorialStep < 14)
+                if ((tutorialStep < 3 || tutorialStep > 5)  && tutorialStep < tutorialLength)
                 {
                     Debug.Log("Returning from pressing 2");
                     return;
@@ -147,7 +152,7 @@ public class TypeTracker : MonoBehaviour
         {
             if (gameManager.gameLoopManager.GetTutorialState())
             {
-                if ((tutorialStep < 6 || tutorialStep > 8) && tutorialStep < 14)
+                if ((tutorialStep < 6 || tutorialStep > 8) && tutorialStep < tutorialLength)
                 {
                     Debug.Log("Returning from pressing 3");
                     return;
@@ -160,7 +165,7 @@ public class TypeTracker : MonoBehaviour
         {
             if (gameManager.gameLoopManager.GetTutorialState())
             {
-                if ((tutorialStep < 9 || tutorialStep > 11) && tutorialStep < 14)
+                if ((tutorialStep < 9 || tutorialStep > 11) && tutorialStep < tutorialLength)
                 {
                     Debug.Log("Returning from pressing 4");
                     return;
@@ -192,7 +197,9 @@ public class TypeTracker : MonoBehaviour
     {
         // If they're already in that mode, do nothing
         if (mode == newMode)
+        {
             return;
+        }
 
         mode = newMode;
 
@@ -268,7 +275,7 @@ public class TypeTracker : MonoBehaviour
                     promptText.text = "";
                     inputField.text = "";
 
-                    if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep < 14)
+                    if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep < tutorialLength)
                     {
                         Debug.Log("In current target projectile");
                         phase = 0;
@@ -319,23 +326,23 @@ public class TypeTracker : MonoBehaviour
         {
 
             // Restrict only during tutorial
-            if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep < 14)
+            if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep < tutorialLength)
             {
                 bool valid = false;
 
-                if ((tutorialStep <= 2 || tutorialStep >= 12 || tutorialStep >= 13) && currentText == "1")
+                if ((tutorialStep <= 2 || tutorialStep >= 12 || tutorialStep >= tutorialLength) && currentText == "1")
                 {
                     valid = true;
                 }
-                else if (((tutorialStep >= 3 && tutorialStep <= 5) || tutorialStep >= 13) && currentText == "2")
+                else if (((tutorialStep >= 3 && tutorialStep <= 5) || tutorialStep >= tutorialLength) && currentText == "2")
                 {
                     valid = true;
                 }
-                else if (((tutorialStep >= 6 && tutorialStep <= 8) || tutorialStep >= 13) && currentText == "3")
+                else if (((tutorialStep >= 6 && tutorialStep <= 8) || tutorialStep >= tutorialLength) && currentText == "3")
                 {
                     valid = true;
                 }
-                else if (((tutorialStep >= 9 && tutorialStep <= 11) || tutorialStep >= 13) && currentText == "4")
+                else if (((tutorialStep >= 9 && tutorialStep <= 11) || tutorialStep >= tutorialLength) && currentText == "4")
                 {
                     valid = true;
                 }
@@ -578,18 +585,23 @@ public class TypeTracker : MonoBehaviour
         awaitingTarget = true;
         promptText.color = Color.white;
 
-        if(gameManager.gameLoopManager.GetTutorialState() && phase == 2 && tutorialStep < 15)
+        if(gameManager.gameLoopManager.GetTutorialState() && phase == 2 && tutorialStep < tutorialLength+1)
         {
             phase = 0;
             mode = 0;
             getInstructions();
             Debug.Log("ResetState: " + tutorialStep);
         }
+        else if(gameManager.gameLoopManager.GetTutorialState() && tutorialStep >= tutorialLength +1)
+        {
+            Debug.Log("State Reset aftet tutorial ended");
+            phase = 1;
+            getInstructions();
+        }
         else
         {
             phase = 1;
         }
-
             FocusInputField();
     }
 
@@ -700,14 +712,15 @@ public class TypeTracker : MonoBehaviour
 
     private void getInstructions()
     {
-        if(gameManager.gameLoopManager.GetTutorialState() && tutorialStep < 15)
+        if(gameManager.gameLoopManager.GetTutorialState() && tutorialStep < tutorialLength+1)
         {
             instructionText.text = currentClass.instructionText[tutorialStep];
             tutorialStep++;
         }
         else
         {
-            switch(phase)
+            Debug.Log("In Instrutcion switch case + Phase = " + phase + " + tutorialStep = " + tutorialStep);
+            switch (phase)
             {
                 case 0:
                     instructionText.text = "Please select an ability 1-4.";

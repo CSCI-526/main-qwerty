@@ -82,4 +82,14 @@ public class BalancedClass : ClassBase
         "Press \"Tab\" if you forget what your abilities do.",
         "Oh and typos cause damage."
     };
+
+    public override List<string> classDescription { get; } = new List<string>
+    {
+        "Balanced",
+        "Attacks leech 20% of damage dealt.",
+        "A quick attack that does a little less damage and generates a short prompt.",
+        "Buff yourself or an ally to increase the damage of the next attack by 50%",
+        "Debuff an enemy to make them take 30% more damage on the next 3 attacks.",
+        "Heal yourself or an ally."
+    };
 }
