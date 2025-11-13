@@ -493,7 +493,7 @@ public class GameManager : NetworkBehaviour
         typingEffectManager.AddTypingEffect(buff);
         typingEffectManager.AddTypingEffect(curse);
         cursePanel.SetActive(false);
-        if(IsOwner)
+        if (IsOwner)
             startBattleButton.SetActive(true);
 
         Transform parent = cursePanel.GetComponent<RectTransform>();
@@ -502,6 +502,15 @@ public class GameManager : NetworkBehaviour
             Destroy(child.gameObject);
         }
         cursePanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
+
+        ReportOnBuffCurseSelection();
+    }
+
+    private void ReportOnBuffCurseSelection()
+    {
+        TypingEffectManager.TypingStats typingStats = typingEffectManager.ReportStats();
+        // TODO: turn it into report stats
+        // analyticsManager.PushAnalyticsEvent()
     }
 
     #endregion
