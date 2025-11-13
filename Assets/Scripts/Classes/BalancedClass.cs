@@ -57,7 +57,7 @@ public class BalancedClass : ClassBase
     public override List<string> instructionText { get; } = new List<string>
     {
         "Each class has 4 abilities. Press 1 to try out the first one.",
-        "This ability attacks projectiles and enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
+        "This ability damages enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
         "Enemy targeted, type the prompt below.",
         "Let's try the 2nd ability now. Press 2.",
         "This ability buffs a player. Enter a player's <color=yellow>Target Word</color>:",
@@ -68,11 +68,9 @@ public class BalancedClass : ClassBase
         "Let's try the 4th ability. Press 4.",
         "This heals a player. Enter a player's <color=yellow>Target Word</color>:",
         "Player targeted, type the prompt below.",
-        "Destroy enemy projecticles with an attack (press 1):",
+        "Destroy enemy projectiles with an attack (press 1):",
         "Enter the projectile's <color=yellow>Target Word</color>:",
-        "Now finish off the enemy. Select any ability.",
-        "Enter a <color=yellow>Target Word</color>:",
-        "Type the prompt below."
+        "Now finish off the enemy. Select any ability."
     };
 
     public override List<string> promptText { get; } = new List<string>

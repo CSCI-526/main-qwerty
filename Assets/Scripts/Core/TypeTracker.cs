@@ -101,7 +101,6 @@ public class TypeTracker : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("Start: " + tutorialStep);
         getInstructions();
         promptText.text = "";
 
@@ -269,7 +268,7 @@ public class TypeTracker : MonoBehaviour
                     promptText.text = "";
                     inputField.text = "";
 
-                    if (gameManager.gameLoopManager.GetTutorialState())
+                    if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep < 14)
                     {
                         Debug.Log("In current target projectile");
                         phase = 0;
@@ -579,7 +578,7 @@ public class TypeTracker : MonoBehaviour
         awaitingTarget = true;
         promptText.color = Color.white;
 
-        if(gameManager.gameLoopManager.GetTutorialState() && phase == 2 && tutorialStep < 14)
+        if(gameManager.gameLoopManager.GetTutorialState() && phase == 2 && tutorialStep < 15)
         {
             phase = 0;
             mode = 0;
@@ -701,7 +700,7 @@ public class TypeTracker : MonoBehaviour
 
     private void getInstructions()
     {
-        if(gameManager.gameLoopManager.GetTutorialState() && tutorialStep <= 16)
+        if(gameManager.gameLoopManager.GetTutorialState() && tutorialStep < 15)
         {
             instructionText.text = currentClass.instructionText[tutorialStep];
             tutorialStep++;
