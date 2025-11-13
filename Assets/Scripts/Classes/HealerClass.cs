@@ -10,7 +10,7 @@ public class HealerClass : ClassBase
         int delta = Math.Max((int)(baseValue / Math.Pow(modMultipler, mod)), 1);
         if(target.currentHealth.Value <= target.maxHealth.Value / 2)
         {
-            gameManager.addBuffDebuffToListRpc(0, playerID, 0.3f, 1, "LeechBuff");
+            gameManager.addBuffDebuffToListRpc(0, playerID, 0.3f, 1, "HealBuff");
         }
         gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, delta);
         LogAbility("HealerClass", 1, "Heal (1.2x base value) — single target");
@@ -31,7 +31,7 @@ public class HealerClass : ClassBase
         int delta = Math.Max((int)(baseValue / Math.Pow(modMultipler, mod)), 1);
         if (target.currentHealth.Value <= target.maxHealth.Value / 2)
         {
-            gameManager.addBuffDebuffToListRpc(0, playerID, 1.0f, 1, "LeechBuff");
+            gameManager.addBuffDebuffToListRpc(0, playerID, 1.0f, 1, "HealBuff");
         }
         gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, delta);
         LogAbility("HealerClass", 3, "Big Heal (2x base value)");
