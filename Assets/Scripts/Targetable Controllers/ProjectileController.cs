@@ -83,6 +83,7 @@ public class ProjectileController : TargetableController
         {
             // Mark the string as question marks, set color to red
             word = new string('?', word.Length);
+            GetComponent<TMP_Text>().text = word;
             GetComponent<TMP_Text>().color = Color.red;
         }
     }
