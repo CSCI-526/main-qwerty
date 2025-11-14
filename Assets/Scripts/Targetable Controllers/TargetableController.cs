@@ -20,8 +20,11 @@ public abstract class TargetableController : NetworkBehaviour
 
     public HealthBar healthBar;
 
-    private bool isDead = false;
-
+    protected NetworkVariable<bool> isDead = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
     protected virtual void InitHealth()
     {
         UpdateCurrentHealthRpc(maxHealth);
@@ -42,7 +45,8 @@ public abstract class TargetableController : NetworkBehaviour
 
         if (currentHealth.Value <= 0)
         {
-            isDead = true;
+            if(IsOwner)
+                isDead.Value = true;
             Die();
         }
     }
@@ -52,7 +56,7 @@ public abstract class TargetableController : NetworkBehaviour
         UpdateCurrentHealthRpc(currentHealth.Value + amount);
     }
 
-    public bool IsDead() { return isDead; }
+    public bool IsDead() { return isDead.Value; }
 
     protected abstract void Die();
 

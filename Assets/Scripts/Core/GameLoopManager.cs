@@ -29,6 +29,10 @@ public class GameLoopManager : NetworkBehaviour
         {
             typingElements.SetActive(false);
         }
+        else if (gameManager.localPlayer != null && !typingElements.activeSelf && !gameManager.localPlayer.IsDead())
+        { 
+            typingElements.SetActive(true); 
+        }
         if (!IsOwner) return;
         if (inCombat && gameManager.IsEnemiesDead())
         {

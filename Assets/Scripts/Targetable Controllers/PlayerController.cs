@@ -20,7 +20,13 @@ public class PlayerController : TargetableController
 
     protected override void Die()
     {
-        gameManager.RemovePlayer(targetingID.Value);
+        
+    }
+
+    [Rpc(SendTo.Owner)]
+    public void ReviveRpc()
+    {
+        isDead.Value = false;
     }
 
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)

@@ -164,7 +164,12 @@ public class GameManager : NetworkBehaviour
     {
         if (players.Count == 0) return null;
         List<PlayerController> playerList = players.Values.ToList();
-        int randomIndex = Random.Range(0, playerList.Count);
+        int randomIndex = 0;
+        do
+        {
+            randomIndex = Random.Range(0, playerList.Count);
+        } 
+        while (playerList[randomIndex].IsDead());
         return playerList[randomIndex];
     }
 
@@ -214,7 +219,12 @@ public class GameManager : NetworkBehaviour
 
     public bool IsPlayersDead()
     {
-        return players.Count == 0;
+        foreach(PlayerController player in players.Values)
+        {
+            if (!player.IsDead())
+                return false;
+        }
+        return true;
     }
 
     public bool PlayersSpawned()
@@ -642,7 +652,7 @@ public class GameManager : NetworkBehaviour
                 break;
         }
 
-        if (player == null || target == null) return;
+        if (player == null || target == null || target.IsDead()) return;
 
         float healModifier = player.calculateHealModifier();
         int finalValue = (int)(baseValue * healModifier);
