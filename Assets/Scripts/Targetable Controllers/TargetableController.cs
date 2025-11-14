@@ -41,9 +41,9 @@ public abstract class TargetableController : NetworkBehaviour
     }
 
     [Rpc(SendTo.Owner)]
-    protected virtual void UpdateCurrentHealthRpc(int newHealth)
+    protected virtual void UpdateCurrentHealthRpc(int changeAmount)
     {
-        currentHealth.Value = Mathf.Clamp(newHealth, 0, maxHealth);
+        currentHealth.Value = Mathf.Clamp(currentHealth.Value + changeAmount, 0, maxHealth);
     }
 
     protected virtual void OnHealthChanged(int oldHealth, int newHealth)
@@ -69,7 +69,7 @@ public abstract class TargetableController : NetworkBehaviour
     {
         if (amount >= 0)
         {
-            UpdateCurrentHealthRpc(currentHealth.Value + amount);
+            UpdateCurrentHealthRpc(amount);
         }
         else if (currentShield.Value > 0)
         {
@@ -80,7 +80,7 @@ public abstract class TargetableController : NetworkBehaviour
 
         if (amount < 0)
         {
-            UpdateCurrentHealthRpc(currentHealth.Value + amount);
+            UpdateCurrentHealthRpc(amount);
         }
     }
 
