@@ -29,7 +29,7 @@ public class DPSClass : ClassBase
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
         StartCoroutine(CheckPassiveStacks(playerID, target));
-        LogAbility("DPSClass", 2, "Heavy Attack (1.5x base value) — powerful, deliberate strike");
+        LogAbility("DPSClass", 2, "Heavy Attack (1.5x base value) ï¿½ powerful, deliberate strike");
     }
 
     public override void Ability3(ulong playerID, TargetableController target, float baseValue)
@@ -74,4 +74,49 @@ public class DPSClass : ClassBase
     };
 
     public override string className => "DPS";
+    
+    public override List<string> instructionText { get; } = new List<string>
+    {
+        "Each class has 4 abilities. Press 1 to try out the first one.",
+        "This ability damages enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
+        "Enemy targeted, type the prompt below.",
+        "Let's try the 2nd ability now. Press 2.",
+        "This is a stronger attack. Enter an enemy's <color=yellow>Target Word</color>:",
+        "Enemy targeted, type the prompt below.",
+        "Let's try the 3rd ability. Press 3.",
+        "This buffs yourself. Enter your <color=yellow>Target Word</color>:",
+        "Enemy targeted, type the prompt below.",
+        "Let's try the 4th ability. Press 4.",
+        "This buffs yourself. Enter your <color=yellow>Target Word</color>:",
+        "Player targeted, type the prompt below.",
+        "Destroy enemy projectiles with an attack (press 1):",
+        "Enter the projectile's <color=yellow>Target Word</color>:",
+        "Now finish off the enemy. Select any ability."
+    };
+
+    public override List<string> promptText { get; } = new List<string>
+    {
+        "Press Tab to view your abilities and stats.",
+        "Typos will inflict damage to yourself.",
+        "Attack projectiles to destroy them.",
+        "Defeat the enemy to progress."
+    };
+
+    public override List<string> classDescription { get; } = new List<string>
+    {
+        "DPS",
+        "After destroying 3 projectiles, your next attack does double damage",
+        "A basic attack.",
+        "A stronger attack that requires a longer prompt.",
+        "Sacrifice 30% of your max health, making your next attack do double damage.",
+        "Sacrifice 30% of your max health, making your next attack leech for its damage dealt."
+    };
+
+    public override List<string> abilityDescription { get; } = new List<string>
+    {
+        "Attack",
+        "Attack",
+        "Buff",
+        "Buff"
+    };
 }
