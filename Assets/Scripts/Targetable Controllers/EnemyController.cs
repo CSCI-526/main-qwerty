@@ -27,8 +27,8 @@ public class EnemyController : TargetableController
     public override void OnNetworkSpawn()
     {
         InitTargeting();
+        InitHealth();
         RandomizeTargetWord();
-        currentHealth.OnValueChanged += OnHealthChanged;
     }
 
     [Rpc(SendTo.Everyone)]

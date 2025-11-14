@@ -20,6 +20,7 @@ public class ProjectileController : TargetableController
     public override void OnNetworkSpawn()
     {
         InitHealth();
+        InitTargeting();
     }
 
     void Update()
