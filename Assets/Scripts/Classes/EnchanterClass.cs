@@ -21,10 +21,11 @@ public class EnchanterClass : ClassBase
     {
         ulong targetType = DetermineTargetType(target);
         float mod = 0.3f * baseValue;
-        if (target.targetingID.Value != playerID){
-            gameManager.addBuffDebuffToListRpc(0, playerID, mod, 1, "LeechBuff");
+        if (target.targetingID.Value != playerID)
+        {
+            gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, mod, 1, "LeechBuff");
         }
-        gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, mod, 1, "LeechBuff");
+        gameManager.addBuffDebuffToListRpc(0, playerID, mod, 1, "LeechBuff");
         LogAbility("EnchanterClass", 2, "Next attack leeches 30% of damage done");
     }
 
@@ -34,9 +35,9 @@ public class EnchanterClass : ClassBase
         baseValue = Mathf.Clamp(baseValue * maxHealValue, 1, int.MaxValue);
         if (target.targetingID.Value != playerID)
         {
-            gameManager.localPlayer.ModifyCurrentShieldRpc((int)baseValue);
+            target.ModifyCurrentShieldRpc((int)baseValue);
         }
-        target.ModifyCurrentShieldRpc((int)baseValue);
+        gameManager.localPlayer.ModifyCurrentShieldRpc((int)baseValue);
         LogAbility("EnchanterClass", 3, "Grant target a damage shield of x% base value");
     }
 
