@@ -60,11 +60,10 @@ public class DPSClass : ClassBase
 
     public override List<string> promptText { get; } = new List<string>
     {
-        "This damages the enemy and leeches 30% health.",
-        "This increases an ally's attack by 50%",
-        "This decreases an enemy's attack by 30%:",
-        "Speed & accuracy determines an ability's effectiveness.",
-        "Press Tab if you forget what the abilities do."
+        "Press Tab to view your abilities and stats.",
+        "Typos will inflict damage to yourself.",
+        "Attack projectiles to destroy them.",
+        "Defeat the enemy to progress."
     };
 
     public override List<string> classDescription { get; } = new List<string>
@@ -75,5 +74,13 @@ public class DPSClass : ClassBase
         "A stronger attack that requires a longer prompt.",
         "Sacrifice 30% of your max health, making your next attack do double damage.",
         "Sacrifice 30% of your max health, making your next attack leech for its damage dealt."
+    };
+
+    public override List<string> abilityDescription { get; } = new List<string>
+    {
+        "Attack",
+        "Attack",
+        "Buff",
+        "Buff"
     };
 }

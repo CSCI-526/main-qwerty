@@ -27,6 +27,8 @@ public abstract class ClassBase : MonoBehaviour
 
     public abstract List<string> classDescription { get; }
 
+    public abstract List<string> abilityDescription { get; }
+
     // Optional: you can include shared utility methods here
     protected void LogAbility(string className, int abilityNumber, string description)
     {

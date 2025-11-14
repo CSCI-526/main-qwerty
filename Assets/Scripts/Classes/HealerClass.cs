@@ -62,11 +62,10 @@ public class HealerClass : ClassBase
 
     public override List<string> promptText { get; } = new List<string>
     {
-        "This damages the enemy and leeches 30% health.",
-        "This increases an ally's attack by 50%",
-        "This decreases an enemy's attack by 30%:",
-        "Speed & accuracy determines an ability's effectiveness.",
-        "Press Tab if you forget what the abilities do."
+        "Press Tab to view your abilities and stats.",
+        "Typos will inflict damage to yourself.",
+        "Attack projectiles to destroy them.",
+        "Defeat the enemy to progress."
     };
 
     public override List<string> classDescription { get; } = new List<string>
@@ -77,5 +76,13 @@ public class HealerClass : ClassBase
         "Heal all players for 75% effectiveness.",
         "Heal a player for double the value.",
         "Revive a player and set their health to 20%."
+    };
+
+    public override List<string> abilityDescription { get; } = new List<string>
+    {
+        "Heal",
+        "Heal",
+        "Heal",
+        "Revive"
     };
 }

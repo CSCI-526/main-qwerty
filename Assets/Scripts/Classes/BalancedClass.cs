@@ -90,4 +90,12 @@ public class BalancedClass : ClassBase
         "Debuff an enemy to make them take 30% more damage on the next 2 attacks.",
         "Heal a Player."
     };
+
+    public override List<string> abilityDescription { get; } = new List<string>
+    {
+        "Attack",
+        "Buff",
+        "Debuff",
+        "Heal"
+    };
 }

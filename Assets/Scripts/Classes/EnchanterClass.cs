@@ -70,11 +70,10 @@ public class EnchanterClass : ClassBase
 
     public override List<string> promptText { get; } = new List<string>
     {
-        "This damages the enemy and leeches 30% health.",
-        "This increases an ally's attack by 50%",
-        "This decreases an enemy's attack by 30%:",
-        "Speed & accuracy determines an ability's effectiveness.",
-        "Press Tab if you forget what the abilities do."
+        "Press Tab to view your abilities and stats.",
+        "Typos will inflict damage to yourself.",
+        "Attack projectiles to destroy them.",
+        "Defeat the enemy to progress."
     };
 
     public override List<string> classDescription { get; } = new List<string>
@@ -85,5 +84,13 @@ public class EnchanterClass : ClassBase
         "Makes the player's next attack leech for 30% of the damage done.",
         "Gives a player a shield that blocks damage.",
         "Makes an enemy take 40% more damage on the next 3 attacks."
+    };
+
+    public override List<string> abilityDescription { get; } = new List<string>
+    {
+        "Attack",
+        "Buff",
+        "Shield",
+        "Debuff"
     };
 }

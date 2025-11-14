@@ -1608,7 +1608,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 2 Buff
+  m_text: '2 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2346,7 +2346,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 3 Debuff
+  m_text: '3 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2575,10 +2575,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectedClass: {fileID: 1096307247}
   passive: {fileID: 2141155861}
-  ability1: {fileID: 1673559656}
-  ability2: {fileID: 1616833755}
-  ability3: {fileID: 570422825}
-  ability4: {fileID: 1528826391}
+  tabability1: {fileID: 1673559656}
+  tabability2: {fileID: 1616833755}
+  tabability3: {fileID: 570422825}
+  tabability4: {fileID: 1528826391}
+  ability1: {fileID: 1801714150}
+  ability2: {fileID: 780637017}
+  ability3: {fileID: 926797999}
+  ability4: {fileID: 1738050401}
 --- !u!1 &1020654710
 GameObject:
   m_ObjectHideFlags: 0
@@ -5015,7 +5019,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 4 Heal
+  m_text: '4 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5151,7 +5155,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1 Attack
+  m_text: '1 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
