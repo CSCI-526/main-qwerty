@@ -46,7 +46,7 @@ public class TypeTracker : MonoBehaviour
 
     private TargetableController currentTarget;
 
-    private ClassBase currentClass = new HealerClass();
+    private ClassBase currentClass = new BalancedClass();
 
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
