@@ -175,7 +175,7 @@ public class GameLoopManager : NetworkBehaviour
     {
         gameManager.analyticsManager.setRoundNumber(roundNumber);
         gameManager.analyticsManager.setEnemyHealth(FindFirstObjectByType<EnemyController>().maxHealth);
-        gameManager.analyticsManager.setEnemyAttackSpeed(FindFirstObjectByType<EnemyController>().attackCooldown);
+        gameManager.analyticsManager.setEnemyAttackSpeed(FindFirstObjectByType<EnemyController>().GetAttackCooldown());
         gameManager.analyticsManager.setNumPlayers(gameManager.networkManager.ConnectedClients.Count);
         gameManager.analyticsManager.setDifficultyLevel(1);
 

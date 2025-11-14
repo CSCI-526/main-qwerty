@@ -2457,7 +2457,11 @@ MonoBehaviour:
   playerPanel: {fileID: 1997162214}
   playerPrefab: {fileID: 3576826155321347564, guid: 4b45afb4231c96746903e3a84fea7c9a, type: 3}
   enemyPanel: {fileID: 2120846188}
-  enemyPrefab: {fileID: 9015733590952320127, guid: d85506600e2170744b06f1368fe8f08c, type: 3}
+  enemyPrefabs:
+  - {fileID: 9015733590952320127, guid: 62197210d2bd9414380d7e9e620c44f8, type: 3}
+  - {fileID: 9015733590952320127, guid: 0d2a863476fb61444b256830db0be1d3, type: 3}
+  - {fileID: 9015733590952320127, guid: 08ea1f41d714eb7489b026d9e6e313b2, type: 3}
+  - {fileID: 9015733590952320127, guid: 7cce6e97f34b1b541b196fbc4980cb0b, type: 3}
 --- !u!1 &1357705507
 GameObject:
   m_ObjectHideFlags: 0

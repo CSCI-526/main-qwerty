@@ -67,6 +67,8 @@ public class EnemyController : TargetableController
         gameManager.RefreshEnemies();
     }
 
+    public float GetAttackCooldown() {  return attackCooldown; }
+
     private void Update()
     {
         if (!IsOwner) return;

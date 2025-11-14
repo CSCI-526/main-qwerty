@@ -190,6 +190,7 @@ public class GameManager : NetworkBehaviour
                 break;
             }
         }
+    }
     public List<PlayerController> GetRandomPlayers()
     {
         if (players.Count == 0) return null;
