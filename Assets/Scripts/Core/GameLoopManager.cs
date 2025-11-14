@@ -29,7 +29,7 @@ public class GameLoopManager : NetworkBehaviour
         {
             typingElements.SetActive(false);
         }
-        else if (gameManager.localPlayer != null && !typingElements.activeSelf && !gameManager.localPlayer.IsDead())
+        else if (gameManager.localPlayer != null && !typingElements.activeSelf && !gameManager.localPlayer.IsDead() && inCombat)
         { 
             typingElements.SetActive(true); 
         }
@@ -77,7 +77,7 @@ public class GameLoopManager : NetworkBehaviour
     public void StartBattleRpc()
     {
         if (inCombat) return;
-        if (!gameManager.AllReady())
+        if (!gameManager.AllReady() || !gameManager.AllChosenClasses())
         {
             StartCoroutine(ShowNotReadyWarning(3f));
         }

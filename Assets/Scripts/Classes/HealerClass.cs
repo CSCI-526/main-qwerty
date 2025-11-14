@@ -34,7 +34,7 @@ public class HealerClass : ClassBase
             {
                 gameManager.addBuffDebuffToListRpc(0, playerID, 1.3f, 1, "HealBuff");
             }
-            gameManager.playerHealRpc(playerID, 1, player.targetingID.Value, delta);
+            gameManager.playerHealRpc(playerID, 0, player.targetingID.Value, delta);
         }
         LogAbility("HealerClass", 2, "Group Heal (0.75x base value) — all allies");
     }

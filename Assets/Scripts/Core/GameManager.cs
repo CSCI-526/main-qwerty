@@ -29,14 +29,16 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject cursePanel;
     [SerializeField] private GameObject curseMsgPrefab;
 
-    [DoNotSerialize] public TypingEffectManager typingEffectManager => FindFirstObjectByType<TypingEffectManager>();
+    [DoNotSerialize] public TypingEffectManager typingEffectManager => FindFirstObjectByType<TypingEffectManager>(FindObjectsInactive.Include);
     [DoNotSerialize] public NetworkManager networkManager => NetworkManager.Singleton;
-    [DoNotSerialize] public SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>();
-    [DoNotSerialize] public GameLoopManager gameLoopManager => FindFirstObjectByType<GameLoopManager>();
-    [DoNotSerialize] public AnalyticsManager analyticsManager => FindFirstObjectByType<AnalyticsManager>();
-    [DoNotSerialize] public DamageManager damageManager => FindFirstObjectByType<DamageManager>();
+    [DoNotSerialize] public SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>(FindObjectsInactive.Include);
+    [DoNotSerialize] public GameLoopManager gameLoopManager => FindFirstObjectByType<GameLoopManager>(FindObjectsInactive.Include);
+    [DoNotSerialize] public AnalyticsManager analyticsManager => FindFirstObjectByType<AnalyticsManager>(FindObjectsInactive.Include);
+    [DoNotSerialize] public DamageManager damageManager => FindFirstObjectByType<DamageManager>(FindObjectsInactive.Include);
+    [DoNotSerialize] public TypeTracker typeTracker => FindFirstObjectByType<TypeTracker>(FindObjectsInactive.Include);
 
     [DoNotSerialize] public ulong projectileTargetingIdCounter = 0;
+    private int classChosenCount = 0;
 
     #region Unity Methods
 
@@ -688,6 +690,43 @@ public class GameManager : NetworkBehaviour
 
         // Use a public TargetableController method to add the buff (see TargetableController change below).
         target.AddBuffDebuff(modifier, duration, effectType);
+    }
+
+    #endregion
+
+    #region Class Selection
+
+    public void ChooseClass(int id)
+    {
+        switch (id)
+        {
+            case 0:
+                typeTracker.currentClass = typeTracker.gameObject.AddComponent<BalancedClass>();
+                break;
+            case 1:
+                typeTracker.currentClass = typeTracker.gameObject.AddComponent<DPSClass>();
+                break;
+            case 2:
+                typeTracker.currentClass = typeTracker.gameObject.AddComponent<EnchanterClass>();
+                break;
+            case 3:
+                typeTracker.currentClass = typeTracker.gameObject.AddComponent<HealerClass>();
+                break;
+        }
+
+        IncrementClassChosenCountRpc();
+
+    }
+
+    [Rpc(SendTo.Owner)]
+    public void IncrementClassChosenCountRpc()
+    {
+        classChosenCount++;
+    }
+
+    public bool AllChosenClasses()
+    {
+        return classChosenCount >= networkManager.ConnectedClients.Count;
     }
 
     #endregion
