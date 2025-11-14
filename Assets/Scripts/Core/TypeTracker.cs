@@ -198,7 +198,14 @@ public class TypeTracker : MonoBehaviour
         // If they're already in that mode, do nothing
         if (mode == newMode)
         {
-            return;
+            if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep == tutorialLength + 1)
+            {
+                EnterTargetPhase();
+            }
+            else
+            {
+                return;
+            }
         }
 
         mode = newMode;
@@ -596,6 +603,7 @@ public class TypeTracker : MonoBehaviour
         {
             Debug.Log("State Reset aftet tutorial ended");
             phase = 1;
+            mode = 0;
             getInstructions();
         }
         else
@@ -738,7 +746,7 @@ public class TypeTracker : MonoBehaviour
     private void getPrompt()
     {
         phase = 2;
-        if (gameManager.gameLoopManager.GetTutorialState() && promptStep <= 5)
+        if (gameManager.gameLoopManager.GetTutorialState() && promptStep <= currentClass.classDescription.Count-1)
         {
             promptText.text = currentClass.promptText[promptStep];
             prompt = promptText.text; // For comparisons

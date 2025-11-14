@@ -75,12 +75,10 @@ public class BalancedClass : ClassBase
 
     public override List<string> promptText { get; } = new List<string>
     {
-        "This damages the enemy and heals for 30% of damage dealt.",
-        "This increases a player's attack by 50%",
-        "This makes an enemy take 30% more damage.",
-        "Speed & accuracy determines an ability's effectiveness.",
-        "Press \"Tab\" if you forget what your abilities do.",
-        "Oh and typos cause damage."
+        "Press Tab to view your abilities and stats.",
+        "Typos will inflict damage to yourself.",
+        "Attack projectiles to destroy them.",
+        "Defeat the enemy to progress."
     };
 
     public override List<string> classDescription { get; } = new List<string>

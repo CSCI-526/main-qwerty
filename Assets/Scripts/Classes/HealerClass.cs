@@ -44,16 +44,16 @@ public class HealerClass : ClassBase
     public override List<string> instructionText { get; } = new List<string>
     {
         "Each class has 4 abilities. Press 1 to try out the first one.",
-        "This ability attacks projectiles and enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
-        "Enemy targeted, type the prompt below.",
+        "This ability heals a player. Enter a player's <color=yellow>Target Word</color> (Word in yellow):",
+        "Type the prompt below.",
         "Let's try the 2nd ability now. Press 2.",
-        "This ability buffs allies. Enter a player's <color=yellow>Target Word</color>:",
-        "Player targeted, type the prompt below.",
+        "This ability heals all players. Enter a player's <color=yellow>Target Word</color>:",
+        "Type the prompt below.",
         "Let's try the 3rd ability. Press 3.",
-        "This debuffs an enemy. Enter an enemy's <color=yellow>Target Word</color>:",
-        "Enemy targeted, type the prompt below.",
+        "This heals a player for more. Enter an enemy's <color=yellow>Target Word</color>:",
+        "Type the prompt below.",
         "Let's try the 4th ability. Press 4.",
-        "This heals a player. Enter a player's <color=yellow>Target Word</color>:",
+        "This revives a player. Enter a player's <color=yellow>Target Word</color>:",
         "Player targeted, type the prompt below.",
         "Now everyone finish off the enemy. Select an ability.",
         "Enter a <color=yellow>Target Word</color>:",
@@ -71,11 +71,11 @@ public class HealerClass : ClassBase
 
     public override List<string> classDescription { get; } = new List<string>
     {
-        "Balanced",
-        "Attacks leech 20% of damage dealt.",
-        "A quick attack that does a little less damage and generates a short prompt.",
-        "Buff yourself or an ally to increase the damage of the next attack by 50%",
-        "Debuff an enemy to make them take 30% more damage on the next 3 attacks.",
-        "Heal yourself or an ally."
+        "Healer",
+        "Healing are 30% stronger on player's with less than 50% health.",
+        "Heal a single player.",
+        "Heal all players for 75% effectiveness.",
+        "Heal a player for double the value.",
+        "Revive a player and set their health to 20%."
     };
 }
