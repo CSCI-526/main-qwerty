@@ -11,6 +11,16 @@ public class ForceDoublingCurseData : TypingEffectBase
         this.isCaseSensitive = isCaseSensitive;
     }
 
+    public bool IsCaseSensitive()
+    {
+        return isCaseSensitive;
+    }
+
+    public char GetDoubledLetter()
+    {
+        return doubledLetter;
+    }
+
     public override string ApplyEffectOnPrompt(ref string prompt)
     {
         var stringBuilder = new StringBuilder();

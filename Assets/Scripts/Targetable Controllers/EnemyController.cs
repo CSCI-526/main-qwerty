@@ -7,15 +7,16 @@ using UnityEngine;
 public class EnemyController : TargetableController
 {
     [Header("Enemy Settings")]
-    [SerializeField] private float attackCooldown = 10;
-    private float attackCd = 0;
-    private bool tutorial = false;
+    [SerializeField] protected float attackCooldown = 10;
+    protected float attackCd = 0;
+    protected bool tutorial = false;
+    protected int damage = 20;
 
-    private List<string> wordList = new List<string>();
+    protected List<string> wordList = new List<string>();
 
     [Header("GameObjects")]
-    [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private GameObject projectileStartingPoint;
+    [SerializeField] protected GameObject projectilePrefab;
+    [SerializeField] protected GameObject projectileStartingPoint;
 
     private void Start()
     {
@@ -27,8 +28,8 @@ public class EnemyController : TargetableController
     public override void OnNetworkSpawn()
     {
         InitTargeting();
+        InitHealth();
         RandomizeTargetWord();
-        currentHealth.OnValueChanged += OnHealthChanged;
     }
 
     [Rpc(SendTo.Everyone)]
@@ -39,7 +40,16 @@ public class EnemyController : TargetableController
         OnHealthChanged(currentHealth.Value, maxHealth);
     }
 
-    public void SetAttackCooldown(float multiplier)
+    [Rpc(SendTo.Everyone)]
+    public void SetMaxHealthAmountRpc(int amount)
+    {
+        maxHealth = amount;
+        UpdateCurrentHealthRpc(maxHealth);
+        OnHealthChanged(maxHealth, maxHealth);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetAttackCooldownRpc(float multiplier)
     {
         attackCooldown *= multiplier;
     }
@@ -47,6 +57,11 @@ public class EnemyController : TargetableController
     public void SetTutorial(bool flag)
     {
         tutorial = flag;
+        if(flag)
+        {
+            SetMaxHealthAmountRpc(1000);
+            damage = 5;
+        }
     }
 
     protected override void Die()
@@ -65,6 +80,8 @@ public class EnemyController : TargetableController
     {
         gameManager.RefreshEnemies();
     }
+
+    public float GetAttackCooldown() {  return attackCooldown; }
 
     private void Update()
     {
@@ -85,7 +102,7 @@ public class EnemyController : TargetableController
         }
     }
 
-    private void ShootWord(string word)
+    protected virtual void ShootWord(string word)
     {
         PlayerController targetPlayer = gameManager.GetRandomPlayer();
 
@@ -103,11 +120,12 @@ public class EnemyController : TargetableController
         pc.SetTargetWord(word);
         pc.SetSpawner(this);
         pc.SetTarget(targetPlayer);
+        pc.SetDamage(damage);
         pc.targetingID.Value = ++gameManager.projectileTargetingIdCounter;
 
         gameManager.AddProjectile(new ProjectileNetworkData
         {
-            TargetingID = pc.targetingID.Value
+            TargetingID = gameManager.projectileTargetingIdCounter
         });
 
         wordList.Add(word);

@@ -7,15 +7,17 @@ public struct PlayerNetworkData : INetworkSerializable, IEquatable<PlayerNetwork
 {
     public ulong TargetingID;
     public FixedString128Bytes PlayerName;
+    public bool IsReady;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref TargetingID);
         serializer.SerializeValue(ref PlayerName);
+        serializer.SerializeValue(ref IsReady);
     }
 
     public bool Equals(PlayerNetworkData other)
     {
-        return TargetingID == other.TargetingID;
+        return TargetingID == other.TargetingID && IsReady == other.IsReady;
     }
 }

@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System;
+using System.Threading;
 
 public class TypeTracker : MonoBehaviour
 {
@@ -27,13 +28,14 @@ public class TypeTracker : MonoBehaviour
 
     [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
     [SerializeField] private DamageManager damageManager;
+    [SerializeField] private ClassInfoManager classInfoManager;
 
     private string prompt;
     private bool timerStarted = false;
     private float startTime = 0f;
     private int errors;
 
-    private int mode = 0; // 0 = none, 1 = attack, 2 = heal
+    private int mode = 0; 
     private bool awaitingTarget = true; // Whether we're asking for a target name
     private HashSet<int> activeErrors = new HashSet<int>();
 
@@ -42,64 +44,33 @@ public class TypeTracker : MonoBehaviour
     private float caretTimer = 0f;
     private bool caretVisible = true;
 
-    private int numSubmissions = 0;
-    private float averageWPM = 0f;
-    private float averageAccuracy = 0f;
-    private int damageDealt = 0;
-    private int healingDone = 0;
-
-    private int tutorial = 0;
+    private int tutorialLength = 0;
+    private int tutorialStep = 0;
+    private int promptStep = 0;
+    private int phase = 0;
+    private bool tutorialIncremented = false;
 
     private TargetableController currentTarget;
 
-    private ClassBase currentClass = new BalancedClass();
+    public ClassBase currentClass = new BalancedClass();
 
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
     public void OnEnable()
     {
-        resetState();
-        EnterTargetPhase();
-        ResetMetrics();
-    }
-
-    public void OnDisable()
-    {
-        ReportStats();
-    }
-
-    private void ReportStats()
-    {
-        if (numSubmissions == 0)
-            return;
-
-        StatsEvent statsEvent = new StatsEvent
+        if (!gameManager.gameLoopManager.GetTutorialState())
         {
-            NumSubmissions = numSubmissions,
-            AverageWPM = averageWPM,
-            AverageAccuracy = averageAccuracy,
-            DamageDealt = damageDealt,
-            HealingDone = healingDone
-        };
-        gameManager.analyticsManager.PushAnalyticsEvent(statsEvent);
-    }
-
-    private void ResetMetrics()
-    {
-        numSubmissions = 0;
-        averageWPM = 0f;
-        averageAccuracy = 0f;
-        damageDealt = 0;
-        healingDone = 0;
+            resetState();
+            EnterTargetPhase();
+        }
     }
 
     private void Start()
     {
-        if (gameManager.gameLoopManager.GetTutorialState())
-            instructionText.text = "Select an ability 1-4. Let's try attacking with 1!";
-        else
-            instructionText.text = "Select an ability 1-4:\n";
+        classInfoManager.updateUI(currentClass);
+        tutorialLength = currentClass.instructionText.Count - 1;
 
+        getInstructions();
         promptText.text = "";
 
         inputField.text = "";
@@ -115,20 +86,56 @@ public class TypeTracker : MonoBehaviour
     {
         bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
-        if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false)
+        if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false  && phase != 2)
         {
+            if(gameManager.gameLoopManager.GetTutorialState())
+            {
+                if((tutorialStep >= 2 && tutorialStep < 12))
+                {
+                    Debug.Log("Returning from pressing 1");
+                    return;
+                }
+                changeMode(1);
+            }
             changeMode(1);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false)
+        if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false && phase != 2)
         {
+            if (gameManager.gameLoopManager.GetTutorialState())
+            {
+                if ((tutorialStep < 3 || tutorialStep > 5)  && tutorialStep < tutorialLength)
+                {
+                    Debug.Log("Returning from pressing 2");
+                    return;
+                }
+                changeMode(2);
+            }
             changeMode(2);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false)
+        if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false && phase != 2)
         {
-            changeMode(3);
+            if (gameManager.gameLoopManager.GetTutorialState())
+            {
+                if ((tutorialStep < 6 || tutorialStep > 8) && tutorialStep < tutorialLength)
+                {
+                    Debug.Log("Returning from pressing 3");
+                    return;
+                }
+                changeMode(3);
+            }
+                changeMode(3);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false)
+        if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false && phase != 2)
         {
+            if (gameManager.gameLoopManager.GetTutorialState())
+            {
+                if ((tutorialStep < 9 || tutorialStep > 11) && tutorialStep < tutorialLength)
+                {
+                    Debug.Log("Returning from pressing 4");
+                    return;
+                }
+                changeMode(4);
+            }
             changeMode(4);
         }
 
@@ -154,7 +161,16 @@ public class TypeTracker : MonoBehaviour
     {
         // If they're already in that mode, do nothing
         if (mode == newMode)
-            return;
+        {
+            if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep == tutorialLength + 1)
+            {
+                EnterTargetPhase();
+            }
+            else
+            {
+                return;
+            }
+        }
 
         mode = newMode;
 
@@ -162,6 +178,7 @@ public class TypeTracker : MonoBehaviour
         ability2.color = new Color(0f, 0f, 0f, 0.3f);
         ability3.color = new Color(0f, 0f, 0f, 0.3f);
         ability4.color = new Color(0f, 0f, 0f, 0.3f);
+
 
         if (mode == 1)
         {
@@ -187,14 +204,9 @@ public class TypeTracker : MonoBehaviour
     private void EnterTargetPhase()
     {
         awaitingTarget = true;
-        instructionText.text = "Enter <color=yellow>Target</color>: ";
-        if (gameManager.gameLoopManager.GetTutorialState())
-        {
-            if(tutorial == 0)
-                instructionText.text = "Enter the enemy's <color=yellow>Target word</color> (word in yellow): ";
-            if (tutorial == 1)
-                instructionText.text = "You can target anything in yellow. Enter <color=yellow>Target word</color>: ";
-        }
+        getInstructions();
+        Debug.Log("EnterTargetPhase: " + tutorialStep);
+        phase = 1;
         FocusInputField();
     }
 
@@ -213,67 +225,46 @@ public class TypeTracker : MonoBehaviour
                 if (currentTarget is ProjectileController)
                 {
                     inputField.text = "";
-                    if(gameManager.gameLoopManager.GetTutorialState() && tutorial == 1)
-                    {
-                        tutorial++;
-                    }
+
                     if (mode == 1)
                     {
-                        currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     else if (mode == 2)
                     {
-                        currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     else if (mode == 3)
                     {
-                        currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     else if (mode == 4)
                     {
-                        currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     currentTarget = null;
                     promptText.text = "";
                     inputField.text = "";
-                    EnterTargetPhase();
+
+                    if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep < tutorialLength)
+                    {
+                        Debug.Log("In current target projectile");
+                        phase = 0;
+                        mode = 0;
+                        awaitingTarget = true;
+                        promptText.color = Color.white;
+                        getInstructions();
+                    }
+                    else
+                    { 
+                        EnterTargetPhase();
+                    }
                     return;
                 }
-                else if (mode == 1)
-                {
-                    Debug.Log(currentClass.promptFileNames);
-                    string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[0]);
-                    promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
-                }
-                else if (mode == 2)
-                {
-                    string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[1]);
-                    promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
-                }
-                else if (mode == 3)
-                {
-                    string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[2]);
-                    promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
-                }
-                else if (mode == 4)
-                {
-                    string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[3]);
-                    promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
-                }
 
-                    prompt = promptText.text; // For comparisons
-                promptText.color = Color.gray;
-                instructionText.text = "Type the prompt below!";
-                if (gameManager.gameLoopManager.GetTutorialState() && tutorial == 0)
-                {
-                    promptText.text = "Typing speed & accuracy determine effectiveness.";
-                    prompt = promptText.text;
-                    tutorial++;
-                }
-
-                inputField.text = "";
-                timerStarted = true; // will start when they begin typing
-                startTime = Time.time;
+                getPrompt();
+                getInstructions();
+                Debug.Log("onEnter: " + tutorialStep);
 
                 FocusInputField();
             }
@@ -302,16 +293,66 @@ public class TypeTracker : MonoBehaviour
     // Called when text changes (while typing)
     private void OnInputChanged(string currentText)
     {
-        if(mode == 0)
+        if (phase == 0)
+        {
+
+            // Restrict only during tutorial
+            if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep < tutorialLength)
+            {
+                bool valid = false;
+
+                if ((tutorialStep <= 2 || tutorialStep >= 12 || tutorialStep >= tutorialLength) && currentText == "1")
+                {
+                    valid = true;
+                }
+                else if (((tutorialStep >= 3 && tutorialStep <= 5) || tutorialStep >= tutorialLength) && currentText == "2")
+                {
+                    valid = true;
+                }
+                else if (((tutorialStep >= 6 && tutorialStep <= 8) || tutorialStep >= tutorialLength) && currentText == "3")
+                {
+                    valid = true;
+                }
+                else if (((tutorialStep >= 9 && tutorialStep <= 11) || tutorialStep >= tutorialLength) && currentText == "4")
+                {
+                    valid = true;
+                }
+
+                // If invalid input during tutorial
+                if (!valid)
+                {
+
+                    inputField.text = "";
+                    instructionText.text = currentClass.instructionText[tutorialStep-1];
+                    return;
+                }
+            }
+            else if(tutorialStep >= 14)
+            {
+                // General rule outside tutorial: Only allow 1–4
+                if (currentText != "1" && currentText != "2" && currentText != "3" && currentText != "4")
+                {
+                    inputField.text = "";
+                    getInstructions();
+                    return;
+                }
+            }
+
+            // Clear text after pressing a valid number
+            inputField.text = "";
+            return;
+        }
+
+        if (mode == 0)
         {
             inputField.text = "";
-            instructionText.text = "Please select an ability first: 1 for Attack, 2 for Heal.";
             return;
         }
 
         // Prevent 1 or 2 from appearing if pressed (we handle those separately)
-        if (currentText == "1" || currentText == "2" || currentText == "3" || currentText == "4")
+        if ((currentText == "1" || currentText == "2" || currentText == "3" || currentText == "4") && phase != 2)
         {
+            Debug.Log("Phase: " + phase);
             inputField.text = "";
             return;
         }
@@ -410,15 +451,15 @@ public class TypeTracker : MonoBehaviour
 
         float grossWPM = (float)input.Length / 5f / totalMinutes;
 
-        if(promptText.text.Length != input.Length)
+        if(prompt.Length != input.Length)
         {
-            errors += Math.Abs(promptText.text.Length - input.Length);
+            errors += Math.Abs(prompt.Length - input.Length);
         }
 
         if (input.Length > 0)
         {
             int correctCharacters = Mathf.Max(0, input.Length - errors);
-            float ratio = (float)correctCharacters / input.Length;
+            float ratio = correctCharacters / (float)input.Length;
             accuracy = ratio * 100f;
         }
         else
@@ -426,40 +467,43 @@ public class TypeTracker : MonoBehaviour
             accuracy = 0f;
         }
 
-        numSubmissions++;
-        averageWPM = ((averageWPM * (numSubmissions - 1)) + grossWPM) / numSubmissions;
-        averageAccuracy = ((averageAccuracy * (numSubmissions - 1)) + accuracy) / numSubmissions;
-
         // Damage calculation to make speed more forgiving and errors more penalizing. Also has a floor of 1 damage.
-        float wpmFactor = Mathf.Log10(grossWPM + 10) * 6f;
+        float wpmFactor = Math.Min(1, Mathf.Log10((grossWPM + 14) / 14));
         float accuracyFactor = Mathf.Pow(accuracy / 100f, 2f);
-        int healthModifier = (int)(wpmFactor*accuracyFactor);
-        if(gameManager.gameLoopManager.GetTutorialState())
-            healthModifier = 4;
+        float modifier = wpmFactor * accuracyFactor;
+
+        gameManager.analyticsManager.addNumSubmissions(1);
+        gameManager.analyticsManager.addAverageWPM(grossWPM);
+        gameManager.analyticsManager.addAverageAccuracy(accuracy);
 
         if (mode == 1)
         {
-            currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
-            // damageManager.applyHealthChange(currentTarget, delta);
-            // damageDealt -= delta;
+            currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, modifier);
+            gameManager.analyticsManager.addAbility1Uses(1);
         }
         else if (mode == 2)
         {
-            currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, modifier);
+            gameManager.analyticsManager.addAbility2Uses(1);
         }
         else if (mode == 3)
         {
-            currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, modifier);
+            gameManager.analyticsManager.addAbility3Uses(1);
         }
         else if (mode == 4)
         {
-            currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, modifier);
+            gameManager.analyticsManager.addAbility4Uses(1);
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;
 
         resetState();
-        EnterTargetPhase();
+        if (!gameManager.gameLoopManager.GetTutorialState())
+        {
+            EnterTargetPhase();
+        }
     }
 
     // Dummy function to test targeting
@@ -510,7 +554,24 @@ public class TypeTracker : MonoBehaviour
         awaitingTarget = true;
         promptText.color = Color.white;
 
-        FocusInputField();
+        if(gameManager.gameLoopManager.GetTutorialState() && phase == 2 && tutorialStep < tutorialLength+1)
+        {
+            phase = 0;
+            mode = 0;
+            getInstructions();
+            Debug.Log("ResetState: " + tutorialStep);
+        }
+        else if(gameManager.gameLoopManager.GetTutorialState() && tutorialStep >= tutorialLength +1)
+        {
+            Debug.Log("State Reset after tutorial ended");
+            phase = 1;
+            getInstructions();
+        }
+        else
+        {
+            phase = 1;
+        }
+            FocusInputField();
     }
 
     // Probably get rid of this eventually and just fix the prompts
@@ -616,5 +677,86 @@ public class TypeTracker : MonoBehaviour
         caretRect.anchoredPosition = anchored;
 
         caretRect.anchoredPosition += new Vector2(0, caretRect.sizeDelta.y * 0.3f);
+    }
+
+    private void getInstructions()
+    {
+        if(gameManager.gameLoopManager.GetTutorialState() && tutorialStep < tutorialLength+1)
+        {
+            instructionText.text = currentClass.instructionText[tutorialStep];
+            tutorialStep++;
+            if (tutorialStep >= tutorialLength && !tutorialIncremented)
+            {
+                gameManager.IncrementTutorialFinishedCountRpc();
+            }
+        }
+        else
+        {
+            Debug.Log("In Instrutcion switch case + Phase = " + phase + " + tutorialStep = " + tutorialStep);
+            switch (phase)
+            {
+                case 0:
+                    instructionText.text = "Please select an ability 1-4.";
+                    break;
+                case 1:
+                    instructionText.text = "Enter a <color=yellow>Target word</color>:";
+                    break;
+                case 2:
+                    instructionText.text = "Type the prompt below.";
+                    break;
+            }
+        }
+    }
+
+    private void getPrompt()
+    {
+        phase = 2;
+        if (gameManager.gameLoopManager.GetTutorialState() && promptStep < currentClass.promptText.Count)
+        {
+            Debug.Log("GetPrompt. Tutorial Step: " + tutorialStep + " PromptStep: " + promptStep);
+            promptText.text = currentClass.promptText[promptStep];
+            prompt = promptText.text; // For comparisons
+            promptText.color = Color.gray;
+
+            inputField.text = "";
+            timerStarted = true; // will start when they begin typing
+            startTime = Time.time;
+            promptStep++;
+
+            FocusInputField();
+        }
+        else
+        {
+            if (mode == 1)
+            {
+                //Debug.Log(currentClass.promptFileNames);
+                string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[0]);
+                promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
+            }
+            else if (mode == 2)
+            {
+                string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[1]);
+                promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
+            }
+            else if (mode == 3)
+            {
+                string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[2]);
+                promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
+            }
+            else if (mode == 4)
+            {
+                string temp = promptGenerator.GetRandomSentence(currentClass.promptFileNames[3]);
+                promptText.text = gameManager.typingEffectManager.ApplyEffectOnPrompt(ref temp);
+            }
+
+            prompt = promptText.text; // For comparisons
+            promptText.color = Color.gray;
+
+            inputField.text = "";
+            timerStarted = true; // will start when they begin typing
+            startTime = Time.time;
+
+            FocusInputField();
+        }
     }
 }

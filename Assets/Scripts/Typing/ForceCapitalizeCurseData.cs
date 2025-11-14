@@ -7,6 +7,11 @@ public class ForceCapitalizeCurseData : TypingEffectBase
         this.capitalizedLetter = char.ToLower(capitalizedLetter);
     }
 
+    public char GetCapitalizedLetter()
+    {
+        return this.capitalizedLetter;
+    }
+
     public override string ApplyEffectOnPrompt(ref string prompt)
     {
         return prompt.Replace(capitalizedLetter, char.ToUpper(capitalizedLetter));

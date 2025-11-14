@@ -7,19 +7,22 @@ public abstract class ClassBase : MonoBehaviour
     [DoNotSerialize]
     public GameManager gameManager => FindFirstObjectByType<GameManager>();
 
-    // Common properties for all classes (optional)
-    [Header("Base Stats")]
-    public float baseAttackValue = 100f;
-    public float baseHealValue = 100f;
-
     // --- Abstract Abilities ---
     // Each subclass must override these
-    public abstract void Ability1(ulong playerID, TargetableController target, int baseDamage);
-    public abstract void Ability2(ulong playerID, TargetableController target, int baseDamage);
-    public abstract void Ability3(ulong playerID, TargetableController target, int baseDamage);
-    public abstract void Ability4(ulong playerID, TargetableController target, int baseDamage);
+    public abstract void Ability1(ulong playerID, TargetableController target, float baseValue);
+    public abstract void Ability2(ulong playerID, TargetableController target, float baseValue);
+    public abstract void Ability3(ulong playerID, TargetableController target, float baseValue);
+    public abstract void Ability4(ulong playerID, TargetableController target, float baseValue);
 
     public abstract List<string> promptFileNames { get; }
+
+    public abstract List<string> instructionText { get; }
+
+    public abstract List<string> promptText { get; }
+
+    public abstract List<string> classDescription { get; }
+
+    public abstract List<string> abilityDescription { get; }
 
     // Optional: you can include shared utility methods here
     protected void LogAbility(string className, int abilityNumber, string description)
@@ -38,4 +41,9 @@ public abstract class ClassBase : MonoBehaviour
         else
             return 3; // Unknown
     }
+
+    public abstract string className { get; }
+
+    protected float maxDamageValue = 15;
+    protected float maxHealValue = 25;
 }
