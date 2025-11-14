@@ -110,7 +110,7 @@ public class EnemyController : TargetableController
 
         gameManager.AddProjectile(new ProjectileNetworkData
         {
-            TargetingID = pc.targetingID.Value
+            TargetingID = gameManager.projectileTargetingIdCounter
         });
 
         wordList.Add(word);
