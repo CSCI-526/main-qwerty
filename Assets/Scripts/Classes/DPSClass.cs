@@ -29,20 +29,20 @@ public class DPSClass : ClassBase
     public override void Ability3(ulong playerID, TargetableController target, int baseValue)
     {
         ulong targetType = DetermineTargetType(target);
-        gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 2.0f, 1, "DamageBuff");
+        gameManager.addBuffDebuffToListRpc(0, playerID, 2.0f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
         int delta = Math.Max((int)(baseValue / Math.Pow(modMultipler, mod)), 1);
-        gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, (int)(-0.3 * target.maxHealth));
+        gameManager.playerHealRpc(playerID, 0, playerID, (int)(-0.3 * target.maxHealth));
         LogAbility("DPSClass", 3, "Sacrifice 30% max HP: next attack deals 2x damage (stacks with passive)");
     }
 
     public override void Ability4(ulong playerID, TargetableController target, int baseValue)
     {
         ulong targetType = DetermineTargetType(target);
-        gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 1.0f, 1, "DamageBuff");
+        gameManager.addBuffDebuffToListRpc(0, playerID, 1.0f, 1, "LeechBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
         int delta = Math.Max((int)(baseValue / Math.Pow(modMultipler, mod)), 1);
-        gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, (int)(-0.3 * target.maxHealth));
+        gameManager.playerHealRpc(playerID, 0, playerID, (int)(-0.3 * target.maxHealth));
         LogAbility("DPSClass", 4, "Sacrifice 30% max HP: next attack leeches 100% of its damage");
     }
 
