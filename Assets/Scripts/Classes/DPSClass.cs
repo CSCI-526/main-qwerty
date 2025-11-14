@@ -6,8 +6,10 @@ using UnityEngine;
 public class DPSClass : ClassBase
 {
     private float modMultipler = 1.2f;
+    private int numProjectilesKilled = 3;
     public override void Ability1(ulong playerID, TargetableController target, float baseValue)
     {
+        CheckPassiveStacks(playerID, target);
         ulong targetType = DetermineTargetType(target);
         gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 1.2f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
@@ -19,6 +21,7 @@ public class DPSClass : ClassBase
 
     public override void Ability2(ulong playerID, TargetableController target, float baseValue)
     {
+        CheckPassiveStacks(playerID, target);
         ulong targetType = DetermineTargetType(target);
         gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 1.5f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
@@ -32,7 +35,8 @@ public class DPSClass : ClassBase
     {
         ulong targetType = DetermineTargetType(target);
         gameManager.addBuffDebuffToListRpc(0, playerID, 1.0f + baseValue, 1, "DamageBuff");
-        gameManager.playerHealRpc(playerID, 0, playerID, (int)(-0.3 * target.maxHealth));
+        gameManager.localPlayer.ModifyCurrentHealth((int)(-0.3 * gameManager.localPlayer.maxHealth));
+        gameManager.damageManager.applyHealthChange(gameManager.localPlayer, (int)-0.3 * gameManager.localPlayer.maxHealth);
         LogAbility("DPSClass", 3, "Sacrifice 30% max HP: next attack deals 2x damage (stacks with passive)");
     }
 
@@ -40,8 +44,22 @@ public class DPSClass : ClassBase
     {
         ulong targetType = DetermineTargetType(target);
         gameManager.addBuffDebuffToListRpc(0, playerID, baseValue, 1, "LeechBuff");
-        gameManager.playerHealRpc(playerID, 0, playerID, (int)(-0.3 * target.maxHealth));
+        gameManager.localPlayer.ModifyCurrentHealth((int)(-0.3 * gameManager.localPlayer.maxHealth));
+        gameManager.damageManager.applyHealthChange(gameManager.localPlayer, (int)-0.3 * gameManager.localPlayer.maxHealth);
         LogAbility("DPSClass", 4, "Sacrifice 30% max HP: next attack leeches 100% of its damage");
+    }
+
+    private void CheckPassiveStacks(ulong playerID, TargetableController target)
+    {
+        if (DetermineTargetType(target) == 2)
+        {
+            numProjectilesKilled--;
+            if (numProjectilesKilled <= 0)
+            {
+                gameManager.addBuffDebuffToListRpc(0, playerID, 2.0f, 1, "DamageBuff");
+                numProjectilesKilled = 3;
+            }
+        }
     }
 
     public override List<string> promptFileNames { get; } = new List<string>
