@@ -44,10 +44,16 @@ public class GameLoopManager : NetworkBehaviour
         }
     }
 
+    [Rpc(SendTo.Everyone)]
+    public void SetInCombatRpc(bool inCombat)
+    {
+        this.inCombat = inCombat;
+    }
+
     public void ResetGame()
     {
         if (!IsOwner) return;
-        inCombat = false;
+        SetInCombatRpc(false);
         gameManager.RemoveAllPlayers();
         gameManager.RemoveAllEnemies();
         gameManager.RemoveAllProjectiles();
@@ -98,7 +104,7 @@ public class GameLoopManager : NetworkBehaviour
         gameManager.SpawnEnemy();
         ToggleElementsRpc(true, false, false, tutorial);
         yield return new WaitForSeconds(2f);
-        inCombat = true;
+        SetInCombatRpc(true);
         gameManager.ResetReadyStatusRpc();
         ShareRoundStats();
     }
@@ -106,7 +112,7 @@ public class GameLoopManager : NetworkBehaviour
     public void EndBattle()
     {
         if (!inCombat || !IsOwner) return;
-        inCombat = false;
+        SetInCombatRpc(false);
         gameManager.RemoveAllEnemies();
         gameManager.RemoveAllProjectiles();
         battleCount++;
@@ -193,6 +199,8 @@ public class GameLoopManager : NetworkBehaviour
             gameManager.analyticsManager.setCapitalizedCharacters(stats.capitalizedCharacters);
             gameManager.analyticsManager.setDoubledCharacters(stats.doubledCharacters);
         }
+
+        gameManager.analyticsManager.setClassName(gameManager.typeTracker.currentClass.className);
     }
 
     [Rpc(SendTo.Everyone)]

@@ -55,7 +55,7 @@ public class SharedCanvasController : NetworkBehaviour
         ec.SetTutorial(tutorialState);
         gameManager.AddEnemy(new EnemyNetworkData
         {
-            TargetingID = ec.targetingID.Value,
+            TargetingID = enemyIdCounter,
             EnemyName = new FixedString128Bytes($"Enemy {enemyIdCounter}")
         });
         RefreshLayoutGroupEveryoneRpc();

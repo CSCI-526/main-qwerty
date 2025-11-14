@@ -71,4 +71,6 @@ public class HealerClass : ClassBase
         "ClassCSkill3",
         "ClassCSkill4"
     };
+
+    public override string className => "Healer";
 }

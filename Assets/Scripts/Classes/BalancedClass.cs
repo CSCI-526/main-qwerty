@@ -51,4 +51,6 @@ public class BalancedClass : ClassBase
         "ClassASkill3",
         "ClassASkill4"
     };
+
+    public override string className => "Balanced";
 }

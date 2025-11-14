@@ -56,4 +56,6 @@ public class EnchanterClass : ClassBase
         "ClassDSkill3",
         "ClassDSkill4"
     };
+
+    public override string className => "Enchanter";
 }

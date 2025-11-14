@@ -27,8 +27,8 @@ public class EnemyController : TargetableController
     public override void OnNetworkSpawn()
     {
         InitTargeting();
+        InitHealth();
         RandomizeTargetWord();
-        currentHealth.OnValueChanged += OnHealthChanged;
     }
 
     [Rpc(SendTo.Everyone)]
@@ -110,7 +110,7 @@ public class EnemyController : TargetableController
 
         gameManager.AddProjectile(new ProjectileNetworkData
         {
-            TargetingID = pc.targetingID.Value
+            TargetingID = gameManager.projectileTargetingIdCounter
         });
 
         wordList.Add(word);
