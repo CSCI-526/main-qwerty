@@ -9,25 +9,25 @@ public class DPSClass : ClassBase
     private int numProjectilesKilled = 3;
     public override void Ability1(ulong playerID, TargetableController target, float baseValue)
     {
-        CheckPassiveStacks(playerID, target);
         ulong targetType = DetermineTargetType(target);
-        gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 1.2f, 1, "DamageBuff");
+        gameManager.addBuffDebuffToListRpc(0, playerID, 1.2f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
         baseValue = Mathf.Clamp(baseValue * maxDamageValue, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
+        CheckPassiveStacks(playerID, target);
         LogAbility("DPSClass", 1, "Attack (1.2x base value)");
     }
 
     public override void Ability2(ulong playerID, TargetableController target, float baseValue)
     {
-        CheckPassiveStacks(playerID, target);
         ulong targetType = DetermineTargetType(target);
-        gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 1.5f, 1, "DamageBuff");
+        gameManager.addBuffDebuffToListRpc(0, playerID, 1.5f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
         baseValue = Mathf.Clamp(baseValue * maxDamageValue, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
+        CheckPassiveStacks(playerID, target);
         LogAbility("DPSClass", 2, "Heavy Attack (1.5x base value) — powerful, deliberate strike");
     }
 
