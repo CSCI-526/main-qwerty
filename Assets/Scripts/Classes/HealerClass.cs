@@ -89,8 +89,6 @@ public class HealerClass : ClassBase
         "This revives a player. Enter a player's <color=yellow>Target Word</color>:",
         "Player targeted, type the prompt below.",
         "Now everyone finish off the enemy. Select an ability.",
-        "Enter a <color=yellow>Target Word</color>:",
-        "Type the prompt below."
     };
 
     public override List<string> promptText { get; } = new List<string>

@@ -39,6 +39,7 @@ public class GameManager : NetworkBehaviour
 
     [DoNotSerialize] public ulong projectileTargetingIdCounter = 0;
     private int classChosenCount = 0;
+    private int tutorialFinishedCount = 0;
 
     #region Unity Methods
 
@@ -762,6 +763,17 @@ public class GameManager : NetworkBehaviour
             data.IsReady = false;
             playerData[i] = data;
         }
+    }
+
+    [Rpc(SendTo.Owner)]
+    public void IncrementTutorialFinishedCountRpc()
+    {
+        tutorialFinishedCount++;
+    }
+
+    public bool AllFinishedTutorial()
+    {
+        return tutorialFinishedCount >= networkManager.ConnectedClients.Count;
     }
 
     #endregion

@@ -106,6 +106,7 @@ public class ProjectileController : TargetableController
 
     public void SetSpawner(TargetableController obj) { spawner = obj; }
     public void SetTarget(TargetableController obj) { target = obj; }
+    public void SetDamage(int damage) { this.damage = damage; }
 
     void OnTriggerEnter2D(Collider2D other) 
     {

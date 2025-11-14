@@ -10,6 +10,7 @@ public class EnemyController : TargetableController
     [SerializeField] protected float attackCooldown = 10;
     protected float attackCd = 0;
     protected bool tutorial = false;
+    protected int damage = 20;
 
     protected List<string> wordList = new List<string>();
 
@@ -40,6 +41,14 @@ public class EnemyController : TargetableController
     }
 
     [Rpc(SendTo.Everyone)]
+    public void SetMaxHealthAmountRpc(int amount)
+    {
+        maxHealth = amount;
+        UpdateCurrentHealthRpc(maxHealth);
+        OnHealthChanged(maxHealth, maxHealth);
+    }
+
+    [Rpc(SendTo.Everyone)]
     public void SetAttackCooldownRpc(float multiplier)
     {
         attackCooldown *= multiplier;
@@ -48,6 +57,11 @@ public class EnemyController : TargetableController
     public void SetTutorial(bool flag)
     {
         tutorial = flag;
+        if(flag)
+        {
+            SetMaxHealthAmountRpc(1000);
+            damage = 5;
+        }
     }
 
     protected override void Die()
@@ -106,6 +120,7 @@ public class EnemyController : TargetableController
         pc.SetTargetWord(word);
         pc.SetSpawner(this);
         pc.SetTarget(targetPlayer);
+        pc.SetDamage(damage);
         pc.targetingID.Value = ++gameManager.projectileTargetingIdCounter;
 
         gameManager.AddProjectile(new ProjectileNetworkData
