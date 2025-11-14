@@ -61,8 +61,8 @@ public class EnchanterClass : ClassBase
         "This buffs a player. Enter a player's <color=yellow>Target Word</color>:",
         "Player targeted, type the prompt below.",
         "Let's try the 4th ability. Press 4.",
-        "This buffs a player. Enter a player's <color=yellow>Target Word</color>:",
-        "Player targeted, type the prompt below.",
+        "This debuffs an enemy. Enter an enemy's <color=yellow>Target Word</color>:",
+        "Enemy targeted, type the prompt below.",
         "Now everyone finish off the enemy. Select an ability.",
         "Enter a <color=yellow>Target Word</color>:",
         "Type the prompt below."
@@ -84,6 +84,6 @@ public class EnchanterClass : ClassBase
         "A weak attack.",
         "Makes the player's next attack leech for 30% of the damage done.",
         "Gives a player a shield that blocks damage.",
-        "Cuts a player's next prompt to half the length."
+        "Makes an enemy take 40% more damage on the next 3 attacks."
     };
 }
