@@ -372,15 +372,15 @@ public class TypeTracker : MonoBehaviour
 
         float grossWPM = (float)input.Length / 5f / totalMinutes;
 
-        if(promptText.text.Length != input.Length)
+        if(prompt.Length != input.Length)
         {
-            errors += Math.Abs(promptText.text.Length - input.Length);
+            errors += Math.Abs(prompt.Length - input.Length);
         }
 
         if (input.Length > 0)
         {
             int correctCharacters = Mathf.Max(0, input.Length - errors);
-            float ratio = (float)correctCharacters / input.Length;
+            float ratio = correctCharacters / (float)input.Length;
             accuracy = ratio * 100f;
         }
         else
