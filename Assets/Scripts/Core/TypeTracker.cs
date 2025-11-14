@@ -182,19 +182,19 @@ public class TypeTracker : MonoBehaviour
                     }
                     if (mode == 1)
                     {
-                        currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     else if (mode == 2)
                     {
-                        currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     else if (mode == 3)
                     {
-                        currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     else if (mode == 4)
                     {
-                        currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     currentTarget = null;
                     promptText.text = "";
