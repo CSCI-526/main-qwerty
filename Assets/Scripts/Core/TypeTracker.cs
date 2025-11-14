@@ -382,10 +382,6 @@ public class TypeTracker : MonoBehaviour
         if (mode == 0)
         {
             inputField.text = "";
-            if (gameManager.gameLoopManager.GetTutorialState())
-            {
-                instructionText.text = currentClass.instructionText[tutorialStep];
-            }
             return;
         }
 
@@ -601,9 +597,8 @@ public class TypeTracker : MonoBehaviour
         }
         else if(gameManager.gameLoopManager.GetTutorialState() && tutorialStep >= tutorialLength +1)
         {
-            Debug.Log("State Reset aftet tutorial ended");
+            Debug.Log("State Reset after tutorial ended");
             phase = 1;
-            mode = 0;
             getInstructions();
         }
         else
@@ -746,8 +741,9 @@ public class TypeTracker : MonoBehaviour
     private void getPrompt()
     {
         phase = 2;
-        if (gameManager.gameLoopManager.GetTutorialState() && promptStep <= currentClass.classDescription.Count-1)
+        if (gameManager.gameLoopManager.GetTutorialState() && promptStep < currentClass.promptText.Count)
         {
+            Debug.Log("GetPrompt. Tutorial Step: " + tutorialStep + " PromptStep: " + promptStep);
             promptText.text = currentClass.promptText[promptStep];
             prompt = promptText.text; // For comparisons
             promptText.color = Color.gray;
