@@ -423,7 +423,6 @@ public class GameManager : NetworkBehaviour
     {
         foreach (var enemy in enemies)
         {
-            if (enemy.Value.IsDead()) continue;
             if (enemy.Value.GetTargetWord().Equals(word))
             {
                 return enemy.Value;
@@ -431,7 +430,6 @@ public class GameManager : NetworkBehaviour
         }
         foreach (var player in players)
         {
-            if (player.Value.IsDead()) continue;
             if (player.Value.GetTargetWord().Equals(word))
             {
                 return player.Value;
@@ -439,7 +437,6 @@ public class GameManager : NetworkBehaviour
         }
         foreach (var projectile in projectiles)
         {
-            if (projectile.Value.IsDead()) continue;
             if (projectile.Value.GetTargetWord().Equals(word))
             {
                 return projectile.Value;
