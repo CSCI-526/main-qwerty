@@ -7,15 +7,15 @@ using UnityEngine;
 public class EnemyController : TargetableController
 {
     [Header("Enemy Settings")]
-    [SerializeField] public float attackCooldown = 10;
-    private float attackCd = 0;
-    private bool tutorial = false;
+    [SerializeField] protected float attackCooldown = 10;
+    protected float attackCd = 0;
+    protected bool tutorial = false;
 
-    private List<string> wordList = new List<string>();
+    protected List<string> wordList = new List<string>();
 
     [Header("GameObjects")]
-    [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private GameObject projectileStartingPoint;
+    [SerializeField] protected GameObject projectilePrefab;
+    [SerializeField] protected GameObject projectileStartingPoint;
 
     private void Start()
     {
@@ -86,7 +86,7 @@ public class EnemyController : TargetableController
         }
     }
 
-    private void ShootWord(string word)
+    protected virtual void ShootWord(string word)
     {
         PlayerController targetPlayer = gameManager.GetRandomPlayer();
 

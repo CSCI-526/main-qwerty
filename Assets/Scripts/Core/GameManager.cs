@@ -190,6 +190,25 @@ public class GameManager : NetworkBehaviour
                 break;
             }
         }
+    public List<PlayerController> GetRandomPlayers()
+    {
+        if (players.Count == 0) return null;
+        List<PlayerController> playerList = players.Values.ToList();
+        if (playerList.Count == 1) return playerList;
+
+        List<PlayerController> selectedList = new List<PlayerController>();
+        List<PlayerController> tempList = new List<PlayerController>(playerList);
+
+        int numberOfItemsToSelect = Random.Range(1, playerList.Count + 1);
+
+        for (int i = 0; i < numberOfItemsToSelect; i++)
+        {
+            int randomIndex = Random.Range(0, tempList.Count);
+            selectedList.Add(tempList[randomIndex]);
+            tempList.RemoveAt(randomIndex);
+        }
+
+        return selectedList;
     }
 
     public bool IsPlayersDead()

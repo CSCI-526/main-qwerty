@@ -65,10 +65,43 @@ public class ProjectileController : TargetableController
     }
 
     [Rpc(SendTo.Everyone)]
-    public void UpdateTextEveryoneRpc(FixedString128Bytes newWord) {
+    public void UpdateTextEveryoneRpc(FixedString128Bytes newWord, int special = 0) {
         word = newWord.ToString();
         GetComponent<TMP_Text>().text = word; 
+
+        // Special modes
+        if (special == 1)
+        {
+            // Reverse the string, set color to purple
+            char[] array = word.ToCharArray();
+            Array.Reverse(array);
+            word = new string(array);
+            GetComponent<TMP_Text>().text = word;
+            GetComponent<TMP_Text>().color = Color.magenta;
+        }
+        else if (special == 2)
+        {
+            // Mark the string as question marks, set color to red
+            word = new string('?', word.Length);
+            GetComponent<TMP_Text>().color = Color.red;
+        }
     }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void UpdateTextClientRpc(FixedString128Bytes newWord, int special = 0, RpcParams rpcParams = default)
+    {
+        word = newWord.ToString();
+        GetComponent<TMP_Text>().text = word;
+
+        // Special modes
+        if (special == 2)
+        {
+            // Set color to red for the specific target
+            GetComponent<TMP_Text>().color = Color.red;
+        }
+
+    }
+
     public void SetSpawner(TargetableController obj) { spawner = obj; }
     public void SetTarget(TargetableController obj) { target = obj; }
 
