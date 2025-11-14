@@ -23,12 +23,6 @@ public class PlayerController : TargetableController
         
     }
 
-    [Rpc(SendTo.Owner)]
-    public void ReviveRpc()
-    {
-        isDead.Value = false;
-    }
-
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
     {
         targetWordText.text = newWord.ToString();

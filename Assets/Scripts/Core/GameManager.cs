@@ -150,6 +150,11 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    public List<PlayerController> GetAllPlayers()
+    {
+        return players.Values.ToList();
+    }
+
     public PlayerController GetPlayerByClientId(ulong clientId)
     {
         return players.TryGetValue(clientId, out PlayerController player) ? player : null;
@@ -593,7 +598,7 @@ public class GameManager : NetworkBehaviour
         float damageModifier = player.calculateDamageModifier();
         float leechModifier = player.calculateLeechModifier();
         float damageTakenModifier = target.calculateDamageTakenModifier();
-        int finalValue = (int)(baseValue * damageModifier * damageTakenModifier);
+        int finalValue = Mathf.Clamp((int)(baseValue * damageModifier * damageTakenModifier), int.MinValue, -1);
         int leechValue = (int)(finalValue * leechModifier);
 
         target.ModifyCurrentHealth(finalValue);
@@ -655,7 +660,7 @@ public class GameManager : NetworkBehaviour
         if (player == null || target == null || target.IsDead()) return;
 
         float healModifier = player.calculateHealModifier();
-        int finalValue = (int)(baseValue * healModifier);
+        int finalValue = Mathf.Clamp((int)(baseValue * healModifier), 1, int.MaxValue);
         target.ModifyCurrentHealth(finalValue);
         showDamageRpc(targetType, targetingID, finalValue, 0, RpcTarget.Single(playerID, RpcTargetUse.Temp));
     }

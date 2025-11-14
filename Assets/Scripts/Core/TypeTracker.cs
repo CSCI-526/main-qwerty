@@ -46,7 +46,7 @@ public class TypeTracker : MonoBehaviour
 
     private TargetableController currentTarget;
 
-    private ClassBase currentClass = new BalancedClass();
+    private ClassBase currentClass = new EnchanterClass();
 
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
@@ -389,11 +389,9 @@ public class TypeTracker : MonoBehaviour
         }
 
         // Damage calculation to make speed more forgiving and errors more penalizing. Also has a floor of 1 damage.
-        float wpmFactor = Mathf.Log10(grossWPM + 10) * 6f;
+        float wpmFactor = Math.Min(1, Mathf.Log10((grossWPM + 14) / 14));
         float accuracyFactor = Mathf.Pow(accuracy / 100f, 2f);
-        int healthModifier = (int)(wpmFactor*accuracyFactor);
-        if(gameManager.gameLoopManager.GetTutorialState())
-            healthModifier = 4;
+        float modifier = wpmFactor * accuracyFactor;
 
         gameManager.analyticsManager.addNumSubmissions(1);
         gameManager.analyticsManager.addAverageWPM(grossWPM);
@@ -401,22 +399,22 @@ public class TypeTracker : MonoBehaviour
 
         if (mode == 1)
         {
-            currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, modifier);
             gameManager.analyticsManager.addAbility1Uses(1);
         }
         else if (mode == 2)
         {
-            currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, modifier);
             gameManager.analyticsManager.addAbility2Uses(1);
         }
         else if (mode == 3)
         {
-            currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, modifier);
             gameManager.analyticsManager.addAbility3Uses(1);
         }
         else if (mode == 4)
         {
-            currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, modifier);
             gameManager.analyticsManager.addAbility4Uses(1);
         }
         currentTarget.RandomizeTargetWord();

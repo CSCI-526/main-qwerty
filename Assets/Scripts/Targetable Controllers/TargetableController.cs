@@ -18,6 +18,13 @@ public abstract class TargetableController : NetworkBehaviour
         NetworkVariableWritePermission.Server
     );
 
+    [DoNotSerialize]
+    public NetworkVariable<int> currentShield = new NetworkVariable<int>(
+        0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
     public HealthBar healthBar;
 
     protected NetworkVariable<bool> isDead = new NetworkVariable<bool>(
@@ -30,6 +37,7 @@ public abstract class TargetableController : NetworkBehaviour
         UpdateCurrentHealthRpc(maxHealth);
         OnHealthChanged(currentHealth.Value, maxHealth);
         currentHealth.OnValueChanged += OnHealthChanged;
+        currentShield.OnValueChanged += OnShieldChanged;
     }
 
     [Rpc(SendTo.Owner)]
@@ -41,7 +49,7 @@ public abstract class TargetableController : NetworkBehaviour
     protected virtual void OnHealthChanged(int oldHealth, int newHealth)
     {
         if (healthBar != null)
-            healthBar.SetFillAmount(newHealth, maxHealth);
+            healthBar.SetFillAmount(newHealth, currentShield.Value, maxHealth);
 
         if (currentHealth.Value <= 0)
         {
@@ -51,14 +59,46 @@ public abstract class TargetableController : NetworkBehaviour
         }
     }
 
+    protected virtual void OnShieldChanged(int oldShield, int newShield)
+    {
+        if (healthBar != null && isDead.Value == false)
+            healthBar.SetFillAmount(currentHealth.Value, newShield, maxHealth);
+    }
+
     public virtual void ModifyCurrentHealth(int amount)
     {
-        UpdateCurrentHealthRpc(currentHealth.Value + amount);
+        if (amount >= 0)
+        {
+            UpdateCurrentHealthRpc(currentHealth.Value + amount);
+        }
+        else if (currentShield.Value > 0)
+        {
+            int temp = amount;
+            amount += currentShield.Value;
+            ModifyCurrentShieldRpc(temp);
+        }
+
+        if (amount < 0)
+        {
+            UpdateCurrentHealthRpc(currentHealth.Value + amount);
+        }
+    }
+
+    [Rpc(SendTo.Owner)]
+    public virtual void ModifyCurrentShieldRpc(int amount)
+    {
+        currentShield.Value = Mathf.Clamp(currentShield.Value + amount, 0, int.MaxValue);
     }
 
     public bool IsDead() { return isDead.Value; }
 
     protected abstract void Die();
+
+    [Rpc(SendTo.Owner)]
+    public void ReviveRpc()
+    {
+        isDead.Value = false;
+    }
 
     #endregion
 
