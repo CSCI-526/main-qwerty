@@ -1,14 +1,17 @@
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class HealerClass : ClassBase
 {
+    private float modMultipler = 1.2f;
     public override void Ability1(ulong playerID, TargetableController target, int baseValue)
     {
         ulong targetType = DetermineTargetType(target);
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
         int delta = Math.Max((int)(baseValue / Math.Pow(modMultipler, mod)), 1);
-        if(target.currentHealth.Value <= target.maxHealth.Value / 2)
+        if(target.currentHealth.Value <= target.maxHealth / 2)
         {
             gameManager.addBuffDebuffToListRpc(0, playerID, 0.3f, 1, "HealBuff");
         }
@@ -29,7 +32,7 @@ public class HealerClass : ClassBase
         ulong targetType = DetermineTargetType(target);
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
         int delta = Math.Max((int)(baseValue / Math.Pow(modMultipler, mod)), 1);
-        if (target.currentHealth.Value <= target.maxHealth.Value / 2)
+        if (target.currentHealth.Value <= target.maxHealth / 2)
         {
             gameManager.addBuffDebuffToListRpc(0, playerID, 1.0f, 1, "HealBuff");
         }
