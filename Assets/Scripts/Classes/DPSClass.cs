@@ -32,7 +32,7 @@ public class DPSClass : ClassBase
         gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 2.0f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
         int delta = Math.Max((int)(baseValue / Math.Pow(modMultipler, mod)), 1);
-        gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, -0.3 * target.MaxHealth);
+        gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, (int)(-0.3 * target.maxHealth));
         LogAbility("DPSClass", 3, "Sacrifice 30% max HP: next attack deals 2x damage (stacks with passive)");
     }
 
@@ -42,7 +42,7 @@ public class DPSClass : ClassBase
         gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 1.0f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[1];
         int delta = Math.Max((int)(baseValue / Math.Pow(modMultipler, mod)), 1);
-        gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, -0.3 * target.MaxHealth);
+        gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, (int)(-0.3 * target.maxHealth));
         LogAbility("DPSClass", 4, "Sacrifice 30% max HP: next attack leeches 100% of its damage");
     }
 

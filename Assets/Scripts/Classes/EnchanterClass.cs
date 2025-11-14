@@ -21,7 +21,7 @@ public class EnchanterClass : ClassBase
         ulong targetType = DetermineTargetType(target);
         if (target.targetingID.Value != playerID){
             gameManager.addBuffDebuffToListRpc(0, playerID, 0.3f, 1, "LeechBuff");
-         }
+        }
         gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 0.3f, 1, "LeechBuff");
         LogAbility("EnchanterClass", 2, "Next attack leeches 30% of damage done");
     }
@@ -34,10 +34,8 @@ public class EnchanterClass : ClassBase
         if (target.targetingID.Value != playerID)
         {
             gameManager.playerHealRpc(playerID, 0, playerID, delta);
-            //target.maxHealth.Value += delta;
         }
         gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, delta);
-        //target.maxHealth.Value += delta;
         LogAbility("EnchanterClass", 3, "Grant target a damage shield of x% base value");
     }
 
