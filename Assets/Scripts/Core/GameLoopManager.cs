@@ -199,6 +199,8 @@ public class GameLoopManager : NetworkBehaviour
             gameManager.analyticsManager.setCapitalizedCharacters(stats.capitalizedCharacters);
             gameManager.analyticsManager.setDoubledCharacters(stats.doubledCharacters);
         }
+
+        gameManager.analyticsManager.setClassName(gameManager.typeTracker.currentClass.className);
     }
 
     [Rpc(SendTo.Everyone)]

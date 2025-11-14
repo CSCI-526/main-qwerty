@@ -39,6 +39,8 @@ public abstract class ClassBase : MonoBehaviour
             return 3; // Unknown
     }
 
+    public abstract string className { get; }
+
     protected float maxDamageValue = 15;
     protected float maxHealValue = 25;
 }

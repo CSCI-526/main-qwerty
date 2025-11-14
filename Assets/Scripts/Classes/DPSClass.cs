@@ -51,4 +51,6 @@ public class DPSClass : ClassBase
         "ClassBSkill3",
         "ClassBSkill4"
     };
+
+    public override string className => "DPS";
 }
