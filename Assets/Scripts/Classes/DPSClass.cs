@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ public class DPSClass : ClassBase
         baseValue = Mathf.Clamp(baseValue * maxDamageValue, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
-        CheckPassiveStacks(playerID, target);
+        StartCoroutine(CheckPassiveStacks(playerID, target));
         LogAbility("DPSClass", 1, "Attack (1.2x base value)");
     }
 
@@ -27,7 +28,7 @@ public class DPSClass : ClassBase
         baseValue = Mathf.Clamp(baseValue * maxDamageValue, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
-        CheckPassiveStacks(playerID, target);
+        StartCoroutine(CheckPassiveStacks(playerID, target));
         LogAbility("DPSClass", 2, "Heavy Attack (1.5x base value) — powerful, deliberate strike");
     }
 
@@ -49,8 +50,10 @@ public class DPSClass : ClassBase
         LogAbility("DPSClass", 4, "Sacrifice 30% max HP: next attack leeches 100% of its damage");
     }
 
-    private void CheckPassiveStacks(ulong playerID, TargetableController target)
+    private IEnumerator CheckPassiveStacks(ulong playerID, TargetableController target)
     {
+        yield return new WaitForSeconds(1f);
+
         if (DetermineTargetType(target) == 2)
         {
             numProjectilesKilled--;
