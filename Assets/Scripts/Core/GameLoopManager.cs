@@ -178,6 +178,17 @@ public class GameLoopManager : NetworkBehaviour
         gameManager.analyticsManager.setEnemyAttackSpeed(FindFirstObjectByType<EnemyController>().attackCooldown);
         gameManager.analyticsManager.setNumPlayers(gameManager.networkManager.ConnectedClients.Count);
         gameManager.analyticsManager.setDifficultyLevel(1);
+
+        TypingEffectManager.TypingStats stats = gameManager.typingEffectManager.ReportStats();
+        if (stats != null)
+        {
+            gameManager.analyticsManager.setDamagePercentage(stats.damagePercentage);
+            gameManager.analyticsManager.setHealingPercentage(stats.healingPercentage);
+            gameManager.analyticsManager.setPunishmentPercentage(stats.punishmentPercentage);
+            gameManager.analyticsManager.setBulletSpeedPercentage(stats.bulletSpeedPercentage);
+            gameManager.analyticsManager.setCapitalizedCharacters(stats.capitalizedCharacters);
+            gameManager.analyticsManager.setDoubledCharacters(stats.doubledCharacters);
+        }
     }
 
     [Rpc(SendTo.Everyone)]
