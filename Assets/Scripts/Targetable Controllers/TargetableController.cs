@@ -288,26 +288,45 @@ public abstract class TargetableController : NetworkBehaviour
 
     public void RefreshBuffDebuffUI()
     {
-        attackBuff.SetActive(false);
-        damageDebuff.SetActive(false);
-        leechBuff.SetActive(false);
+        SetAttackBuffRpc(false);
+        SetDamageDebuffRpc(false);
+        SetLeechBuffRpc(false);
 
-        foreach(BuffDebuffData data in BuffDebuffList)
+        foreach (BuffDebuffData data in BuffDebuffList)
         {
             if (data.effectType.ToString().Equals("DamageBuff"))
             {
-                attackBuff.SetActive(true);
+                SetAttackBuffRpc(true);
             }
             else if (data.effectType.ToString().Equals("DamageTakenDebuff"))
             {
-                damageDebuff.SetActive(true);
+                SetDamageDebuffRpc(true);
             }
             else if (data.effectType.ToString().Equals("LeechBuff"))
             {
-                leechBuff.SetActive(true);
+                SetLeechBuffRpc(true);
             }
         }
+    }
 
+    [Rpc(SendTo.Everyone)]
+    public void SetAttackBuffRpc(bool state)
+    {
+        attackBuff.SetActive(state);
+        buffDebuffLayoutGroup.RefreshLayout();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetDamageDebuffRpc(bool state)
+    {
+        damageDebuff.SetActive(state);
+        buffDebuffLayoutGroup.RefreshLayout();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetLeechBuffRpc(bool state)
+    {
+        leechBuff.SetActive(state);
         buffDebuffLayoutGroup.RefreshLayout();
     }
 
