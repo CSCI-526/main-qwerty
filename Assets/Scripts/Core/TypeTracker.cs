@@ -62,16 +62,22 @@ public class TypeTracker : MonoBehaviour
 
     public void OnEnable()
     {
-        if (!gameManager.gameLoopManager.GetTutorialState())
+        if (!tutorialManager.isTutorialActive)
         {
             resetState();
             EnterTargetPhase();
+            tutorialManager.currentClass = currentClass;
+        }
+        else
+        {
+            getInstructions();
         }
     }
 
     private void Start()
     {
         classInfoManager.updateUI(currentClass);
+        tutorialManager.currentClass = currentClass;
 
         getInstructions();
         promptText.text = "";
@@ -91,7 +97,7 @@ public class TypeTracker : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false  && phase == 0)
         {
-            if(tutorialManager.isTutorialActive && tutorialManager.abilityAllowed(1))
+            if(tutorialManager.isTutorialActive && tutorialManager.abilityAllowed("1"))
             {
                 tutorialManager.incrementTutorial();
                 changeMode(1);
@@ -105,7 +111,7 @@ public class TypeTracker : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false && phase == 0)
         {
-            if (tutorialManager.isTutorialActive && tutorialManager.abilityAllowed(2))
+            if (tutorialManager.isTutorialActive && tutorialManager.abilityAllowed("2"))
             {
                 tutorialManager.incrementTutorial();
                 changeMode(2);
@@ -119,7 +125,7 @@ public class TypeTracker : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false && phase == 0)
         {
-            if (tutorialManager.isTutorialActive && tutorialManager.abilityAllowed(3))
+            if (tutorialManager.isTutorialActive && tutorialManager.abilityAllowed("3"))
             {
                 tutorialManager.incrementTutorial();
                 changeMode(3);
@@ -133,7 +139,7 @@ public class TypeTracker : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false && phase == 0)
         {
-            if (tutorialManager.isTutorialActive && tutorialManager.abilityAllowed(4))
+            if (tutorialManager.isTutorialActive && tutorialManager.abilityAllowed("4"))
             {
                 tutorialManager.incrementTutorial();
                 changeMode(4);
@@ -227,6 +233,17 @@ public class TypeTracker : MonoBehaviour
             if (currentTarget != null)
             {
                 awaitingTarget = false;
+                if(tutorialManager.isTutorialActive && !tutorialManager.checkTarget(currentTarget))
+                {
+                    instructionText.text = "Invalid Target. Try Again.";
+
+                    inputField.text = "";
+                    promptText.text = "";
+                    awaitingTarget = true;
+
+                    FocusInputField();
+                    return;
+                }
 
                 if (currentTarget is ProjectileController)
                 {
@@ -254,7 +271,7 @@ public class TypeTracker : MonoBehaviour
 
                     if (tutorialManager.isTutorialActive)
                     {
-                        Debug.Log("In current target projectile");
+                        tutorialManager.incrementTutorial();
                         phase = 0;
                         mode = 0;
                         awaitingTarget = true;
@@ -281,15 +298,6 @@ public class TypeTracker : MonoBehaviour
                         tutorialManager.incrementTutorial();
                         getPrompt();
                         getInstructions();
-                        FocusInputField();
-                    }
-                    else
-                    {
-                        instructionText.text = "Invalid Target. Try Again.";
-
-                        inputField.text = "";
-                        promptText.text = "";
-
                         FocusInputField();
                     }
                 }
@@ -327,7 +335,7 @@ public class TypeTracker : MonoBehaviour
             {
                 bool valid = false;
 
-                if (tutorialManager.abilityAllowed(int.Parse(currentText)))
+                if (tutorialManager.abilityAllowed(currentText))
                 {
                     valid = true;
                 }
@@ -513,14 +521,14 @@ public class TypeTracker : MonoBehaviour
         currentTarget.RandomizeTargetWord();
         currentTarget = null;
 
-        resetState();
-
-        if(tutorialManager.isTutorialActive)
+        if (tutorialManager.isTutorialActive)
         {
             tutorialManager.incrementTutorial();
         }
 
-        if (!gameManager.gameLoopManager.GetTutorialState())
+        resetState();
+
+        if (!tutorialManager.isTutorialActive)
         {
             EnterTargetPhase();
         }
@@ -680,7 +688,7 @@ public class TypeTracker : MonoBehaviour
     {
         if(tutorialManager.isTutorialActive)
         {
-            tutorialManager.getInstruction();
+            instructionText.text = tutorialManager.getInstruction();
         }
         else
         {

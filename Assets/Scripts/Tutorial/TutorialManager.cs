@@ -12,39 +12,35 @@ public class TutorialManager : MonoBehaviour
 
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
-    public bool isTutorialActive => gameManager.gameLoopManager.GetTutorialState();
     private int tutorialLength => currentClass.instructionText.Count - 1;
+    private bool tutorialEnd = false;
+    public bool isTutorialActive => !tutorialEnd && gameManager.gameLoopManager.GetTutorialState();
 
-    public void Start()
-    {
-
-    }
-
-    public bool abilityAllowed(int ability)
+    public bool abilityAllowed(string ability)
     {
         if (!isTutorialActive)
         {
             return true;
         }
 
-        if (tutorialStep >= 2 && tutorialStep < 12 && ability == 1)
+        if ((tutorialStep <= 2 || tutorialStep >= 12) && ability == "1")
         {
             Debug.Log("1 Pressed and allowed");
             return true;
         }
-        if ((tutorialStep < 3 || tutorialStep > 5) && tutorialStep < tutorialLength && ability == 2)
+        if ((tutorialStep >= 3 && tutorialStep <= 5) && ability == "2")
         {
             Debug.Log("2 Pressed and allowed");
             return true;
         }
-        if ((tutorialStep < 6 || tutorialStep > 8) && tutorialStep < tutorialLength && ability == 3)
+        if ((tutorialStep >= 6 && tutorialStep <= 8) && ability == "3")
         {
             Debug.Log("3 Pressed and allowed");
             return true;
         }
-        if ((tutorialStep < 9 || tutorialStep > 11) && tutorialStep < tutorialLength && ability == 3)
+        if ((tutorialStep >= 9 && tutorialStep <= 11)  && ability == "4")
         {
-            Debug.Log("3 Pressed and allowed");
+            Debug.Log("4 Pressed and allowed");
             return true;
         }
 
@@ -59,8 +55,10 @@ public class TutorialManager : MonoBehaviour
             return false;
         }
 
+        Debug.Log("Target Tag: " + target.tag + "| Expected Target: " + currentClass.targetList[tutorialStep / 3]);
         if (target.tag == currentClass.targetList[tutorialStep / 3])
         {
+            Debug.Log("Target Match");
             return true;
         }
 
@@ -104,5 +102,18 @@ public class TutorialManager : MonoBehaviour
     public void incrementTutorial()
     {
         tutorialStep++;
+        Debug.Log("Tutorial Incremented: " + tutorialStep);
+
+        if(tutorialStep > tutorialLength)
+        {
+            endTutorial();
+        }
+    }
+
+    public void endTutorial()
+    {
+        Debug.Log("Tutorial Ended");
+        tutorialEnd = true;
+        gameManager.IncrementTutorialFinishedCountRpc();
     }
 }
