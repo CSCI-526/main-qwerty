@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -10,7 +11,7 @@ public class SharedCanvasController : NetworkBehaviour
     [SerializeField] public RectTransform playerPanel;
     [SerializeField] private NetworkObject playerPrefab;
     [SerializeField] public RectTransform enemyPanel;
-    [SerializeField] private NetworkObject enemyPrefab;
+    [SerializeField] private List<NetworkObject> enemyPrefabs;
 
     private ulong enemyIdCounter = 0;
 
@@ -30,7 +31,8 @@ public class SharedCanvasController : NetworkBehaviour
         gameManager.AddPlayer(new PlayerNetworkData
         {
             TargetingID = requesterClientId,
-            PlayerName = playerName
+            PlayerName = playerName,
+            IsReady = true
         });
         RefreshLayoutGroupEveryoneRpc();
     }
@@ -38,18 +40,22 @@ public class SharedCanvasController : NetworkBehaviour
     [Rpc(SendTo.Owner)]
     public void RequestSpawnEnemyIconOwnerRpc(float maxHealthMultiplier, float attackCooldownMultiplier, bool tutorialState)
     {
-        GameObject go = Instantiate(enemyPrefab.gameObject);
+        GameObject go = null;
+        if (tutorialState)
+            go = Instantiate(enemyPrefabs[0].gameObject);
+        else
+            go = Instantiate(GetRandomEnemyPrefab().gameObject);
         NetworkObject no = go.GetComponent<NetworkObject>();
         no.Spawn(true);
         enemyPanel.GetComponent<CustomLayoutGroup>().AddToLayout(go.GetComponent<RectTransform>());
         EnemyController ec = go.GetComponent<EnemyController>();
         ec.targetingID.Value = ++enemyIdCounter;
         ec.SetMaxHealthRpc(maxHealthMultiplier);
-        ec.SetAttackCooldown(attackCooldownMultiplier);
+        ec.SetAttackCooldownRpc(attackCooldownMultiplier);
         ec.SetTutorial(tutorialState);
         gameManager.AddEnemy(new EnemyNetworkData
         {
-            TargetingID = ec.targetingID.Value,
+            TargetingID = enemyIdCounter,
             EnemyName = new FixedString128Bytes($"Enemy {enemyIdCounter}")
         });
         RefreshLayoutGroupEveryoneRpc();
@@ -60,5 +66,10 @@ public class SharedCanvasController : NetworkBehaviour
     {
         playerPanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
         enemyPanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
+    }
+
+    private NetworkObject GetRandomEnemyPrefab()
+    {
+        return enemyPrefabs[(int)Random.Range(0, enemyPrefabs.Count)];
     }
 }

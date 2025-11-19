@@ -16,7 +16,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private NetworkList<PlayerNetworkData> playerData = new NetworkList<PlayerNetworkData>();
     [SerializeField] private NetworkList<EnemyNetworkData> enemyData = new NetworkList<EnemyNetworkData>();
     [SerializeField] private NetworkList<ProjectileNetworkData> projectileData = new NetworkList<ProjectileNetworkData>();
-    public PlayerController localPlayer;
+    [DoNotSerialize] public PlayerController localPlayer;
 
     [Header("Controllers")]
     [SerializeField] private Dictionary<ulong, PlayerController> players = new Dictionary<ulong, PlayerController>();
@@ -29,15 +29,17 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject cursePanel;
     [SerializeField] private GameObject curseMsgPrefab;
 
-    [DoNotSerialize]
-    public TypingEffectManager typingEffectManager => FindFirstObjectByType<TypingEffectManager>();
-    public NetworkManager networkManager => NetworkManager.Singleton;
-    public SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>();
-    public GameLoopManager gameLoopManager => FindFirstObjectByType<GameLoopManager>();
-    public AnalyticsManager analyticsManager => FindFirstObjectByType<AnalyticsManager>();
-    public DamageManager damageManager => FindFirstObjectByType<DamageManager>();
+    [DoNotSerialize] public TypingEffectManager typingEffectManager => FindFirstObjectByType<TypingEffectManager>(FindObjectsInactive.Include);
+    [DoNotSerialize] public NetworkManager networkManager => NetworkManager.Singleton;
+    [DoNotSerialize] public SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>(FindObjectsInactive.Include);
+    [DoNotSerialize] public GameLoopManager gameLoopManager => FindFirstObjectByType<GameLoopManager>(FindObjectsInactive.Include);
+    [DoNotSerialize] public AnalyticsManager analyticsManager => FindFirstObjectByType<AnalyticsManager>(FindObjectsInactive.Include);
+    [DoNotSerialize] public DamageManager damageManager => FindFirstObjectByType<DamageManager>(FindObjectsInactive.Include);
+    [DoNotSerialize] public TypeTracker typeTracker => FindFirstObjectByType<TypeTracker>(FindObjectsInactive.Include);
 
-    public ulong projectileTargetingIdCounter = 0;
+    [DoNotSerialize] public ulong projectileTargetingIdCounter = 0;
+    private int classChosenCount = 0;
+    private int tutorialFinishedCount = 0;
 
     #region Unity Methods
 
@@ -151,6 +153,11 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    public List<PlayerController> GetAllPlayers()
+    {
+        return players.Values.ToList();
+    }
+
     public PlayerController GetPlayerByClientId(ulong clientId)
     {
         return players.TryGetValue(clientId, out PlayerController player) ? player : null;
@@ -165,13 +172,67 @@ public class GameManager : NetworkBehaviour
     {
         if (players.Count == 0) return null;
         List<PlayerController> playerList = players.Values.ToList();
-        int randomIndex = Random.Range(0, playerList.Count);
+        int randomIndex = 0;
+        do
+        {
+            randomIndex = Random.Range(0, playerList.Count);
+        } 
+        while (playerList[randomIndex].IsDead());
         return playerList[randomIndex];
+    }
+
+    public PlayerNetworkData GetPlayerDataByClientId(ulong clientId)
+    {
+        foreach (PlayerNetworkData data in playerData)
+        {
+            if (data.TargetingID == clientId)
+            {
+                return data;
+            }
+        }
+        return default;
+    }
+
+    public void ReplacePlayerDataByClientId(ulong clientId, PlayerNetworkData newData)
+    {
+        for (int i = 0; i < playerData.Count; i++)
+        {
+            if (playerData[i].TargetingID == clientId)
+            {
+                playerData[i] = newData;
+                break;
+            }
+        }
+    }
+    public List<PlayerController> GetRandomPlayers()
+    {
+        if (players.Count == 0) return null;
+        List<PlayerController> playerList = players.Values.ToList();
+        if (playerList.Count == 1) return playerList;
+
+        List<PlayerController> selectedList = new List<PlayerController>();
+        List<PlayerController> tempList = new List<PlayerController>(playerList);
+
+        int numberOfItemsToSelect = Random.Range(1, playerList.Count + 1);
+
+        for (int i = 0; i < numberOfItemsToSelect; i++)
+        {
+            int randomIndex = Random.Range(0, tempList.Count);
+            selectedList.Add(tempList[randomIndex]);
+            tempList.RemoveAt(randomIndex);
+        }
+
+        return selectedList;
     }
 
     public bool IsPlayersDead()
     {
-        return players.Count == 0;
+        foreach(PlayerController player in players.Values)
+        {
+            if (!player.IsDead())
+                return false;
+        }
+        return true;
     }
 
     public bool PlayersSpawned()
@@ -186,8 +247,6 @@ public class GameManager : NetworkBehaviour
     private void OnEnemyDataChanged(NetworkListEvent<EnemyNetworkData> changeEvent)
     {
         List<EnemyController> enemyObjects = FindObjectsByType<EnemyController>(FindObjectsSortMode.None).ToList();
-        
-        Debug.Log($"OnEnemyDataChanged called: {changeEvent.Type} for ID {changeEvent.Value.TargetingID}");
 
         switch (changeEvent.Type)
         {
@@ -367,7 +426,6 @@ public class GameManager : NetworkBehaviour
     {
         foreach (var enemy in enemies)
         {
-            if (enemy.Value.IsDead()) continue;
             if (enemy.Value.GetTargetWord().Equals(word))
             {
                 return enemy.Value;
@@ -375,7 +433,6 @@ public class GameManager : NetworkBehaviour
         }
         foreach (var player in players)
         {
-            if (player.Value.IsDead()) continue;
             if (player.Value.GetTargetWord().Equals(word))
             {
                 return player.Value;
@@ -383,7 +440,6 @@ public class GameManager : NetworkBehaviour
         }
         foreach (var projectile in projectiles)
         {
-            if (projectile.Value.IsDead()) continue;
             if (projectile.Value.GetTargetWord().Equals(word))
             {
                 return projectile.Value;
@@ -493,8 +549,9 @@ public class GameManager : NetworkBehaviour
         typingEffectManager.AddTypingEffect(buff);
         typingEffectManager.AddTypingEffect(curse);
         cursePanel.SetActive(false);
-        if(IsOwner)
+        if (IsOwner)
             startBattleButton.SetActive(true);
+        SetReadyStatusRpc(networkManager.LocalClientId, true);
 
         Transform parent = cursePanel.GetComponent<RectTransform>();
         foreach (Transform child in parent)
@@ -502,6 +559,15 @@ public class GameManager : NetworkBehaviour
             Destroy(child.gameObject);
         }
         cursePanel.GetComponent<CustomLayoutGroup>().RefreshLayout();
+
+        ReportOnBuffCurseSelection();
+    }
+
+    private void ReportOnBuffCurseSelection()
+    {
+        TypingEffectManager.TypingStats typingStats = typingEffectManager.ReportStats();
+        // TODO: turn it into report stats
+        // analyticsManager.PushAnalyticsEvent()
     }
 
     #endregion
@@ -532,16 +598,16 @@ public class GameManager : NetworkBehaviour
         float damageModifier = player.calculateDamageModifier();
         float leechModifier = player.calculateLeechModifier();
         float damageTakenModifier = target.calculateDamageTakenModifier();
-        int finalValue = (int)(baseValue * damageModifier * damageTakenModifier);
+        int finalValue = Mathf.Clamp((int)(baseValue * damageModifier * damageTakenModifier), int.MinValue, -1);
         int leechValue = (int)(finalValue * leechModifier);
 
         target.ModifyCurrentHealth(finalValue);
         player.ModifyCurrentHealth(-1 * leechValue);
 
-        Debug.Log("Pre-Buff/Debuff: " + baseValue + ", Damage Mod: " + damageModifier + ", Damage Taken Mod: " + damageTakenModifier + ", Final Damage: " + finalValue + ", Leech Mod: " + leechModifier + ", Leech Value: " + leechValue);
-
         if(targetType != 2)
+        {
             showDamageRpc(targetType, targetingID, finalValue, leechValue, RpcTarget.Single(playerID, RpcTargetUse.Temp));
+        }   
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
@@ -591,10 +657,10 @@ public class GameManager : NetworkBehaviour
                 break;
         }
 
-        if (player == null || target == null) return;
+        if (player == null || target == null || target.IsDead()) return;
 
         float healModifier = player.calculateHealModifier();
-        int finalValue = (int)(baseValue * healModifier);
+        int finalValue = Mathf.Clamp((int)(baseValue * healModifier), 1, int.MaxValue);
         target.ModifyCurrentHealth(finalValue);
         showDamageRpc(targetType, targetingID, finalValue, 0, RpcTarget.Single(playerID, RpcTargetUse.Temp));
     }
@@ -625,6 +691,89 @@ public class GameManager : NetworkBehaviour
 
         // Use a public TargetableController method to add the buff (see TargetableController change below).
         target.AddBuffDebuff(modifier, duration, effectType);
+    }
+
+    #endregion
+
+    #region Class Selection
+
+    public void ChooseClass(int id)
+    {
+        switch (id)
+        {
+            case 0:
+                typeTracker.currentClass = typeTracker.gameObject.AddComponent<BalancedClass>();
+                break;
+            case 1:
+                typeTracker.currentClass = typeTracker.gameObject.AddComponent<DPSClass>();
+                break;
+            case 2:
+                typeTracker.currentClass = typeTracker.gameObject.AddComponent<EnchanterClass>();
+                break;
+            case 3:
+                typeTracker.currentClass = typeTracker.gameObject.AddComponent<HealerClass>();
+                break;
+        }
+
+        IncrementClassChosenCountRpc();
+
+    }
+
+    [Rpc(SendTo.Owner)]
+    public void IncrementClassChosenCountRpc()
+    {
+        classChosenCount++;
+    }
+
+    public bool AllChosenClasses()
+    {
+        return classChosenCount >= networkManager.ConnectedClients.Count;
+    }
+
+    #endregion
+
+    #region Status Check
+
+    [Rpc(SendTo.Owner)]
+    public void SetReadyStatusRpc(ulong playerID, bool isReady)
+    {
+        PlayerNetworkData playerData = GetPlayerDataByClientId(playerID);
+        playerData.IsReady = isReady;
+        ReplacePlayerDataByClientId(playerID, playerData);
+    }
+
+    public bool AllReady()
+    {
+        foreach (PlayerNetworkData data in playerData)
+        {
+            if (!data.IsReady)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    [Rpc(SendTo.Owner)]
+    public void ResetReadyStatusRpc()
+    {
+        for (int i = 0; i < playerData.Count; i++)
+        {
+            PlayerNetworkData data = playerData[i];
+            data.IsReady = false;
+            playerData[i] = data;
+        }
+    }
+
+    [Rpc(SendTo.Owner)]
+    public void IncrementTutorialFinishedCountRpc()
+    {
+        tutorialFinishedCount++;
+    }
+
+    public bool AllFinishedTutorial()
+    {
+        return tutorialFinishedCount >= networkManager.ConnectedClients.Count;
     }
 
     #endregion

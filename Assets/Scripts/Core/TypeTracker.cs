@@ -52,10 +52,11 @@ public class TypeTracker : MonoBehaviour
     private int healingDone = 0;
 
     private int phase = 0;
+    private bool tutorialIncremented = false;
 
     private TargetableController currentTarget;
 
-    private ClassBase currentClass = new BalancedClass();
+    public ClassBase currentClass = new BalancedClass();
 
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
@@ -65,38 +66,7 @@ public class TypeTracker : MonoBehaviour
         {
             resetState();
             EnterTargetPhase();
-            ResetMetrics();
         }
-    }
-
-    public void OnDisable()
-    {
-        ReportStats();
-    }
-
-    private void ReportStats()
-    {
-        if (numSubmissions == 0)
-            return;
-
-        StatsEvent statsEvent = new StatsEvent
-        {
-            NumSubmissions = numSubmissions,
-            AverageWPM = averageWPM,
-            AverageAccuracy = averageAccuracy,
-            DamageDealt = damageDealt,
-            HealingDone = healingDone
-        };
-        gameManager.analyticsManager.PushAnalyticsEvent(statsEvent);
-    }
-
-    private void ResetMetrics()
-    {
-        numSubmissions = 0;
-        averageWPM = 0f;
-        averageAccuracy = 0f;
-        damageDealt = 0;
-        healingDone = 0;
     }
 
     private void Start()
@@ -264,19 +234,19 @@ public class TypeTracker : MonoBehaviour
 
                     if (mode == 1)
                     {
-                        currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     else if (mode == 2)
                     {
-                        currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     else if (mode == 3)
                     {
-                        currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     else if (mode == 4)
                     {
-                        currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, 10);
+                        currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, 0);
                     }
                     currentTarget = null;
                     promptText.text = "";
@@ -495,15 +465,15 @@ public class TypeTracker : MonoBehaviour
 
         float grossWPM = (float)input.Length / 5f / totalMinutes;
 
-        if (promptText.text.Length != input.Length)
+        if(prompt.Length != input.Length)
         {
-            errors += Math.Abs(promptText.text.Length - input.Length);
+            errors += Math.Abs(prompt.Length - input.Length);
         }
 
         if (input.Length > 0)
         {
             int correctCharacters = Mathf.Max(0, input.Length - errors);
-            float ratio = (float)correctCharacters / input.Length;
+            float ratio = correctCharacters / (float)input.Length;
             accuracy = ratio * 100f;
         }
         else
@@ -511,32 +481,34 @@ public class TypeTracker : MonoBehaviour
             accuracy = 0f;
         }
 
-        numSubmissions++;
-        averageWPM = ((averageWPM * (numSubmissions - 1)) + grossWPM) / numSubmissions;
-        averageAccuracy = ((averageAccuracy * (numSubmissions - 1)) + accuracy) / numSubmissions;
-
         // Damage calculation to make speed more forgiving and errors more penalizing. Also has a floor of 1 damage.
-        float wpmFactor = Mathf.Log10(grossWPM + 10) * 6f;
+        float wpmFactor = Math.Min(1, Mathf.Log10((grossWPM + 14) / 14));
         float accuracyFactor = Mathf.Pow(accuracy / 100f, 2f);
-        int healthModifier = (int)(wpmFactor * accuracyFactor);
+        float modifier = wpmFactor * accuracyFactor;
+
+        gameManager.analyticsManager.addNumSubmissions(1);
+        gameManager.analyticsManager.addAverageWPM(grossWPM);
+        gameManager.analyticsManager.addAverageAccuracy(accuracy);
 
         if (mode == 1)
         {
-            currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
-            // damageManager.applyHealthChange(currentTarget, delta);
-            // damageDealt -= delta;
+            currentClass.Ability1(gameManager.networkManager.LocalClientId, currentTarget, modifier);
+            gameManager.analyticsManager.addAbility1Uses(1);
         }
         else if (mode == 2)
         {
-            currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            currentClass.Ability2(gameManager.networkManager.LocalClientId, currentTarget, modifier);
+            gameManager.analyticsManager.addAbility2Uses(1);
         }
         else if (mode == 3)
         {
-            currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            currentClass.Ability3(gameManager.networkManager.LocalClientId, currentTarget, modifier);
+            gameManager.analyticsManager.addAbility3Uses(1);
         }
         else if (mode == 4)
         {
-            currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, healthModifier);
+            currentClass.Ability4(gameManager.networkManager.LocalClientId, currentTarget, modifier);
+            gameManager.analyticsManager.addAbility4Uses(1);
         }
         currentTarget.RandomizeTargetWord();
         currentTarget = null;

@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 public class TypingEffectManager : MonoBehaviour
 {
@@ -83,6 +84,72 @@ public class TypingEffectManager : MonoBehaviour
     {
         activeTypingEffects = new();
         UpdateEffectText();
+    }
+
+    public class TypingStats {
+        public float punishmentPercentage;
+        public float healingPercentage;
+        public float damagePercentage;
+        public float bulletSpeedPercentage;
+        public string capitalizedCharacters;
+        public string doubledCharacters;
+    }
+
+    public TypingStats ReportStats()
+    {
+        TypingStats stats = new();
+        stats.capitalizedCharacters = "";
+        stats.doubledCharacters = "";
+
+        foreach (var typingEffect in activeTypingEffects)
+        {
+            if (typingEffect is ForceCapitalizeCurseData capitalData)
+            {
+                stats.capitalizedCharacters += capitalData.GetCapitalizedLetter();
+            }
+            else if (typingEffect is ForceDoublingCurseData doubleData)
+            {
+                if (doubleData.IsCaseSensitive())
+                {
+                    stats.doubledCharacters += doubleData.GetDoubledLetter();
+                }
+                else
+                {
+                    stats.doubledCharacters += Char.ToLower(doubleData.GetDoubledLetter()) + Char.ToUpper(doubleData.GetDoubledLetter());
+                }
+            }
+            else
+            {
+                if (typingEffect.ApplyPunishmentMod() != 0)
+                {
+                    stats.punishmentPercentage += typingEffect.ApplyPunishmentMod();
+                }
+
+                if (typingEffect.ApplyHealMod() != 0)
+                {
+                    stats.healingPercentage += typingEffect.ApplyHealMod();
+                }
+
+                if (typingEffect.ApplyDamageMod() != 0)
+                {
+                    stats.damagePercentage += typingEffect.ApplyDamageMod();
+                }
+
+                if (typingEffect.ApplyBulletSpeedMod() != 0)
+                {
+                    stats.bulletSpeedPercentage += typingEffect.ApplyBulletSpeedMod();
+                }
+            }
+        }
+        stats.doubledCharacters = new string(stats.doubledCharacters.Distinct().OrderBy(c => c).ToArray());
+        stats.capitalizedCharacters = new string(stats.capitalizedCharacters.Distinct().OrderBy(c => c).ToArray());
+
+        stats.punishmentPercentage = (float)Math.Pow(modMultiplier, stats.punishmentPercentage) * 100f;
+        stats.bulletSpeedPercentage = (float)Math.Pow(modMultiplier, stats.bulletSpeedPercentage) * 100f;
+        stats.damagePercentage = 1.0f / (float)Math.Pow(modMultiplier, stats.damagePercentage) * 100f;
+        stats.healingPercentage = 1.0f / (float)Math.Pow(modMultiplier, stats.healingPercentage) * 100f;
+
+        return stats;
     }
 
     /// <summary>

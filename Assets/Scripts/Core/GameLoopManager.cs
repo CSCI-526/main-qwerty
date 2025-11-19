@@ -8,12 +8,14 @@ public class GameLoopManager : NetworkBehaviour
     [Header("GameObjects")]
     [SerializeField] private GameObject typingElements;
     [SerializeField] private GameObject startBattleButton;
+    [SerializeField] private GameObject notReadyWarning;
     [SerializeField] private GameObject cursePanel;
 
     private bool tutorial = true;
     private bool tutorialStage = true;
     private bool inCombat = false;
     private int battleCount = 0;
+    private bool exitedTutorial = false;
 
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
@@ -28,6 +30,11 @@ public class GameLoopManager : NetworkBehaviour
         {
             typingElements.SetActive(false);
         }
+        else if (gameManager.localPlayer != null && !typingElements.activeSelf && !gameManager.localPlayer.IsDead() && inCombat)
+        { 
+            typingElements.SetActive(true); 
+        }
+
         if (!IsOwner) return;
         if (inCombat && gameManager.IsEnemiesDead())
         {
@@ -37,12 +44,25 @@ public class GameLoopManager : NetworkBehaviour
         {
             ResetGame();
         }
+
+        if(inCombat && tutorialStage && gameManager.AllFinishedTutorial() && !exitedTutorial)
+        {
+            exitedTutorial = true;
+            EnemyController enemy = FindFirstObjectByType<EnemyController>();
+            enemy.SetMaxHealthAmountRpc((int)GetEnemyHealthMultiplier() * 25);
+        }
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetInCombatRpc(bool inCombat)
+    {
+        this.inCombat = inCombat;
     }
 
     public void ResetGame()
     {
         if (!IsOwner) return;
-        inCombat = false;
+        SetInCombatRpc(false);
         gameManager.RemoveAllPlayers();
         gameManager.RemoveAllEnemies();
         gameManager.RemoveAllProjectiles();
@@ -71,26 +91,41 @@ public class GameLoopManager : NetworkBehaviour
     [Rpc(SendTo.Owner)]
     public void StartBattleRpc()
     {
-        if(inCombat) return;
-        StartCoroutine(StartBattle());
+        if (inCombat) return;
+        if (!gameManager.AllReady() || !gameManager.AllChosenClasses())
+        {
+            StartCoroutine(ShowNotReadyWarning(3f));
+        }
+        else
+            StartCoroutine(StartBattle());
+    }
+
+    private IEnumerator ShowNotReadyWarning(float delay)
+    {
+        notReadyWarning.SetActive(true);
+        yield return new WaitForSeconds(delay);
+        notReadyWarning.SetActive(false);
     }
 
     public IEnumerator StartBattle()
     {
         CreatePlayers();
         gameManager.SpawnEnemy();
-        yield return new WaitForSeconds(2f);
         ToggleElementsRpc(true, false, false, tutorial);
-        inCombat = true;
+        yield return new WaitForSeconds(2f);
+        SetInCombatRpc(true);
+        gameManager.ResetReadyStatusRpc();
+        ShareRoundStats();
     }
 
     public void EndBattle()
     {
         if (!inCombat || !IsOwner) return;
-        inCombat = false;
+        SetInCombatRpc(false);
         gameManager.RemoveAllEnemies();
         gameManager.RemoveAllProjectiles();
         battleCount++;
+        SendAnalyticsRpc();
         AssignRandomCurses();
         ToggleElementsRpc(false, false, true);
     }
@@ -102,7 +137,6 @@ public class GameLoopManager : NetworkBehaviour
         if(IsOwner)
             startBattleButton.SetActive(startBattleButtonState);
         cursePanel.SetActive(cursePanelState);
-        Debug.Log(tutorialState);
         if (tutorialState)
         {
             tutorialStage = true;
@@ -147,5 +181,46 @@ public class GameLoopManager : NetworkBehaviour
     public bool GetTutorialState()
     {
         return tutorialStage;
+    }
+
+    private void ShareRoundStats()
+    {
+        if (!IsOwner) return;
+        ShareRoundStatsRpc(battleCount);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void ShareRoundStatsRpc(int roundNumber)
+    {
+        gameManager.analyticsManager.setRoundNumber(roundNumber);
+        gameManager.analyticsManager.setEnemyHealth(FindFirstObjectByType<EnemyController>().maxHealth);
+        gameManager.analyticsManager.setEnemyAttackSpeed(FindFirstObjectByType<EnemyController>().GetAttackCooldown());
+        gameManager.analyticsManager.setNumPlayers(gameManager.networkManager.ConnectedClients.Count);
+        gameManager.analyticsManager.setDifficultyLevel(1);
+
+        TypingEffectManager.TypingStats stats = gameManager.typingEffectManager.ReportStats();
+        if (stats != null)
+        {
+            gameManager.analyticsManager.setDamagePercentage(stats.damagePercentage);
+            gameManager.analyticsManager.setHealingPercentage(stats.healingPercentage);
+            gameManager.analyticsManager.setPunishmentPercentage(stats.punishmentPercentage);
+            gameManager.analyticsManager.setBulletSpeedPercentage(stats.bulletSpeedPercentage);
+            gameManager.analyticsManager.setCapitalizedCharacters(stats.capitalizedCharacters);
+            gameManager.analyticsManager.setDoubledCharacters(stats.doubledCharacters);
+        }
+
+        gameManager.analyticsManager.setClassName(gameManager.typeTracker.currentClass.className);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void SendAnalyticsRpc()
+    {
+        StartCoroutine(WaitAnalyticsCollection());
+    }
+
+    private IEnumerator WaitAnalyticsCollection()
+    {
+        yield return new WaitForSeconds(2f);
+        gameManager.analyticsManager.PushAnalyticsEvent();
     }
 }
