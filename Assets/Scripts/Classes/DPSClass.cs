@@ -66,6 +66,15 @@ public class DPSClass : ClassBase
         "Defeat the enemy to progress."
     };
 
+    public override List<string> targetList { get; } = new List<string>
+    {
+        "Enemy",
+        "Enemy",
+        "Player",
+        "Player",
+        "Projectile"
+    };
+
     public override List<string> classDescription { get; } = new List<string>
     {
         "DPS",

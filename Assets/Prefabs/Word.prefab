@@ -93,7 +93,7 @@ GameObject:
   - component: {fileID: 5255507644032329701}
   m_Layer: 5
   m_Name: Word
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

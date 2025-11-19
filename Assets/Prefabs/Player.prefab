@@ -734,9 +734,8 @@ MonoBehaviour:
         byte0123: 0
         byte0124: 0
         byte0125: 0
-  networkedTargetingId:
-    m_InternalValue: 0
-  targetingId: 0
+  targetingID:
+    m_InternalValue: 18446744073709551615
   targetWordText: {fileID: 3278988893325512189}
   playerIcon: {fileID: 7791024457676251120}
 --- !u!61 &2760696267416844064
@@ -1000,7 +999,7 @@ GameObject:
   - component: {fileID: 3278988893325512189}
   m_Layer: 5
   m_Name: Target Word
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

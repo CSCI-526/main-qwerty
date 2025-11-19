@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Xml;
 using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEditor.Playables;
@@ -79,6 +80,15 @@ public class BalancedClass : ClassBase
         "Typos will inflict damage to yourself.",
         "Attack projectiles to destroy them.",
         "Defeat the enemy to progress."
+    };
+
+    public override List<string> targetList { get; } = new List<string>
+    {
+        "Enemy",
+        "Player",
+        "Enemy",
+        "Player",
+        "Projectile"
     };
 
     public override List<string> classDescription { get; } = new List<string>
