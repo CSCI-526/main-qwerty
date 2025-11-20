@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8675078
 RectTransform:
   m_ObjectHideFlags: 0
@@ -546,7 +546,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &119672015
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2026,6 +2026,14 @@ MonoBehaviour:
   typingEffectManager: {fileID: 922871282824396222}
   damageManager: {fileID: 773131783}
   classInfoManager: {fileID: 1837284897}
+  key_1_down: {fileID: 8675077}
+  key_1_up: {fileID: 1262288300}
+  key_2_down: {fileID: 119672014}
+  key_2_up: {fileID: 699366324}
+  key_3_down: {fileID: 1603214566}
+  key_3_up: {fileID: 1826912801}
+  key_4_down: {fileID: 1872168632}
+  key_4_up: {fileID: 1213746041}
   caretRect: {fileID: 1223125938}
   caretBlinkRate: 0.5
   currentClass: {fileID: 0}
@@ -4297,7 +4305,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1276603631
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5396,7 +5404,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1603214567
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6497,7 +6505,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1872168633
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7123,6 +7131,8 @@ MonoBehaviour:
   effectText: {fileID: 1837284898}
   effectPanel: {fileID: 1837284899}
   modMultiplier: 1.2
+  key_tab_up: {fileID: 1841304269}
+  key_tab_down: {fileID: 1276603630}
 --- !u!1001 &1019155473020742496
 PrefabInstance:
   m_ObjectHideFlags: 0

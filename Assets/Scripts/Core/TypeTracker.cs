@@ -30,6 +30,15 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private DamageManager damageManager;
     [SerializeField] private ClassInfoManager classInfoManager;
 
+    [SerializeField] private GameObject key_1_down;
+    [SerializeField] private GameObject key_1_up;
+    [SerializeField] private GameObject key_2_down;
+    [SerializeField] private GameObject key_2_up;
+    [SerializeField] private GameObject key_3_down;
+    [SerializeField] private GameObject key_3_up;
+    [SerializeField] private GameObject key_4_down;
+    [SerializeField] private GameObject key_4_up;
+
     private string prompt;
     private bool timerStarted = false;
     private float startTime = 0f;
@@ -86,57 +95,103 @@ public class TypeTracker : MonoBehaviour
     {
         bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
-        if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false  && phase != 2)
+        if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false)
         {
-            if(gameManager.gameLoopManager.GetTutorialState())
+            key_1_down.SetActive(true);
+            key_1_up.SetActive(false);
+
+            if (phase != 2)
             {
-                if((tutorialStep >= 2 && tutorialStep < 12))
+                if (gameManager.gameLoopManager.GetTutorialState())
                 {
-                    Debug.Log("Returning from pressing 1");
-                    return;
+                    if ((tutorialStep >= 2 && tutorialStep < 12))
+                    {
+                        Debug.Log("Returning from pressing 1");
+                        return;
+                    }
+                    changeMode(1);
                 }
                 changeMode(1);
             }
-            changeMode(1);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false && phase != 2)
+        if (Input.GetKeyUp(KeyCode.Alpha1) && shiftHeld == false)
         {
-            if (gameManager.gameLoopManager.GetTutorialState())
+            key_1_down.SetActive(false);
+            key_1_up.SetActive(true);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false)
+        {
+            key_2_down.SetActive(true);
+            key_2_up.SetActive(false);
+            if (phase != 2)
             {
-                if ((tutorialStep < 3 || tutorialStep > 5)  && tutorialStep < tutorialLength)
+                if (gameManager.gameLoopManager.GetTutorialState())
                 {
-                    Debug.Log("Returning from pressing 2");
-                    return;
+                    if ((tutorialStep < 3 || tutorialStep > 5) && tutorialStep < tutorialLength)
+                    {
+                        Debug.Log("Returning from pressing 2");
+                        return;
+                    }
+                    changeMode(2);
                 }
                 changeMode(2);
             }
-            changeMode(2);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false && phase != 2)
+        if (Input.GetKeyUp(KeyCode.Alpha2) && shiftHeld == false)
         {
-            if (gameManager.gameLoopManager.GetTutorialState())
+            key_2_down.SetActive(false);
+            key_2_up.SetActive(true);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false)
+        {
+            key_3_down.SetActive(true);
+            key_3_up.SetActive(false);
+
+            if (phase != 2)
             {
-                if ((tutorialStep < 6 || tutorialStep > 8) && tutorialStep < tutorialLength)
+                if (gameManager.gameLoopManager.GetTutorialState())
                 {
-                    Debug.Log("Returning from pressing 3");
-                    return;
+                    if ((tutorialStep < 6 || tutorialStep > 8) && tutorialStep < tutorialLength)
+                    {
+                        Debug.Log("Returning from pressing 3");
+                        return;
+                    }
+                    changeMode(3);
                 }
                 changeMode(3);
             }
-                changeMode(3);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false && phase != 2)
+        if (Input.GetKeyUp(KeyCode.Alpha3) && shiftHeld == false)
         {
-            if (gameManager.gameLoopManager.GetTutorialState())
+            key_3_down.SetActive(false);
+            key_3_up.SetActive(true);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false)
+        {
+            key_4_down.SetActive(true);
+            key_4_up.SetActive(false);
+
+            if (phase != 2)
             {
-                if ((tutorialStep < 9 || tutorialStep > 11) && tutorialStep < tutorialLength)
+                if (gameManager.gameLoopManager.GetTutorialState())
                 {
-                    Debug.Log("Returning from pressing 4");
-                    return;
+                    if ((tutorialStep < 9 || tutorialStep > 11) && tutorialStep < tutorialLength)
+                    {
+                        Debug.Log("Returning from pressing 4");
+                        return;
+                    }
+                    changeMode(4);
                 }
                 changeMode(4);
             }
-            changeMode(4);
+        }
+        if (Input.GetKeyUp(KeyCode.Alpha4) && shiftHeld == false)
+        {
+            key_4_down.SetActive(false);
+            key_4_up.SetActive(true);
         }
 
         if (Input.GetKeyDown(KeyCode.Return))
