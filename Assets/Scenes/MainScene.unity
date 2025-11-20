@@ -6110,10 +6110,7 @@ MonoBehaviour:
     m_Bottom: 0
   reverseOrder: 0
   stretchChildren: 0
-  children:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  children: []
 --- !u!1 &2006937935
 GameObject:
   m_ObjectHideFlags: 0
