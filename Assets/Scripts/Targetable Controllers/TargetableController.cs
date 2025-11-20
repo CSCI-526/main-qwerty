@@ -159,6 +159,11 @@ public abstract class TargetableController : NetworkBehaviour
 
     #region Buff/Debuff
 
+    [SerializeField] GameObject attackBuff;
+    [SerializeField] GameObject damageDebuff;
+    [SerializeField] GameObject leechBuff;
+    [SerializeField] CustomLayoutGroup buffDebuffLayoutGroup;
+
     public struct BuffDebuffData {
         public float modifier;
         public int duration;
@@ -187,6 +192,7 @@ public abstract class TargetableController : NetworkBehaviour
                 if (effect.duration <= 0)
                 {
                     BuffDebuffList.RemoveAt(i);
+                    RefreshBuffDebuffUI();
                 }
                 else
                 {
@@ -233,6 +239,7 @@ public abstract class TargetableController : NetworkBehaviour
                 if (effect.duration <= 0)
                 {
                     BuffDebuffList.RemoveAt(i);
+                    RefreshBuffDebuffUI();
                 }
                 else
                 {
@@ -256,6 +263,7 @@ public abstract class TargetableController : NetworkBehaviour
                 if (effect.duration <= 0)
                 {
                     BuffDebuffList.RemoveAt(i);
+                    RefreshBuffDebuffUI();
                 }
                 else
                 {
@@ -275,6 +283,51 @@ public abstract class TargetableController : NetworkBehaviour
             effectType = effectType
         };
         BuffDebuffList.Add(data);
+        RefreshBuffDebuffUI();
+    }
+
+    public void RefreshBuffDebuffUI()
+    {
+        SetAttackBuffRpc(false);
+        SetDamageDebuffRpc(false);
+        SetLeechBuffRpc(false);
+
+        foreach (BuffDebuffData data in BuffDebuffList)
+        {
+            if (data.effectType.ToString().Equals("DamageBuff"))
+            {
+                SetAttackBuffRpc(true);
+            }
+            else if (data.effectType.ToString().Equals("DamageTakenDebuff"))
+            {
+                SetDamageDebuffRpc(true);
+            }
+            else if (data.effectType.ToString().Equals("LeechBuff"))
+            {
+                SetLeechBuffRpc(true);
+            }
+        }
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetAttackBuffRpc(bool state)
+    {
+        attackBuff.SetActive(state);
+        buffDebuffLayoutGroup.RefreshLayout();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetDamageDebuffRpc(bool state)
+    {
+        damageDebuff.SetActive(state);
+        buffDebuffLayoutGroup.RefreshLayout();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetLeechBuffRpc(bool state)
+    {
+        leechBuff.SetActive(state);
+        buffDebuffLayoutGroup.RefreshLayout();
     }
 
     #endregion

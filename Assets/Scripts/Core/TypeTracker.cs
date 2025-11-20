@@ -48,6 +48,7 @@ public class TypeTracker : MonoBehaviour
     private int tutorialStep = 0;
     private int promptStep = 0;
     private int phase = 0;
+    private bool tutorialIncremented = false;
 
     private TargetableController currentTarget;
 
@@ -61,7 +62,6 @@ public class TypeTracker : MonoBehaviour
         {
             resetState();
             EnterTargetPhase();
-            ResetMetrics();
         }
     }
 
@@ -685,6 +685,10 @@ public class TypeTracker : MonoBehaviour
         {
             instructionText.text = currentClass.instructionText[tutorialStep];
             tutorialStep++;
+            if (tutorialStep >= tutorialLength && !tutorialIncremented)
+            {
+                gameManager.IncrementTutorialFinishedCountRpc();
+            }
         }
         else
         {

@@ -15,6 +15,7 @@ public class GameLoopManager : NetworkBehaviour
     private bool tutorialStage = true;
     private bool inCombat = false;
     private int battleCount = 0;
+    private bool exitedTutorial = false;
 
     GameManager gameManager => FindFirstObjectByType<GameManager>();
 
@@ -33,6 +34,7 @@ public class GameLoopManager : NetworkBehaviour
         { 
             typingElements.SetActive(true); 
         }
+
         if (!IsOwner) return;
         if (inCombat && gameManager.IsEnemiesDead())
         {
@@ -41,6 +43,13 @@ public class GameLoopManager : NetworkBehaviour
         else if (inCombat && gameManager.IsPlayersDead())
         {
             ResetGame();
+        }
+
+        if(inCombat && tutorialStage && gameManager.AllFinishedTutorial() && !exitedTutorial)
+        {
+            exitedTutorial = true;
+            EnemyController enemy = FindFirstObjectByType<EnemyController>();
+            enemy.SetMaxHealthAmountRpc((int)GetEnemyHealthMultiplier() * 25);
         }
     }
 
