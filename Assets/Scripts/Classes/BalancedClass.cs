@@ -78,14 +78,6 @@ public class BalancedClass : ClassBase
         "Now finish off the enemy. Select any ability."
     };
 
-    public override List<string> promptText { get; } = new List<string>
-    {
-        "Press Tab to view your abilities and stats.",
-        "Typos will inflict damage to yourself.",
-        "Attack projectiles to destroy them.",
-        "Defeat the enemy to progress."
-    };
-
     public override List<string[]> targetList { get; } = new List<string[]>
     {
         new string[] { "Enemy", "Projectile" },
