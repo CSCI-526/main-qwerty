@@ -87,13 +87,13 @@ public class BalancedClass : ClassBase
         "Defeat the enemy to progress."
     };
 
-    public override List<string> targetList { get; } = new List<string>
+    public override List<string[]> targetList { get; } = new List<string[]>
     {
-        "Enemy",
-        "Player",
-        "Enemy",
-        "Player",
-        "Projectile"
+        new string[] { "Enemy", "Projectile" },
+        new string[] { "Player" },   
+        new string[] { "Enemy" },  
+        new string[] { "Player" },                  
+        new string[] { "Projectile"}    
     };
 
     public override List<string> classDescription { get; } = new List<string>

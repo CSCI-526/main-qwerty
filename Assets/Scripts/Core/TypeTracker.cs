@@ -95,59 +95,71 @@ public class TypeTracker : MonoBehaviour
     {
         bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
-        if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false  && phase == 0)
+        if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false)
         {
-            if(tutorialManager.isTutorialActive && tutorialManager.abilityAllowed("1"))
+            if (tutorialManager.isTutorialActive)
             {
-                tutorialManager.incrementTutorial();
-                changeMode(1);
-            }
-            else
-            {
-                Debug.Log("Ability 1 not allowed");
-                return;
+                if (tutorialManager.abilityAllowed("1") && phase == 0)
+                {
+                    tutorialManager.incrementTutorial();
+                    changeMode(1);
+                }
+                else
+                {
+                    Debug.Log("Ability 1 not allowed");
+                    return;
+                }
             }
             changeMode(1);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false && phase == 0)
+        if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false)
         {
-            if (tutorialManager.isTutorialActive && tutorialManager.abilityAllowed("2"))
+            if (tutorialManager.isTutorialActive)
             {
-                tutorialManager.incrementTutorial();
-                changeMode(2);
-            }
-            else
-            {
-                Debug.Log("Ability 2 not allowed");
-                return;
+                if (tutorialManager.abilityAllowed("2") && phase == 0)
+                {
+                    tutorialManager.incrementTutorial();
+                    changeMode(2);
+                }
+                else
+                {
+                    Debug.Log("Ability 2 not allowed");
+                    return;
+                }
             }
             changeMode(2);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false && phase == 0)
+        if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false)
         {
-            if (tutorialManager.isTutorialActive && tutorialManager.abilityAllowed("3"))
+            if (tutorialManager.isTutorialActive)
             {
-                tutorialManager.incrementTutorial();
-                changeMode(3);
-            }
-            else
-            {
-                Debug.Log("Ability 3 not allowed");
-                return;
+                if (tutorialManager.abilityAllowed("3") && phase == 0)
+                {
+                    tutorialManager.incrementTutorial();
+                    changeMode(3);
+                }
+                else
+                {
+                    Debug.Log("Ability 3 not allowed");
+                    return;
+                }
             }
             changeMode(3);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false && phase == 0)
+        if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false)
         {
-            if (tutorialManager.isTutorialActive && tutorialManager.abilityAllowed("4"))
+            if (tutorialManager.isTutorialActive)
             {
-                tutorialManager.incrementTutorial();
-                changeMode(4);
-            }
-            else
-            {
-                Debug.Log("Ability 4 not allowed");
-                return;
+                if (tutorialManager.abilityAllowed("4") && phase == 0)
+                {
+                    tutorialManager.incrementTutorial();
+                    changeMode(4);
+                }
+                else
+                {
+                    Debug.Log("Ability 4 not allowed");
+                    return;
+                }
             }
             changeMode(4);
         }
@@ -233,16 +245,36 @@ public class TypeTracker : MonoBehaviour
             if (currentTarget != null)
             {
                 awaitingTarget = false;
-                if(tutorialManager.isTutorialActive && !tutorialManager.checkTarget(currentTarget))
+                if (tutorialManager.isTutorialActive)
                 {
-                    instructionText.text = "Invalid Target. Try Again.";
+                    if (!tutorialManager.checkTarget(currentTarget))
+                    {
+                        instructionText.text = "Invalid Target. Try Again.";
 
-                    inputField.text = "";
-                    promptText.text = "";
-                    awaitingTarget = true;
+                        inputField.text = "";
+                        promptText.text = "";
+                        awaitingTarget = true;
 
-                    FocusInputField();
-                    return;
+                        FocusInputField();
+                        return;
+                    }
+                }
+                else
+                {
+                    if(checkTarget(currentTarget, mode))
+                    {
+                        awaitingTarget = false;
+                    }
+                    else
+                    {
+                        instructionText.text = "Invalid Target. Try Again.";
+
+                        inputField.text = "";
+                        promptText.text = "";
+
+                        FocusInputField();
+                        return;
+                    }
                 }
 
                 if (currentTarget is ProjectileController)
@@ -755,5 +787,25 @@ public class TypeTracker : MonoBehaviour
 
             FocusInputField();
         }
+    }
+
+    private bool checkTarget(TargetableController target, int mode)
+    {
+        if (target == null) return false;
+
+        // Convert mode to index (mode 1 = index 0)
+        int index = Mathf.Clamp(mode - 1, 0, currentClass.targetList.Count - 1);
+
+        string[] allowedTags = currentClass.targetList[index];
+
+        foreach (string tag in allowedTags)
+        {
+            if (target.CompareTag(tag))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
