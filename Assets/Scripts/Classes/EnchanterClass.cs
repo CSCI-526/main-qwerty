@@ -85,6 +85,15 @@ public class EnchanterClass : ClassBase
         "Defeat the enemy to progress."
     };
 
+    public override List<string[]> targetList { get; } = new List<string[]>
+    {
+        new string[] { "Enemy", "Projectile" },
+        new string[] { "Player" },
+        new string[] { "Player" },
+        new string[] { "Enemy" },
+        new string[] { "Projectile" }
+    };
+
     public override List<string> classDescription { get; } = new List<string>
     {
         "Enchanter",
