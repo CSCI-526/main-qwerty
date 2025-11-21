@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Xml;
 using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -14,10 +15,9 @@ public class BalancedClass : ClassBase
     public override void Ability1(ulong playerID, TargetableController target, float baseValue)
     {
         ulong targetType = DetermineTargetType(target);
-        gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 0.9f, 1, "DamageBuff");
         gameManager.addBuffDebuffToListRpc(0, playerID, 0.2f, 1, "LeechBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-        baseValue = Mathf.Clamp(baseValue * maxDamageValue, 1, int.MaxValue);
+        baseValue = Mathf.Clamp(baseValue * maxDamageValue * 0.9f, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
         LogAbility("BalancedClass", 1, "Quick strike (0.9x base attack)");
@@ -78,12 +78,13 @@ public class BalancedClass : ClassBase
         "Now finish off the enemy. Select any ability."
     };
 
-    public override List<string> promptText { get; } = new List<string>
+    public override List<string[]> targetList { get; } = new List<string[]>
     {
-        "Press Tab to view your abilities and stats.",
-        "Typos will inflict damage to yourself.",
-        "Attack projectiles to destroy them.",
-        "Defeat the enemy to progress."
+        new string[] { "Enemy", "Projectile" },
+        new string[] { "Player" },   
+        new string[] { "Enemy" },  
+        new string[] { "Player" },                  
+        new string[] { "Projectile"}    
     };
 
     public override List<string> classDescription { get; } = new List<string>

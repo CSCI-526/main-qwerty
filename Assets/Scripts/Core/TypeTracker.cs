@@ -29,6 +29,16 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private TypingEffectManager typingEffectManager; // manager of curses & buffs
     [SerializeField] private DamageManager damageManager;
     [SerializeField] private ClassInfoManager classInfoManager;
+    [SerializeField] private TutorialManager tutorialManager;
+
+    [SerializeField] private GameObject key_1_down;
+    [SerializeField] private GameObject key_1_up;
+    [SerializeField] private GameObject key_2_down;
+    [SerializeField] private GameObject key_2_up;
+    [SerializeField] private GameObject key_3_down;
+    [SerializeField] private GameObject key_3_up;
+    [SerializeField] private GameObject key_4_down;
+    [SerializeField] private GameObject key_4_up;
 
     private string prompt;
     private bool timerStarted = false;
@@ -44,9 +54,12 @@ public class TypeTracker : MonoBehaviour
     private float caretTimer = 0f;
     private bool caretVisible = true;
 
-    private int tutorialLength = 0;
-    private int tutorialStep = 0;
-    private int promptStep = 0;
+    private int numSubmissions = 0;
+    private float averageWPM = 0f;
+    private float averageAccuracy = 0f;
+    private int damageDealt = 0;
+    private int healingDone = 0;
+
     private int phase = 0;
     private bool tutorialIncremented = false;
 
@@ -58,17 +71,22 @@ public class TypeTracker : MonoBehaviour
 
     public void OnEnable()
     {
-        if (!gameManager.gameLoopManager.GetTutorialState())
+        if (!tutorialManager.isTutorialActive)
         {
             resetState();
             EnterTargetPhase();
+            tutorialManager.currentClass = currentClass;
+        }
+        else
+        {
+            getInstructions();
         }
     }
 
     private void Start()
     {
         classInfoManager.updateUI(currentClass);
-        tutorialLength = currentClass.instructionText.Count - 1;
+        tutorialManager.currentClass = currentClass;
 
         getInstructions();
         promptText.text = "";
@@ -86,57 +104,108 @@ public class TypeTracker : MonoBehaviour
     {
         bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
-        if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false  && phase != 2)
+        if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false)
         {
-            if(gameManager.gameLoopManager.GetTutorialState())
+            key_1_down.SetActive(true);
+            key_1_up.SetActive(false);
+
+            if (tutorialManager.isTutorialActive)
             {
-                if((tutorialStep >= 2 && tutorialStep < 12))
+                if (tutorialManager.abilityAllowed("1") && phase == 0)
                 {
-                    Debug.Log("Returning from pressing 1");
+                    tutorialManager.incrementTutorial();
+                    changeMode(1);
+                }
+                else
+                {
+                    Debug.Log("Ability 1 not allowed");
                     return;
                 }
-                changeMode(1);
             }
             changeMode(1);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false && phase != 2)
+        if (Input.GetKeyUp(KeyCode.Alpha1) && shiftHeld == false)
         {
-            if (gameManager.gameLoopManager.GetTutorialState())
+            key_1_down.SetActive(false);
+            key_1_up.SetActive(true);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false)
+        {
+            key_2_down.SetActive(true);
+            key_2_up.SetActive(false);
+            if (tutorialManager.isTutorialActive)
             {
-                if ((tutorialStep < 3 || tutorialStep > 5)  && tutorialStep < tutorialLength)
+                if (tutorialManager.abilityAllowed("2") && phase == 0)
                 {
-                    Debug.Log("Returning from pressing 2");
+                    tutorialManager.incrementTutorial();
+                    changeMode(2);
+                }
+                else
+                {
+                    Debug.Log("Ability 2 not allowed");
                     return;
                 }
-                changeMode(2);
             }
             changeMode(2);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false && phase != 2)
+        if (Input.GetKeyUp(KeyCode.Alpha2) && shiftHeld == false)
         {
-            if (gameManager.gameLoopManager.GetTutorialState())
-            {
-                if ((tutorialStep < 6 || tutorialStep > 8) && tutorialStep < tutorialLength)
-                {
-                    Debug.Log("Returning from pressing 3");
-                    return;
-                }
-                changeMode(3);
-            }
-                changeMode(3);
+            key_2_down.SetActive(false);
+            key_2_up.SetActive(true);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false && phase != 2)
+        
+        if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false)
         {
-            if (gameManager.gameLoopManager.GetTutorialState())
+            key_3_down.SetActive(true);
+            key_3_up.SetActive(false);
+            
+            if (tutorialManager.isTutorialActive)
             {
-                if ((tutorialStep < 9 || tutorialStep > 11) && tutorialStep < tutorialLength)
+                if (tutorialManager.abilityAllowed("3") && phase == 0)
                 {
-                    Debug.Log("Returning from pressing 4");
+                    tutorialManager.incrementTutorial();
+                    changeMode(3);
+                }
+                else
+                {
+                    Debug.Log("Ability 3 not allowed");
                     return;
                 }
-                changeMode(4);
+            }
+            changeMode(3);
+        }
+
+        if (Input.GetKeyUp(KeyCode.Alpha3) && shiftHeld == false)
+        {
+            key_3_down.SetActive(false);
+            key_3_up.SetActive(true);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false)
+        {
+            key_4_down.SetActive(true);
+            key_4_up.SetActive(false);
+
+            if (tutorialManager.isTutorialActive)
+            {
+                if (tutorialManager.abilityAllowed("4") && phase == 0)
+                {
+                    tutorialManager.incrementTutorial();
+                    changeMode(4);
+                }
+                else
+                {
+                    Debug.Log("Ability 4 not allowed");
+                    return;
+                }
             }
             changeMode(4);
+        }
+        if (Input.GetKeyUp(KeyCode.Alpha4) && shiftHeld == false)
+        {
+            key_4_down.SetActive(false);
+            key_4_up.SetActive(true);
         }
 
         if (Input.GetKeyDown(KeyCode.Return))
@@ -162,7 +231,7 @@ public class TypeTracker : MonoBehaviour
         // If they're already in that mode, do nothing
         if (mode == newMode)
         {
-            if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep == tutorialLength + 1)
+            if (tutorialManager.isTutorialActive)
             {
                 EnterTargetPhase();
             }
@@ -205,7 +274,6 @@ public class TypeTracker : MonoBehaviour
     {
         awaitingTarget = true;
         getInstructions();
-        Debug.Log("EnterTargetPhase: " + tutorialStep);
         phase = 1;
         FocusInputField();
     }
@@ -221,6 +289,38 @@ public class TypeTracker : MonoBehaviour
             if (currentTarget != null)
             {
                 awaitingTarget = false;
+                if (tutorialManager.isTutorialActive)
+                {
+                    if (!tutorialManager.checkTarget(currentTarget))
+                    {
+                        instructionText.text = "Invalid Target. Try Again.";
+
+                        inputField.text = "";
+                        promptText.text = "";
+                        awaitingTarget = true;
+
+                        FocusInputField();
+                        return;
+                    }
+                }
+                else
+                {
+                    if(checkTarget(currentTarget, mode))
+                    {
+                        awaitingTarget = false;
+                    }
+                    else
+                    {
+                        instructionText.text = "Invalid Target. Try Again.";
+
+                        inputField.text = "";
+                        promptText.text = "";
+                        awaitingTarget = true;
+
+                        FocusInputField();
+                        return;
+                    }
+                }
 
                 if (currentTarget is ProjectileController)
                 {
@@ -246,9 +346,9 @@ public class TypeTracker : MonoBehaviour
                     promptText.text = "";
                     inputField.text = "";
 
-                    if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep < tutorialLength)
+                    if (tutorialManager.isTutorialActive)
                     {
-                        Debug.Log("In current target projectile");
+                        tutorialManager.incrementTutorial();
                         phase = 0;
                         mode = 0;
                         awaitingTarget = true;
@@ -256,17 +356,28 @@ public class TypeTracker : MonoBehaviour
                         getInstructions();
                     }
                     else
-                    { 
+                    {
                         EnterTargetPhase();
                     }
                     return;
                 }
 
-                getPrompt();
-                getInstructions();
-                Debug.Log("onEnter: " + tutorialStep);
-
-                FocusInputField();
+                if(!tutorialManager.isTutorialActive)
+                {
+                    getPrompt();
+                    getInstructions();
+                    FocusInputField();
+                }
+                else
+                {
+                    if(tutorialManager.checkTarget(currentTarget))
+                    {
+                        tutorialManager.incrementTutorial();
+                        getPrompt();
+                        getInstructions();
+                        FocusInputField();
+                    }
+                }
             }
             else
             {
@@ -297,23 +408,11 @@ public class TypeTracker : MonoBehaviour
         {
 
             // Restrict only during tutorial
-            if (gameManager.gameLoopManager.GetTutorialState() && tutorialStep < tutorialLength)
+            if (tutorialManager.isTutorialActive)
             {
                 bool valid = false;
 
-                if ((tutorialStep <= 2 || tutorialStep >= 12 || tutorialStep >= tutorialLength) && currentText == "1")
-                {
-                    valid = true;
-                }
-                else if (((tutorialStep >= 3 && tutorialStep <= 5) || tutorialStep >= tutorialLength) && currentText == "2")
-                {
-                    valid = true;
-                }
-                else if (((tutorialStep >= 6 && tutorialStep <= 8) || tutorialStep >= tutorialLength) && currentText == "3")
-                {
-                    valid = true;
-                }
-                else if (((tutorialStep >= 9 && tutorialStep <= 11) || tutorialStep >= tutorialLength) && currentText == "4")
+                if (tutorialManager.abilityAllowed(currentText))
                 {
                     valid = true;
                 }
@@ -323,11 +422,11 @@ public class TypeTracker : MonoBehaviour
                 {
 
                     inputField.text = "";
-                    instructionText.text = currentClass.instructionText[tutorialStep-1];
+                    getInstructions();
                     return;
                 }
             }
-            else if(tutorialStep >= 14)
+            else
             {
                 // General rule outside tutorial: Only allow 1–4
                 if (currentText != "1" && currentText != "2" && currentText != "3" && currentText != "4")
@@ -499,8 +598,14 @@ public class TypeTracker : MonoBehaviour
         currentTarget.RandomizeTargetWord();
         currentTarget = null;
 
+        if (tutorialManager.isTutorialActive)
+        {
+            tutorialManager.incrementTutorial();
+        }
+
         resetState();
-        if (!gameManager.gameLoopManager.GetTutorialState())
+
+        if (!tutorialManager.isTutorialActive)
         {
             EnterTargetPhase();
         }
@@ -525,23 +630,6 @@ public class TypeTracker : MonoBehaviour
         }
     }
 
-    // For getting mode names for UI
-    private string GetModeName()
-    {
-        if (mode == 1)
-        {
-            return "Attack";
-        }
-        else if (mode == 2)
-        {
-            return "Heal";
-        }
-        else
-        {
-            return "None";
-        }
-    }
-
     // Resets all values
     private void resetState()
     {
@@ -554,22 +642,16 @@ public class TypeTracker : MonoBehaviour
         awaitingTarget = true;
         promptText.color = Color.white;
 
-        if(gameManager.gameLoopManager.GetTutorialState() && phase == 2 && tutorialStep < tutorialLength+1)
+        if(tutorialManager.isTutorialActive && phase == 2)
         {
             phase = 0;
             mode = 0;
-            getInstructions();
-            Debug.Log("ResetState: " + tutorialStep);
-        }
-        else if(gameManager.gameLoopManager.GetTutorialState() && tutorialStep >= tutorialLength +1)
-        {
-            Debug.Log("State Reset after tutorial ended");
-            phase = 1;
             getInstructions();
         }
         else
         {
             phase = 1;
+            getInstructions();
         }
             FocusInputField();
     }
@@ -681,18 +763,12 @@ public class TypeTracker : MonoBehaviour
 
     private void getInstructions()
     {
-        if(gameManager.gameLoopManager.GetTutorialState() && tutorialStep < tutorialLength+1)
+        if(tutorialManager.isTutorialActive)
         {
-            instructionText.text = currentClass.instructionText[tutorialStep];
-            tutorialStep++;
-            if (tutorialStep >= tutorialLength && !tutorialIncremented)
-            {
-                gameManager.IncrementTutorialFinishedCountRpc();
-            }
+            instructionText.text = tutorialManager.getInstruction();
         }
         else
         {
-            Debug.Log("In Instrutcion switch case + Phase = " + phase + " + tutorialStep = " + tutorialStep);
             switch (phase)
             {
                 case 0:
@@ -711,17 +787,15 @@ public class TypeTracker : MonoBehaviour
     private void getPrompt()
     {
         phase = 2;
-        if (gameManager.gameLoopManager.GetTutorialState() && promptStep < currentClass.promptText.Count)
+        if (tutorialManager.isTutorialActive)
         {
-            Debug.Log("GetPrompt. Tutorial Step: " + tutorialStep + " PromptStep: " + promptStep);
-            promptText.text = currentClass.promptText[promptStep];
+            promptText.text = tutorialManager.getPrompt();
             prompt = promptText.text; // For comparisons
             promptText.color = Color.gray;
 
             inputField.text = "";
             timerStarted = true; // will start when they begin typing
             startTime = Time.time;
-            promptStep++;
 
             FocusInputField();
         }
@@ -758,5 +832,25 @@ public class TypeTracker : MonoBehaviour
 
             FocusInputField();
         }
+    }
+
+    private bool checkTarget(TargetableController target, int mode)
+    {
+        if (target == null) return false;
+
+        // Convert mode to index (mode 1 = index 0)
+        int index = Mathf.Clamp(mode - 1, 0, currentClass.targetList.Count - 1);
+
+        string[] allowedTags = currentClass.targetList[index];
+
+        foreach (string tag in allowedTags)
+        {
+            if (target.CompareTag(tag))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

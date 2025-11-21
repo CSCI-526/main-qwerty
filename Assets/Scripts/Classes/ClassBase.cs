@@ -18,11 +18,13 @@ public abstract class ClassBase : MonoBehaviour
 
     public abstract List<string> instructionText { get; }
 
-    public abstract List<string> promptText { get; }
+    // public abstract List<string> promptText { get; }
 
     public abstract List<string> classDescription { get; }
 
     public abstract List<string> abilityDescription { get; }
+
+    public abstract List<string[]> targetList { get; }
 
     // Optional: you can include shared utility methods here
     protected void LogAbility(string className, int abilityNumber, string description)
@@ -46,4 +48,12 @@ public abstract class ClassBase : MonoBehaviour
 
     protected float maxDamageValue = 15;
     protected float maxHealValue = 25;
+
+    public List<string> promptText { get; } = new List<string>
+    {
+        "Press Tab to view your abilities and stats.",
+        "Typos will inflict damage to yourself.",
+        "Speed and accuracy determine effectiveness.",
+        "Attack projectiles to destroy them."
+    };
 }

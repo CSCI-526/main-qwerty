@@ -10,7 +10,7 @@ public abstract class TargetableController : NetworkBehaviour
     #region Health
 
     public int maxHealth = 100;
-    
+
     [DoNotSerialize]
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(
         100,
@@ -90,6 +90,12 @@ public abstract class TargetableController : NetworkBehaviour
         currentShield.Value = Mathf.Clamp(currentShield.Value + amount, 0, int.MaxValue);
     }
 
+    [Rpc(SendTo.Owner)]
+    public virtual void ClearCurrentShieldRpc()
+    {
+        currentShield.Value = 0;
+    }
+
     public bool IsDead() { return isDead.Value; }
 
     protected abstract void Die();
@@ -159,6 +165,12 @@ public abstract class TargetableController : NetworkBehaviour
 
     #region Buff/Debuff
 
+    [SerializeField] protected GameObject attackBuff;
+    [SerializeField] protected GameObject damageDebuff;
+    [SerializeField] protected GameObject leechBuff;
+    [SerializeField] protected CustomLayoutGroup buffDebuffLayoutGroup;
+    [SerializeField] public GameObject effectTarget;
+
     public struct BuffDebuffData {
         public float modifier;
         public int duration;
@@ -187,6 +199,7 @@ public abstract class TargetableController : NetworkBehaviour
                 if (effect.duration <= 0)
                 {
                     BuffDebuffList.RemoveAt(i);
+                    RefreshBuffDebuffUI();
                 }
                 else
                 {
@@ -233,6 +246,7 @@ public abstract class TargetableController : NetworkBehaviour
                 if (effect.duration <= 0)
                 {
                     BuffDebuffList.RemoveAt(i);
+                    RefreshBuffDebuffUI();
                 }
                 else
                 {
@@ -256,6 +270,7 @@ public abstract class TargetableController : NetworkBehaviour
                 if (effect.duration <= 0)
                 {
                     BuffDebuffList.RemoveAt(i);
+                    RefreshBuffDebuffUI();
                 }
                 else
                 {
@@ -275,6 +290,62 @@ public abstract class TargetableController : NetworkBehaviour
             effectType = effectType
         };
         BuffDebuffList.Add(data);
+        RefreshBuffDebuffUI();
+    }
+
+    public void ClearBuffDebuff()
+    {
+        BuffDebuffList.Clear();
+        RefreshBuffDebuffUI();
+    }
+
+    public void RefreshBuffDebuffUI()
+    {
+        if(attackBuff == null || damageDebuff == null || leechBuff == null || buffDebuffLayoutGroup == null)
+        {
+            return;
+        }
+
+        SetAttackBuffRpc(false);
+        SetDamageDebuffRpc(false);
+        SetLeechBuffRpc(false);
+
+        foreach (BuffDebuffData data in BuffDebuffList)
+        {
+            if (data.effectType.ToString().Equals("DamageBuff"))
+            {
+                SetAttackBuffRpc(true);
+            }
+            else if (data.effectType.ToString().Equals("DamageTakenDebuff"))
+            {
+                SetDamageDebuffRpc(true);
+            }
+            else if (data.effectType.ToString().Equals("LeechBuff"))
+            {
+                SetLeechBuffRpc(true);
+            }
+        }
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetAttackBuffRpc(bool state)
+    {
+        attackBuff.SetActive(state);
+        buffDebuffLayoutGroup.RefreshLayout();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetDamageDebuffRpc(bool state)
+    {
+        damageDebuff.SetActive(state);
+        buffDebuffLayoutGroup.RefreshLayout();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetLeechBuffRpc(bool state)
+    {
+        leechBuff.SetActive(state);
+        buffDebuffLayoutGroup.RefreshLayout();
     }
 
     #endregion

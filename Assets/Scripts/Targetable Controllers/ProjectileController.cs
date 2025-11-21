@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -11,6 +12,7 @@ public class ProjectileController : TargetableController
     [SerializeField] private int wordSpeedMin = 1;
     [SerializeField] private float modMultiplier = 1.2f;
     [SerializeField] private int damage = 50;
+    [SerializeField] public GameObject deathEffect;
 
     private string word = "";
 
@@ -32,14 +34,45 @@ public class ProjectileController : TargetableController
 
     protected override void Die()
     {
+        ShowDeathRpc();
         gameManager.RemoveProjectile(targetingID.Value);
+        StartCoroutine(DestroyAfterWait(0.25f));
+    }
+
+    IEnumerator DestroyAfterWait(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);
     }
 
+    [Rpc(SendTo.Everyone)]
+    private void ShowDeathRpc()
+    {
+        Instantiate(deathEffect, gameManager.ScreenToWorldSpace(effectTarget.transform.position), Quaternion.identity);
+    }
+
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
     {
-        targetWordText.text = newWord.ToString();
+        Color textColor = targetWordText.color;
+        // Refresh based on the speical word mods
+        if (textColor == Color.magenta)
+        {
+            // Reverse the word
+            char[] array = newWord.ToString().ToCharArray();
+            Array.Reverse(array);
+            targetWordText.text = new string(array);
+        }
+        else if (textColor == Color.red && targetWordText.text.Contains("???"))
+        {
+            // In this case no need to refresh the ?s
+            return;
+        }
+        else
+        {
+            // The generic refresh
+            targetWordText.text = newWord.ToString();
+        }
     }
 
     protected override void OnTargetIDChanged(ulong oldID, ulong newID)
@@ -68,7 +101,7 @@ public class ProjectileController : TargetableController
     [Rpc(SendTo.Everyone)]
     public void UpdateTextEveryoneRpc(FixedString128Bytes newWord, int special = 0) {
         word = newWord.ToString();
-        GetComponent<TMP_Text>().text = word; 
+        GetComponent<TMP_Text>().text = word;
 
         // Special modes
         if (special == 1)

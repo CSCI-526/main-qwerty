@@ -11,9 +11,8 @@ public class DPSClass : ClassBase
     public override void Ability1(ulong playerID, TargetableController target, float baseValue)
     {
         ulong targetType = DetermineTargetType(target);
-        gameManager.addBuffDebuffToListRpc(0, playerID, 1.2f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-        baseValue = Mathf.Clamp(baseValue * maxDamageValue, 1, int.MaxValue);
+        baseValue = Mathf.Clamp(baseValue * maxDamageValue * 1.2f, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
         StartCoroutine(CheckPassiveStacks(playerID, target));
@@ -23,9 +22,8 @@ public class DPSClass : ClassBase
     public override void Ability2(ulong playerID, TargetableController target, float baseValue)
     {
         ulong targetType = DetermineTargetType(target);
-        gameManager.addBuffDebuffToListRpc(0, playerID, 1.5f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-        baseValue = Mathf.Clamp(baseValue * maxDamageValue, 1, int.MaxValue);
+        baseValue = Mathf.Clamp(baseValue * maxDamageValue * 1.5f, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
         StartCoroutine(CheckPassiveStacks(playerID, target));
@@ -94,12 +92,13 @@ public class DPSClass : ClassBase
         "Now finish off the enemy. Select any ability."
     };
 
-    public override List<string> promptText { get; } = new List<string>
+    public override List<string[]> targetList { get; } = new List<string[]>
     {
-        "Press Tab to view your abilities and stats.",
-        "Typos will inflict damage to yourself.",
-        "Attack projectiles to destroy them.",
-        "Defeat the enemy to progress."
+        new string[] { "Enemy", "Projectile" },
+        new string[] { "Enemy", "Projectile" },
+        new string[] { "Player" },
+        new string[] { "Player" },
+        new string[] { "Projectile" }
     };
 
     public override List<string> classDescription { get; } = new List<string>

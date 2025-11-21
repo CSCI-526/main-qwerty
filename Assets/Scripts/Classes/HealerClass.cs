@@ -91,12 +91,12 @@ public class HealerClass : ClassBase
         "Now everyone finish off the enemy. Select an ability.",
     };
 
-    public override List<string> promptText { get; } = new List<string>
+    public override List<string[]> targetList { get; } = new List<string[]>
     {
-        "Press Tab to view your abilities and stats.",
-        "Typos will inflict damage to yourself.",
-        "Attack projectiles to destroy them.",
-        "Defeat the enemy to progress."
+        new string[] { "Player" },
+        new string[] { "Player" },
+        new string[] { "Player" },
+        new string[] { "Player" },
     };
 
     public override List<string> classDescription { get; } = new List<string>
