@@ -288,6 +288,11 @@ public abstract class TargetableController : NetworkBehaviour
 
     public void RefreshBuffDebuffUI()
     {
+        if(attackBuff == null || damageDebuff == null || leechBuff == null || buffDebuffLayoutGroup == null)
+        {
+            return;
+        }
+
         SetAttackBuffRpc(false);
         SetDamageDebuffRpc(false);
         SetLeechBuffRpc(false);
