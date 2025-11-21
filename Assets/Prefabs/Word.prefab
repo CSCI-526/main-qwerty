@@ -402,10 +402,15 @@ MonoBehaviour:
   targetingID:
     m_InternalValue: 18446744073709551615
   targetWordText: {fileID: 613936294155128085}
+  attackBuff: {fileID: 0}
+  damageDebuff: {fileID: 0}
+  leechBuff: {fileID: 0}
+  buffDebuffLayoutGroup: {fileID: 0}
   wordSpeed: 75
   wordSpeedMin: 1
   modMultiplier: 1.2
   damage: 20
+  deathEffect: {fileID: 8499593341196907068, guid: 8264a8acc90b9fb4d864ce52bec0044a, type: 3}
 --- !u!61 &2631638884928488270
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -10,7 +10,7 @@ public abstract class TargetableController : NetworkBehaviour
     #region Health
 
     public int maxHealth = 100;
-    
+
     [DoNotSerialize]
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(
         100,
