@@ -141,6 +141,7 @@ public class TutorialManager : MonoBehaviour
     {
         Debug.Log("Tutorial Ended");
         tutorialEnd = true;
+        turnOnParticles("LOL");
         gameManager.IncrementTutorialFinishedCountRpc();
     }
 
@@ -154,14 +155,13 @@ public class TutorialManager : MonoBehaviour
             if (ps.CompareTag(tag))
             {
                 Debug.Log("Particle Turned On.");
-                ps.gameObject.SetActive(true);
                 ps.Play();
             }
             else
             {
                 Debug.Log("Particle Turned Off.");
                 ps.Stop();
-                ps.gameObject.SetActive(false);
+                ps.Clear();
             }
         }
     }

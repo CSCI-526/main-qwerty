@@ -121,8 +121,8 @@ public class TypeTracker : MonoBehaviour
                     Debug.Log("Ability 1 not allowed");
                     return;
                 }
-                changeMode(1);
             }
+            changeMode(1);
         }
         if (Input.GetKeyUp(KeyCode.Alpha1) && shiftHeld == false)
         {
@@ -315,6 +315,7 @@ public class TypeTracker : MonoBehaviour
 
                         inputField.text = "";
                         promptText.text = "";
+                        awaitingTarget = true;
 
                         FocusInputField();
                         return;

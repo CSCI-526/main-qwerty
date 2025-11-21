@@ -33,10 +33,16 @@ public class ProjectileController : TargetableController
 
     protected override void Die()
     {
-        Instantiate(deathEffect, gameManager.ScreenToWorldSpace(effectTarget.transform.position), Quaternion.identity);
+        ShowDeathRpc();
         gameManager.RemoveProjectile(targetingID.Value);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void ShowDeathRpc()
+    {
+        Instantiate(deathEffect, gameManager.ScreenToWorldSpace(effectTarget.transform.position), Quaternion.identity);
     }
 
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)

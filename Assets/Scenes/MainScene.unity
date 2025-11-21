@@ -1968,6 +1968,7 @@ GameObject:
   - component: {fileID: 773131781}
   - component: {fileID: 773131782}
   - component: {fileID: 773131783}
+  - component: {fileID: 773131784}
   m_Layer: 5
   m_Name: Typing Elements
   m_TagString: Untagged
@@ -2026,6 +2027,7 @@ MonoBehaviour:
   typingEffectManager: {fileID: 922871282824396222}
   damageManager: {fileID: 773131783}
   classInfoManager: {fileID: 1837284897}
+  tutorialManager: {fileID: 773131784}
   key_1_down: {fileID: 8675077}
   key_1_up: {fileID: 1262288300}
   key_2_down: {fileID: 119672014}
@@ -2055,6 +2057,19 @@ MonoBehaviour:
   damageColor: {r: 1, g: 0, b: 0, a: 1}
   healColor: {r: 0, g: 1, b: 0, a: 1}
   popupOffset: {x: 0, y: 50}
+--- !u!114 &773131784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 773131780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cb33175b41c8c647a12302c15951cd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentClass: {fileID: 0}
 --- !u!1 &780637015
 GameObject:
   m_ObjectHideFlags: 0
