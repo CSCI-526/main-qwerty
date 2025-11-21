@@ -14,10 +14,9 @@ public class BalancedClass : ClassBase
     public override void Ability1(ulong playerID, TargetableController target, float baseValue)
     {
         ulong targetType = DetermineTargetType(target);
-        gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 0.9f, 1, "DamageBuff");
         gameManager.addBuffDebuffToListRpc(0, playerID, 0.2f, 1, "LeechBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-        baseValue = Mathf.Clamp(baseValue * maxDamageValue, 1, int.MaxValue);
+        baseValue = Mathf.Clamp(baseValue * maxDamageValue * 0.9f, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
         LogAbility("BalancedClass", 1, "Quick strike (0.9x base attack)");

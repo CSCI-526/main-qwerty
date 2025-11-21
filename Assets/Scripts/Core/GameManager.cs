@@ -29,6 +29,10 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject cursePanel;
     [SerializeField] private GameObject curseMsgPrefab;
 
+    [Header("Particle Effects")]
+    [SerializeField] private GameObject buffEffect;
+    [SerializeField] private GameObject debuffEffect;
+
     [DoNotSerialize] public TypingEffectManager typingEffectManager => FindFirstObjectByType<TypingEffectManager>(FindObjectsInactive.Include);
     [DoNotSerialize] public NetworkManager networkManager => NetworkManager.Singleton;
     [DoNotSerialize] public SharedCanvasController sharedCanvas => FindFirstObjectByType<SharedCanvasController>(FindObjectsInactive.Include);
@@ -689,9 +693,46 @@ public class GameManager : NetworkBehaviour
 
         if (target == null) return;
 
+        if (effectType.ToString().Equals("LeechBuff") || effectType.ToString().Equals("DamageBuff"))
+        {
+            PlayBuffDebuffEffectRpc(targetType, targetingID, true);
+        }
+        else
+        {
+            PlayBuffDebuffEffectRpc(targetType, targetingID, false);
+        }
+
         // Use a public TargetableController method to add the buff (see TargetableController change below).
         target.AddBuffDebuff(modifier, duration, effectType);
     }
+
+    [Rpc(SendTo.Everyone)]
+    public void PlayBuffDebuffEffectRpc(ulong targetType, ulong targetingID, bool isBuff)
+    {
+        TargetableController target = null;
+        switch (targetType)
+        {
+            case 0:
+                target = GetPlayerByTargetingId(targetingID);
+                break;
+            case 1:
+                target = GetEnemyByTargetingId(targetingID);
+                break;
+            case 2:
+                target = GetProjectileByTargetingId(targetingID);
+                break;
+        }
+        if (target == null) return;
+
+        if (isBuff)
+        {
+            Instantiate(buffEffect, ScreenToWorldSpace(target.effectTarget.transform.position), Quaternion.identity);
+        }
+        else
+        {
+             Instantiate(debuffEffect, ScreenToWorldSpace(target.effectTarget.transform.position), Quaternion.identity);
+        }
+    }    
 
     #endregion
 
@@ -824,6 +865,13 @@ public class GameManager : NetworkBehaviour
         }
 
         return word;
+    }
+
+    public Vector3 ScreenToWorldSpace(Vector3 position)
+    {
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(null, position);
+        Vector3 worldPoint = Camera.main.ScreenToWorldPoint(new Vector3(screenPoint.x, screenPoint.y, Camera.main.farClipPlane - 10));
+        return worldPoint;
     }
 
     #endregion

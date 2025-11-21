@@ -11,9 +11,8 @@ public class DPSClass : ClassBase
     public override void Ability1(ulong playerID, TargetableController target, float baseValue)
     {
         ulong targetType = DetermineTargetType(target);
-        gameManager.addBuffDebuffToListRpc(0, playerID, 1.2f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-        baseValue = Mathf.Clamp(baseValue * maxDamageValue, 1, int.MaxValue);
+        baseValue = Mathf.Clamp(baseValue * maxDamageValue * 1.2f, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
         StartCoroutine(CheckPassiveStacks(playerID, target));
@@ -23,9 +22,8 @@ public class DPSClass : ClassBase
     public override void Ability2(ulong playerID, TargetableController target, float baseValue)
     {
         ulong targetType = DetermineTargetType(target);
-        gameManager.addBuffDebuffToListRpc(0, playerID, 1.5f, 1, "DamageBuff");
         int mod = gameManager.typingEffectManager.ApplyEffectOnMod()[2];
-        baseValue = Mathf.Clamp(baseValue * maxDamageValue, 1, int.MaxValue);
+        baseValue = Mathf.Clamp(baseValue * maxDamageValue * 1.5f, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
         StartCoroutine(CheckPassiveStacks(playerID, target));

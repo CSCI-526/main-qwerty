@@ -621,6 +621,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4614587279506669085}
   - {fileID: 3757775769578211472}
   - {fileID: 1479108323488060395}
   - {fileID: 6652146665764544257}
@@ -862,6 +863,7 @@ MonoBehaviour:
   damageDebuff: {fileID: 7441866271082992938}
   leechBuff: {fileID: 1111654434657530684}
   buffDebuffLayoutGroup: {fileID: 5235877179655049706}
+  effectTarget: {fileID: 6132937403427530041}
   attackCooldown: 10
   projectilePrefab: {fileID: 758967849696552827, guid: 18a436f6931f59a49a5e87a166102501, type: 3}
   projectileStartingPoint: {fileID: 4047177821400926993}
@@ -1270,6 +1272,41 @@ MonoBehaviour:
   shieldBar: {fileID: 983696617255810916}
   healthBar: {fileID: 6097297844530677073}
   healthText: {fileID: 3484453289370774039}
+--- !u!1 &6132937403427530041
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4614587279506669085}
+  m_Layer: 5
+  m_Name: Effect Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &4614587279506669085
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6132937403427530041}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 152811115163273784}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -35}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &6209758614907681042
 GameObject:
   m_ObjectHideFlags: 0

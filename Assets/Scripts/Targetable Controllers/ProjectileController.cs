@@ -12,7 +12,6 @@ public class ProjectileController : TargetableController
     [SerializeField] private float modMultiplier = 1.2f;
     [SerializeField] private int damage = 50;
     [SerializeField] public GameObject deathEffect;
-    [SerializeField] public GameObject deathEffectTarget;
 
     private string word = "";
 
@@ -34,10 +33,7 @@ public class ProjectileController : TargetableController
 
     protected override void Die()
     {
-        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(null, deathEffectTarget.transform.position);
-        Vector3 worldPoint = Camera.main.ScreenToWorldPoint(new Vector3(screenPoint.x, screenPoint.y, 930));
-        Instantiate(deathEffect, worldPoint, Quaternion.identity);
-
+        Instantiate(deathEffect, gameManager.ScreenToWorldSpace(effectTarget.transform.position), Quaternion.identity);
         gameManager.RemoveProjectile(targetingID.Value);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);

@@ -159,10 +159,11 @@ public abstract class TargetableController : NetworkBehaviour
 
     #region Buff/Debuff
 
-    [SerializeField] GameObject attackBuff;
-    [SerializeField] GameObject damageDebuff;
-    [SerializeField] GameObject leechBuff;
-    [SerializeField] CustomLayoutGroup buffDebuffLayoutGroup;
+    [SerializeField] protected GameObject attackBuff;
+    [SerializeField] protected GameObject damageDebuff;
+    [SerializeField] protected GameObject leechBuff;
+    [SerializeField] protected CustomLayoutGroup buffDebuffLayoutGroup;
+    [SerializeField] public GameObject effectTarget;
 
     public struct BuffDebuffData {
         public float modifier;
