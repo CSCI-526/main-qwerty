@@ -732,7 +732,16 @@ public class GameManager : NetworkBehaviour
         {
              Instantiate(debuffEffect, ScreenToWorldSpace(target.effectTarget.transform.position), Quaternion.identity);
         }
-    }    
+    }
+
+    [Rpc(SendTo.Owner)]
+    public void RemoveBuffDebuffDataRpc()
+    {
+        foreach (PlayerController player in players.Values)
+        {
+            player.ClearBuffDebuff();
+        }
+    }
 
     #endregion
 
