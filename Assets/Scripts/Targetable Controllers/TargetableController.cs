@@ -90,6 +90,12 @@ public abstract class TargetableController : NetworkBehaviour
         currentShield.Value = Mathf.Clamp(currentShield.Value + amount, 0, int.MaxValue);
     }
 
+    [Rpc(SendTo.Owner)]
+    public virtual void ClearCurrentShieldRpc()
+    {
+        currentShield.Value = 0;
+    }
+
     public bool IsDead() { return isDead.Value; }
 
     protected abstract void Die();
@@ -284,6 +290,12 @@ public abstract class TargetableController : NetworkBehaviour
             effectType = effectType
         };
         BuffDebuffList.Add(data);
+        RefreshBuffDebuffUI();
+    }
+
+    public void ClearBuffDebuff()
+    {
+        BuffDebuffList.Clear();
         RefreshBuffDebuffUI();
     }
 

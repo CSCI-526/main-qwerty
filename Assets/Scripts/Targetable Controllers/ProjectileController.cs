@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -35,6 +36,12 @@ public class ProjectileController : TargetableController
     {
         ShowDeathRpc();
         gameManager.RemoveProjectile(targetingID.Value);
+        StartCoroutine(DestroyAfterWait(0.25f));
+    }
+
+    IEnumerator DestroyAfterWait(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
         gameObject.GetComponent<NetworkObject>().Despawn(false);
         Destroy(gameObject);
     }

@@ -128,6 +128,12 @@ public class GameLoopManager : NetworkBehaviour
         SendAnalyticsRpc();
         AssignRandomCurses();
         ToggleElementsRpc(false, false, true);
+        gameManager.RemoveBuffDebuffDataRpc();
+        foreach (PlayerController player in gameManager.GetAllPlayers())
+        {
+            player.ClearCurrentShieldRpc();
+            
+        }
     }
 
     [Rpc(SendTo.Everyone)]
