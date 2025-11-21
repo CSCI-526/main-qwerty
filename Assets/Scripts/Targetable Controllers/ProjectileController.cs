@@ -39,7 +39,25 @@ public class ProjectileController : TargetableController
 
     protected override void OnTargetWordChanged(FixedString128Bytes oldWord, FixedString128Bytes newWord)
     {
-        targetWordText.text = newWord.ToString();
+        Color textColor = targetWordText.color;
+        // Refresh based on the speical word mods
+        if (textColor == Color.magenta)
+        {
+            // Reverse the word
+            char[] array = newWord.ToString().ToCharArray();
+            Array.Reverse(array);
+            targetWordText.text = new string(array);
+        }
+        else if (textColor == Color.red && targetWordText.text.Contains("???"))
+        {
+            // In this case no need to refresh the ?s
+            return;
+        }
+        else
+        {
+            // The generic refresh
+            targetWordText.text = newWord.ToString();
+        }
     }
 
     protected override void OnTargetIDChanged(ulong oldID, ulong newID)
@@ -68,7 +86,7 @@ public class ProjectileController : TargetableController
     [Rpc(SendTo.Everyone)]
     public void UpdateTextEveryoneRpc(FixedString128Bytes newWord, int special = 0) {
         word = newWord.ToString();
-        GetComponent<TMP_Text>().text = word; 
+        GetComponent<TMP_Text>().text = word;
 
         // Special modes
         if (special == 1)
