@@ -86,7 +86,8 @@ public class TutorialManager : MonoBehaviour
     {
         if (isTutorialActive)
         {
-            return currentClass.instructionText[tutorialStep];
+            if(currentClass != null)
+                return currentClass.instructionText[tutorialStep];
         }
         return "";
     }
