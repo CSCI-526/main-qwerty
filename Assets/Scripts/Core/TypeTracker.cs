@@ -225,6 +225,11 @@ public class TypeTracker : MonoBehaviour
         positionCaret(inputField.text.Length);
     }
 
+    public TutorialManager GetTutorialManager()
+    {
+        return tutorialManager;
+    }
+
     // For changing abilities
     private void changeMode(int newMode)
     {

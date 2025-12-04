@@ -88,7 +88,7 @@ public class EnemyController : TargetableController
         if (!IsOwner) return;
         if (IsDead()) return;
 
-        if (!tutorial || currentHealth.Value != maxHealth)
+        if (!gameManager.typeTracker.GetTutorialManager().isTutorialActive || gameManager.typeTracker.GetTutorialManager().getTutorialStep() >= 12)
         {
             if (attackCd <= 0)
             {
