@@ -104,9 +104,39 @@ public class EnemyController : TargetableController
 
     protected virtual void ShootWord(string word)
     {
+        Debug.LogWarning("ShootWord should not be called in parent class");
+        //PlayerController targetPlayer = gameManager.GetRandomPlayer();
+
+        //if(targetPlayer == null) return;
+
+        //GameObject projectile = Instantiate(projectilePrefab, projectileStartingPoint.transform.position, Quaternion.identity);
+        //projectile.GetComponent<NetworkObject>().Spawn(true);
+
+        //projectile.transform.SetParent(gameManager.GetProjectileParent().transform);
+        //projectile.transform.rotation = projectileStartingPoint.transform.rotation;
+        //projectile.transform.localScale = Vector3.one;
+        
+        //ProjectileController pc = projectile.GetComponent<ProjectileController>();
+        //pc.UpdateTextEveryoneRpc(new FixedString128Bytes(word));
+        //pc.SetTargetWord(word);
+        //pc.SetSpawner(this);
+        //pc.SetTarget(targetPlayer);
+        //pc.SetDamage(damage);
+        //pc.targetingID.Value = ++gameManager.projectileTargetingIdCounter;
+
+        //gameManager.AddProjectile(new ProjectileNetworkData
+        //{
+        //    TargetingID = gameManager.projectileTargetingIdCounter
+        //});
+
+        //wordList.Add(word);
+    }
+
+    protected void ShootWordA(string word)
+    {
         PlayerController targetPlayer = gameManager.GetRandomPlayer();
 
-        if(targetPlayer == null) return;
+        if (targetPlayer == null) return;
 
         GameObject projectile = Instantiate(projectilePrefab, projectileStartingPoint.transform.position, Quaternion.identity);
         projectile.GetComponent<NetworkObject>().Spawn(true);
@@ -114,7 +144,7 @@ public class EnemyController : TargetableController
         projectile.transform.SetParent(gameManager.GetProjectileParent().transform);
         projectile.transform.rotation = projectileStartingPoint.transform.rotation;
         projectile.transform.localScale = Vector3.one;
-        
+
         ProjectileController pc = projectile.GetComponent<ProjectileController>();
         pc.UpdateTextEveryoneRpc(new FixedString128Bytes(word));
         pc.SetTargetWord(word);

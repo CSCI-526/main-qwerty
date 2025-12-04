@@ -10,7 +10,11 @@ public class EnemyB : EnemyController
     protected override void ShootWord(string word)
     {
         int randomAttack = Random.Range(0, 10);
-        if (randomAttack < 7)
+        if (randomAttack < 3)
+        {
+            ShootWordA(word);
+        }
+        else if (randomAttack < 7)
         {
             ShootWordB(word);
         }

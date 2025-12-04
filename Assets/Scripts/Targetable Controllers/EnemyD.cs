@@ -11,7 +11,11 @@ public class EnemyD : EnemyController
     protected override void ShootWord(string word)
     {
         int randomAttack = Random.Range(0, 10);
-        if (randomAttack < 5)
+        if (randomAttack < 2)
+        {
+            ShootWordA(word);
+        }
+        else if (randomAttack < 6)
         {
             ShootWordD(word);
         }
