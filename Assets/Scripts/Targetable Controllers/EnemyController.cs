@@ -131,6 +131,98 @@ public class EnemyController : TargetableController
         wordList.Add(word);
     }
 
+    protected void ShootWordB(string word)
+    {
+        PlayerController targetPlayer = gameManager.GetRandomPlayer();
+
+        if (targetPlayer == null) return;
+
+        GameObject projectile = Instantiate(projectilePrefab, projectileStartingPoint.transform.position, Quaternion.identity);
+        projectile.GetComponent<NetworkObject>().Spawn(true);
+
+        projectile.transform.SetParent(gameManager.GetProjectileParent().transform);
+        projectile.transform.rotation = projectileStartingPoint.transform.rotation;
+        projectile.transform.localScale = Vector3.one;
+
+        ProjectileController pc = projectile.GetComponent<ProjectileController>();
+        pc.UpdateTextEveryoneRpc(new FixedString128Bytes(word), special: 1);
+        pc.SetTargetWord(word);
+        pc.SetSpawner(this);
+        pc.SetTarget(targetPlayer);
+        pc.targetingID.Value = ++gameManager.projectileTargetingIdCounter;
+
+        gameManager.AddProjectile(new ProjectileNetworkData
+        {
+            TargetingID = pc.targetingID.Value
+        });
+
+        wordList.Add(word);
+    }
+
+    protected void ShootWordC(string word)
+    {
+        PlayerController targetPlayer = gameManager.GetRandomPlayer();
+
+        if (targetPlayer == null) return;
+
+        GameObject projectile = Instantiate(projectilePrefab, projectileStartingPoint.transform.position, Quaternion.identity);
+        projectile.GetComponent<NetworkObject>().Spawn(true);
+
+        projectile.transform.SetParent(gameManager.GetProjectileParent().transform);
+        projectile.transform.rotation = projectileStartingPoint.transform.rotation;
+        projectile.transform.localScale = Vector3.one;
+
+        ProjectileController pc = projectile.GetComponent<ProjectileController>();
+        // Mark the word as ??????
+        pc.UpdateTextEveryoneRpc(new FixedString128Bytes(word), special: 2);
+        pc.SetTargetWord(word);
+        pc.SetSpawner(this);
+        pc.SetTarget(targetPlayer);
+
+        // Update the text to the target
+        pc.UpdateTextClientRpc(new FixedString128Bytes(word), special: 2, rpcParams: RpcTarget.Single(targetPlayer.GetPlayerID(), RpcTargetUse.Temp));
+        pc.targetingID.Value = ++gameManager.projectileTargetingIdCounter;
+
+        gameManager.AddProjectile(new ProjectileNetworkData
+        {
+            TargetingID = pc.targetingID.Value
+        });
+
+        wordList.Add(word);
+    }
+
+    protected void ShootWordD(string word)
+    {
+        List<PlayerController> targetPlayers = gameManager.GetRandomPlayers();
+
+        if (targetPlayers == null) return;
+
+        foreach (PlayerController targetPlayer in targetPlayers)
+        {
+            GameObject projectile = Instantiate(projectilePrefab, projectileStartingPoint.transform.position, Quaternion.identity);
+            projectile.GetComponent<NetworkObject>().Spawn(true);
+
+            projectile.transform.SetParent(gameManager.GetProjectileParent().transform);
+            projectile.transform.rotation = projectileStartingPoint.transform.rotation;
+            projectile.transform.localScale = Vector3.one;
+
+            ProjectileController pc = projectile.GetComponent<ProjectileController>();
+            pc.UpdateTextEveryoneRpc(new FixedString128Bytes(word));
+            pc.SetTargetWord(word);
+            pc.SetSpawner(this);
+            pc.SetTarget(targetPlayer);
+            pc.targetingID.Value = ++gameManager.projectileTargetingIdCounter;
+
+            gameManager.AddProjectile(new ProjectileNetworkData
+            {
+                TargetingID = pc.targetingID.Value
+            });
+
+            wordList.Add(word);
+        }
+    }
+
+
     public void RemoveWord(string word)
     {
         wordList.Remove(word);
