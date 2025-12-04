@@ -34,9 +34,18 @@ public class ProjectileController : TargetableController
 
     protected override void Die()
     {
+        if (!IsOwner) return;
+
         ShowDeathRpc();
         gameManager.RemoveProjectile(targetingID.Value);
         StartCoroutine(DestroyAfterWait(0.25f));
+    }
+
+    public void DieWithoutEffect()
+    {
+        if (!IsOwner) return;
+
+        StartCoroutine(DestroyAfterWait(0.0f));
     }
 
     IEnumerator DestroyAfterWait(float waitTime)
@@ -84,7 +93,7 @@ public class ProjectileController : TargetableController
     {
         if (target == null || target.IsDead())
         {
-            Die();
+            DieWithoutEffect();
         }
         else
         {
@@ -150,7 +159,7 @@ public class ProjectileController : TargetableController
             string word = gameObject.GetComponent<TMP_Text>().text;
             target.GetComponent<PlayerController>().ModifyCurrentHealth(-damage);
             spawner.GetComponent<EnemyController>().RemoveWord(word);
-            Die();
+            DieWithoutEffect();
         }
     }
 }
