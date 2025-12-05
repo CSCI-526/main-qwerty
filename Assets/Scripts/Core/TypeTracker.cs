@@ -505,6 +505,9 @@ public class TypeTracker : MonoBehaviour
     // Ends typing phase to calculate damage to enemy
     private void endTyping(string input)
     {
+        /*AudioClip clip = Resources.Load<AudioClip>("SpellCast");
+        AudioSource.PlayClipAtPoint(clip, Vector3.zero);
+        Debug.Log("SFX.\n");*/
         float accuracy, totalTime;
 
         if (timerStarted)
@@ -598,6 +601,7 @@ public class TypeTracker : MonoBehaviour
 
             return false;
         }
+
     }
 
     // Resets all values
