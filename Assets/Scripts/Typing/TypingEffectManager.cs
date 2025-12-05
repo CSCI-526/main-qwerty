@@ -284,6 +284,18 @@ public class TypingEffectManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Shorthand for creating NoPunctuation Buff
+    /// </summary>
+    /// <returns>Effect data</returns>
+    public TypingEffectBase NoPunctuation()
+    {
+        var effect = ScriptableObject.CreateInstance<NoPunctuationBuffData>();
+        // effect.Initialize();
+        // AddTypingEffect(effect);
+        return effect;
+    }
+
+    /// <summary>
     /// (Deprecated) Shorthand for creating DisableLetter Curse.
     /// </summary>
     /// <param name="letter">The letter to be disabled (case sensitive or not).</param>
