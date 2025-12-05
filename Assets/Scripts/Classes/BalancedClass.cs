@@ -62,10 +62,10 @@ public class BalancedClass : ClassBase
     public override List<string> instructionText { get; } = new List<string>
     {
         "Each class has 4 abilities. Press 1 to try out the first one.",
-        "This ability damages enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
+        "This damages enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
         "Enemy targeted, type the prompt below.",
         "Let's try the 2nd ability now. Press 2.",
-        "This ability buffs a player. Enter a player's <color=yellow>Target Word</color>:",
+        "This buffs a player. Enter a player's <color=yellow>Target Word</color>:",
         "Player targeted, type the prompt below.",
         "Let's try the 3rd ability. Press 3.",
         "This debuffs an enemy. Enter an enemy's <color=yellow>Target Word</color>:",
@@ -91,7 +91,7 @@ public class BalancedClass : ClassBase
     {
         "Balanced",
         "Attacks leech 20% of damage dealt.",
-        "A quick attack.",
+        "A quick attack that deals less damage.",
         "Buff yourself or an ally to increase the damage of the next attack by 50%",
         "Debuff an enemy to make them take 30% more damage on the next 2 attacks.",
         "Heal a Player."

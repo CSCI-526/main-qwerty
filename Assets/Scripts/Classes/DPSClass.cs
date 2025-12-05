@@ -76,7 +76,7 @@ public class DPSClass : ClassBase
     public override List<string> instructionText { get; } = new List<string>
     {
         "Each class has 4 abilities. Press 1 to try out the first one.",
-        "This ability damages enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
+        "This damages an enemy. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
         "Enemy targeted, type the prompt below.",
         "Let's try the 2nd ability now. Press 2.",
         "This is a stronger attack. Enter an enemy's <color=yellow>Target Word</color>:",

@@ -261,7 +261,7 @@ public class TypeTracker : MonoBehaviour
                 {
                     if (!tutorialManager.checkTarget(currentTarget))
                     {
-                        instructionText.text = "Invalid Target. Try Again.";
+                        instructionText.text = "Invalid Target. Enter " + currentClass.targetList[mode - 1] + " target word.";
 
                         inputField.text = "";
                         promptText.text = "";
@@ -279,7 +279,7 @@ public class TypeTracker : MonoBehaviour
                     }
                     else
                     {
-                        instructionText.text = "Invalid Target. Try Again.";
+                        instructionText.text = "Invalid Target. Enter " + currentClass.targetList[mode - 1] + " target word.";
 
                         inputField.text = "";
                         promptText.text = "";
@@ -350,8 +350,8 @@ public class TypeTracker : MonoBehaviour
             else
             {
 
-                instructionText.text = "Invalid Target. Try Again.";
-              
+                instructionText.text = "Invalid Target. Enter " + currentClass.targetList[mode - 1] + " target word.";
+
                 inputField.text = "";
                 promptText.text = "";
 

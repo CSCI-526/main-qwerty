@@ -90,7 +90,7 @@ public class EnchanterClass : ClassBase
     {
         "Enchanter",
         "Applying buffs to an ally also applies it to yourself.",
-        "A weak attack.",
+        "A weak attack that does less damage.",
         "Makes the player's next attack leech for 30% of the damage done.",
         "Gives a player a shield that blocks damage.",
         "Makes an enemy take 40% more damage on the next 3 attacks."

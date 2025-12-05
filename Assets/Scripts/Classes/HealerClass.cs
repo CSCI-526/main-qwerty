@@ -77,13 +77,13 @@ public class HealerClass : ClassBase
     public override List<string> instructionText { get; } = new List<string>
     {
         "Each class has 4 abilities. Press 1 to try out the first one.",
-        "This ability heals a player. Enter a player's <color=yellow>Target Word</color> (Word in yellow):",
+        "This heals a player. Enter a player's <color=yellow>Target Word</color> (Word in yellow):",
         "Type the prompt below.",
         "Let's try the 2nd ability now. Press 2.",
-        "This ability heals all players. Enter a player's <color=yellow>Target Word</color>:",
+        "This heals all players. Enter a player's <color=yellow>Target Word</color>:",
         "Type the prompt below.",
         "Let's try the 3rd ability. Press 3.",
-        "This heals a player for more. Enter an enemy's <color=yellow>Target Word</color>:",
+        "This is a greater heal. Enter an enemy's <color=yellow>Target Word</color>:",
         "Type the prompt below.",
         "Let's try the 4th ability. Press 4.",
         "This revives a player. Enter a player's <color=yellow>Target Word</color>:",
@@ -102,10 +102,10 @@ public class HealerClass : ClassBase
     public override List<string> classDescription { get; } = new List<string>
     {
         "Healer",
-        "Healing are 30% stronger on player's with less than 50% health.",
+        "Heals are 30% stronger on player's with less than 50% health.",
         "Heal a single player.",
         "Heal all players for 75% effectiveness.",
-        "Heal a player for double the value.",
+        "A greater heal that require a longer prompt.",
         "Revive a player and set their health to 20%."
     };
 
