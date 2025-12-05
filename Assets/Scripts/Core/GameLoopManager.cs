@@ -10,6 +10,7 @@ public class GameLoopManager : NetworkBehaviour
     [SerializeField] private GameObject startBattleButton;
     [SerializeField] private GameObject notReadyWarning;
     [SerializeField] private GameObject cursePanel;
+    [SerializeField] private GameObject waitingText;
 
     private bool tutorial = true;
     private bool tutorialStage = true;
@@ -142,6 +143,8 @@ public class GameLoopManager : NetworkBehaviour
         typingElements.SetActive(typingElementsState);
         if(IsOwner)
             startBattleButton.SetActive(startBattleButtonState);
+        else
+            waitingText.SetActive(startBattleButtonState);
         cursePanel.SetActive(cursePanelState);
         if (tutorialState)
         {
