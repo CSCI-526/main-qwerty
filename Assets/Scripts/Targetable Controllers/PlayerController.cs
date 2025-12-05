@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -42,22 +43,37 @@ public class PlayerController : TargetableController
     {
         if (!modelShown && typeTracker != null && typeTracker.currentClass != null)
         {
-            ShowPlayerModel();
+            int classType = -1;
+
+            if (typeTracker.currentClass.className.Equals("Balanced"))
+                classType = 0;
+            else if (typeTracker.currentClass.className.Equals("DPS"))
+                classType = 1;
+            else if (typeTracker.currentClass.className.Equals("Enchanter"))
+                classType = 2;
+            else if (typeTracker.currentClass.className.Equals("Healer"))
+                classType = 3;
+
+            if (classType == -1) return;
+
+            ShowPlayerModelRpc(NetworkManager.Singleton.LocalClientId, classType);
+            modelShown = true;
         }
     }
 
-    private void ShowPlayerModel()
+    [Rpc(SendTo.Everyone)]
+    private void ShowPlayerModelRpc(ulong clientId, int classType)
     {
-        if (typeTracker.currentClass.className.Equals("Balanced"))
-            playerModels[0].SetActive(true);
-        else if (typeTracker.currentClass.className.Equals("DPS"))
-            playerModels[1].SetActive(true);
-        else if (typeTracker.currentClass.className.Equals("Enchanter"))
-            playerModels[2].SetActive(true);
-        else if (typeTracker.currentClass.className.Equals("Healer"))
-            playerModels[3].SetActive(true);
+        if (targetingID.Value != clientId) return;
 
-        modelShown = true;
+        if (classType == 0)
+            playerModels[0].SetActive(true);
+        else if (classType == 1)
+            playerModels[1].SetActive(true);
+        else if (classType == 2)
+            playerModels[2].SetActive(true);
+        else if (classType == 3)
+            playerModels[3].SetActive(true);
     }
 
     #region Network Variable Methods
