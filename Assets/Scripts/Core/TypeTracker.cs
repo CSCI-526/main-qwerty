@@ -455,7 +455,7 @@ public class TypeTracker : MonoBehaviour
             if (newInput[i] != newPrompt[i])
             {
                 newErrors.Add(i);
-                outputText += $"<mark=#FF0000>{input[i]}</mark>";
+                outputText += $"<mark=#FF000080>{input[i]}</mark>";
 
                 if (!activeErrors.Contains(i))
                 {

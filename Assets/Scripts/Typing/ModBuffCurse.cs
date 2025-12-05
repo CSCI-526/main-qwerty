@@ -32,7 +32,7 @@ public class ModBuffCurse : TypingEffectBase
             string output = "";
             if (this.punishmentCurse != 0)
             {
-                output += "20% " + (this.punishmentCurse == 1 ? "More" : "Less") + " Punishment"; 
+                output += "20% " + (this.punishmentCurse == 1 ? "More" : "Less") + " damage from Typos"; 
             }
             if (this.healCurse != 0)
             {
