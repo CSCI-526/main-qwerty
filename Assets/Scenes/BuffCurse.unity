@@ -178,7 +178,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: Start Battle
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0e3c794acc456cb47b45428de653685d, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -244,7 +244,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &9981519
@@ -433,7 +433,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 858699638
+  GlobalObjectIdHash: 4146557097
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -461,6 +461,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   typingElements: {fileID: 1107143542}
   startBattleButton: {fileID: 1020654710}
+  notReadyWarning: {fileID: 0}
+  cursePanel: {fileID: 0}
 --- !u!4 &387264344
 Transform:
   m_ObjectHideFlags: 0
@@ -585,7 +587,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 30910906
+  GlobalObjectIdHash: 2990103122
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -611,11 +613,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  players: []
-  enemies: []
-  projectiles: []
+  localPlayer: {fileID: 0}
   projectileParent: {fileID: 1462859614}
-  curseText: {fileID: 2030549937}
+  startBattleButton: {fileID: 0}
+  cursePanel: {fileID: 0}
+  curseMsgPrefab: {fileID: 0}
+  buffEffect: {fileID: 0}
+  debuffEffect: {fileID: 0}
   projectileTargetingIdCounter: 0
 --- !u!4 &859700962
 Transform:
@@ -848,7 +852,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3555227864
+  GlobalObjectIdHash: 2985580595
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -962,7 +966,7 @@ MonoBehaviour:
   playerPanel: {fileID: 1997162214}
   playerPrefab: {fileID: 3576826155321347564, guid: 4b45afb4231c96746903e3a84fea7c9a, type: 3}
   enemyPanel: {fileID: 2120846188}
-  enemyPrefab: {fileID: 9015733590952320127, guid: d85506600e2170744b06f1368fe8f08c, type: 3}
+  enemyPrefabs: []
 --- !u!1 &1462859614
 GameObject:
   m_ObjectHideFlags: 0
@@ -1011,7 +1015,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2035055740
+  GlobalObjectIdHash: 1342017487
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1236,7 +1240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4291949331
+  GlobalObjectIdHash: 1478580583
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1308,8 +1312,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0e3c794acc456cb47b45428de653685d, type: 2}
+  m_sharedMaterial: {fileID: -1452069317857402745, guid: 0e3c794acc456cb47b45428de653685d, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1434,7 +1438,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2093081493
+  GlobalObjectIdHash: 2934803722
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1724,6 +1728,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effectText: {fileID: 0}
+  effectPanel: {fileID: 0}
+  modMultiplier: 1.2
+  key_tab_up: {fileID: 0}
+  key_tab_down: {fileID: 0}
+  damageBar: {fileID: 0}
+  healingBar: {fileID: 0}
+  punishmentBar: {fileID: 0}
+  bulletSpeedBar: {fileID: 0}
 --- !u!114 &1198396187895510290
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2634,9 +2646,28 @@ MonoBehaviour:
   promptGenerator: {fileID: 3235009852076922010}
   inputField: {fileID: 1205258787426694448}
   promptText: {fileID: 560186103536469048}
+  instructionText: {fileID: 0}
   ability1: {fileID: 3212925489730352727}
   ability2: {fileID: 1198396187895510290}
+  ability3: {fileID: 0}
+  ability4: {fileID: 0}
+  damageScreen: {fileID: 0}
+  modMultiplier: 1.2
   typingEffectManager: {fileID: 922871282824396222}
+  damageManager: {fileID: 0}
+  classInfoManager: {fileID: 0}
+  tutorialManager: {fileID: 0}
+  key_1_down: {fileID: 0}
+  key_1_up: {fileID: 0}
+  key_2_down: {fileID: 0}
+  key_2_up: {fileID: 0}
+  key_3_down: {fileID: 0}
+  key_3_up: {fileID: 0}
+  key_4_down: {fileID: 0}
+  key_4_up: {fileID: 0}
+  caretRect: {fileID: 0}
+  caretBlinkRate: 0.5
+  currentClass: {fileID: 0}
 --- !u!224 &6874098091051855023
 RectTransform:
   m_ObjectHideFlags: 0
