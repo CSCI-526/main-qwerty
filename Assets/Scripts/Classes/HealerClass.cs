@@ -18,6 +18,7 @@ public class HealerClass : ClassBase
             gameManager.addBuffDebuffToListRpc(0, playerID, 1.3f, 1, "HealBuff");
         }
         gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, delta);
+        soundManager.PlaySound(4);
         LogAbility("HealerClass", 1, "Heal (1.2x base value) � single target");
     }
 
@@ -36,6 +37,7 @@ public class HealerClass : ClassBase
             }
             gameManager.playerHealRpc(playerID, 0, player.targetingID.Value, delta);
         }
+        soundManager.PlaySound(4);
         LogAbility("HealerClass", 2, "Group Heal (0.75x base value) � all allies");
     }
 
@@ -51,6 +53,7 @@ public class HealerClass : ClassBase
             gameManager.addBuffDebuffToListRpc(0, playerID, 1.3f, 1, "HealBuff");
         }
         gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, delta);
+        soundManager.PlaySound(4);
         LogAbility("HealerClass", 3, "Big Heal (2x base value)");
     }
 
@@ -61,6 +64,7 @@ public class HealerClass : ClassBase
 
         target.ReviveRpc();
         gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, (int)(0.2f * target.maxHealth));
+        soundManager.PlaySound(5);
         LogAbility("HealerClass", 4, "Revive � restore a fallen ally with 20% health");
     }
 

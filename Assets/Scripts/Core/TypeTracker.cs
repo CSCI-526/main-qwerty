@@ -30,6 +30,7 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private DamageManager damageManager;
     [SerializeField] private ClassInfoManager classInfoManager;
     [SerializeField] private TutorialManager tutorialManager;
+    [SerializeField] private SoundManager soundManager;
 
     private string prompt;
     private bool timerStarted = false;
@@ -467,6 +468,7 @@ public class TypeTracker : MonoBehaviour
 
                     damageManager.applyHealthChange(gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId), mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(modMultiplier, mod)) : -1);
                     gameManager.GetPlayerByClientId(gameManager.networkManager.LocalClientId).ModifyCurrentHealth(mod == 0 ? -2 : mod > 0 ? (-2 * (int)Math.Pow(modMultiplier, mod)) : -1);
+                    soundManager.PlaySound(0);
                 }
             }
             else

@@ -6,6 +6,7 @@ public abstract class ClassBase : MonoBehaviour
 {
     [DoNotSerialize]
     public GameManager gameManager => FindFirstObjectByType<GameManager>();
+    public SoundManager soundManager => FindFirstObjectByType<SoundManager>();
 
     // --- Abstract Abilities ---
     // Each subclass must override these

@@ -14,6 +14,8 @@ public class ProjectileController : TargetableController
     [SerializeField] private int damage = 50;
     [SerializeField] public GameObject deathEffect;
 
+    public SoundManager soundManager => FindAnyObjectByType<SoundManager>();
+
     private string word = "";
 
     private TargetableController spawner;
@@ -37,6 +39,7 @@ public class ProjectileController : TargetableController
         if (!IsOwner) return;
 
         ShowDeathRpc();
+        soundManager.PlaySound(6);
         gameManager.RemoveProjectile(targetingID.Value);
         StartCoroutine(DestroyAfterWait(0.25f));
     }

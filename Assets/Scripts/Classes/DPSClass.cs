@@ -16,6 +16,7 @@ public class DPSClass : ClassBase
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
         StartCoroutine(CheckPassiveStacks(playerID, target));
+        soundManager.PlaySound(1);
         LogAbility("DPSClass", 1, "Attack (1.2x base value)");
     }
 
@@ -27,6 +28,7 @@ public class DPSClass : ClassBase
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
         StartCoroutine(CheckPassiveStacks(playerID, target));
+        soundManager.PlaySound(1);
         LogAbility("DPSClass", 2, "Heavy Attack (1.5x base value) � powerful, deliberate strike");
     }
 
@@ -36,6 +38,7 @@ public class DPSClass : ClassBase
         gameManager.addBuffDebuffToListRpc(0, playerID, 1.0f + baseValue, 1, "DamageBuff");
         gameManager.localPlayer.ModifyCurrentHealth((int)(-0.3 * gameManager.localPlayer.maxHealth));
         gameManager.damageManager.applyHealthChange(gameManager.localPlayer, (int)-0.3 * gameManager.localPlayer.maxHealth);
+        soundManager.PlaySound(2);
         LogAbility("DPSClass", 3, "Sacrifice 30% max HP: next attack deals 2x damage (stacks with passive)");
     }
 
@@ -45,6 +48,7 @@ public class DPSClass : ClassBase
         gameManager.addBuffDebuffToListRpc(0, playerID, baseValue, 1, "LeechBuff");
         gameManager.localPlayer.ModifyCurrentHealth((int)(-0.3 * gameManager.localPlayer.maxHealth));
         gameManager.damageManager.applyHealthChange(gameManager.localPlayer, (int)-0.3 * gameManager.localPlayer.maxHealth);
+        soundManager.PlaySound(2);
         LogAbility("DPSClass", 4, "Sacrifice 30% max HP: next attack leeches 100% of its damage");
     }
 
