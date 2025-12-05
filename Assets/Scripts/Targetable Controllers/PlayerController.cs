@@ -18,6 +18,8 @@ public class PlayerController : TargetableController
         InitHealth();
         InitTargeting();
         RandomizeTargetWord();
+        SetPlayerModel(classType.Value);
+        classType.OnValueChanged += OnClassTypeChanged;
     }
 
     protected override void Die()
@@ -39,35 +41,56 @@ public class PlayerController : TargetableController
     TypeTracker typeTracker => FindFirstObjectByType<TypeTracker>();
     bool modelShown = false;
 
+    private NetworkVariable<ulong> classType = new NetworkVariable<ulong>(
+    ulong.MaxValue,
+    NetworkVariableReadPermission.Everyone,
+    NetworkVariableWritePermission.Server
+    );
+
     private void Update()
     {
-        if (targetingID.Value == ulong.MaxValue) return;
+        if (targetingID.Value != NetworkManager.Singleton.LocalClientId) return;
 
         if (!modelShown && typeTracker != null && typeTracker.currentClass != null)
         {
-            int classType = -1;
 
             if (typeTracker.currentClass.className.Equals("Balanced"))
-                classType = 0;
+                UpdateClassTypeRpc(0);
             else if (typeTracker.currentClass.className.Equals("DPS"))
-                classType = 1;
+                UpdateClassTypeRpc(1);
             else if (typeTracker.currentClass.className.Equals("Enchanter"))
-                classType = 2;
+                UpdateClassTypeRpc(2);
             else if (typeTracker.currentClass.className.Equals("Healer"))
-                classType = 3;
+                UpdateClassTypeRpc(3);
 
-            if (classType == -1) return;
+            if (classType.Value == ulong.MaxValue) return;
 
-            ShowPlayerModelRpc(NetworkManager.Singleton.LocalClientId, classType);
+            ShowPlayerModelRpc(NetworkManager.Singleton.LocalClientId, classType.Value);
             modelShown = true;
         }
     }
 
+    public void OnClassTypeChanged(ulong oldValue, ulong newValue)
+    {
+        ShowPlayerModelRpc(targetingID.Value, newValue);
+    }
+
+    [Rpc(SendTo.Owner)]
+    public void UpdateClassTypeRpc(ulong classTypeValue)
+    {
+        classType.Value = classTypeValue;
+    }
+
     [Rpc(SendTo.Everyone)]
-    private void ShowPlayerModelRpc(ulong clientId, int classType)
+    private void ShowPlayerModelRpc(ulong clientId, ulong classType)
     {
         if (targetingID.Value != clientId) return;
 
+        SetPlayerModel(classType);
+    }
+
+    private void SetPlayerModel(ulong classType)
+    {
         if (classType == 0)
             playerModels[0].SetActive(true);
         else if (classType == 1)
