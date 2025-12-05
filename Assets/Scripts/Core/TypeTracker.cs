@@ -102,6 +102,8 @@ public class TypeTracker : MonoBehaviour
 
     private void Update()
     {
+        FocusInputField();
+
         bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
         if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false)
