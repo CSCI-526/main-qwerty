@@ -22,7 +22,7 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private TMP_InputField inputField; // Player input
     [SerializeField] private TMP_Text promptText;       // Displayed prompt
     [SerializeField] private TMP_Text instructionText;       // Displayed prompt
-    [SerializeField] private Image ability1, ability2, ability3, ability4;
+    [SerializeField] private GameObject ability1, ability2, ability3, ability4;
     [SerializeField] private GameObject damageScreen;
     [SerializeField] private float modMultiplier = 1.2f;
 
@@ -30,15 +30,6 @@ public class TypeTracker : MonoBehaviour
     [SerializeField] private DamageManager damageManager;
     [SerializeField] private ClassInfoManager classInfoManager;
     [SerializeField] private TutorialManager tutorialManager;
-
-    [SerializeField] private GameObject key_1_down;
-    [SerializeField] private GameObject key_1_up;
-    [SerializeField] private GameObject key_2_down;
-    [SerializeField] private GameObject key_2_up;
-    [SerializeField] private GameObject key_3_down;
-    [SerializeField] private GameObject key_3_up;
-    [SerializeField] private GameObject key_4_down;
-    [SerializeField] private GameObject key_4_up;
 
     private string prompt;
     private bool timerStarted = false;
@@ -108,9 +99,6 @@ public class TypeTracker : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha1) && shiftHeld == false)
         {
-            key_1_down.SetActive(true);
-            key_1_up.SetActive(false);
-
             if (tutorialManager.isTutorialActive)
             {
                 if (tutorialManager.abilityAllowed("1") && phase == 0)
@@ -126,16 +114,9 @@ public class TypeTracker : MonoBehaviour
             }
             changeMode(1);
         }
-        if (Input.GetKeyUp(KeyCode.Alpha1) && shiftHeld == false)
-        {
-            key_1_down.SetActive(false);
-            key_1_up.SetActive(true);
-        }
         
         if (Input.GetKeyDown(KeyCode.Alpha2) && shiftHeld == false)
         {
-            key_2_down.SetActive(true);
-            key_2_up.SetActive(false);
             if (tutorialManager.isTutorialActive)
             {
                 if (tutorialManager.abilityAllowed("2") && phase == 0)
@@ -151,16 +132,9 @@ public class TypeTracker : MonoBehaviour
             }
             changeMode(2);
         }
-        if (Input.GetKeyUp(KeyCode.Alpha2) && shiftHeld == false)
-        {
-            key_2_down.SetActive(false);
-            key_2_up.SetActive(true);
-        }
         
         if (Input.GetKeyDown(KeyCode.Alpha3) && shiftHeld == false)
         {
-            key_3_down.SetActive(true);
-            key_3_up.SetActive(false);
             
             if (tutorialManager.isTutorialActive)
             {
@@ -178,16 +152,8 @@ public class TypeTracker : MonoBehaviour
             changeMode(3);
         }
 
-        if (Input.GetKeyUp(KeyCode.Alpha3) && shiftHeld == false)
-        {
-            key_3_down.SetActive(false);
-            key_3_up.SetActive(true);
-        }
-
         if (Input.GetKeyDown(KeyCode.Alpha4) && shiftHeld == false)
         {
-            key_4_down.SetActive(true);
-            key_4_up.SetActive(false);
 
             if (tutorialManager.isTutorialActive)
             {
@@ -203,11 +169,6 @@ public class TypeTracker : MonoBehaviour
                 }
             }
             changeMode(4);
-        }
-        if (Input.GetKeyUp(KeyCode.Alpha4) && shiftHeld == false)
-        {
-            key_4_down.SetActive(false);
-            key_4_up.SetActive(true);
         }
 
         if (Input.GetKeyDown(KeyCode.Return))
@@ -250,27 +211,27 @@ public class TypeTracker : MonoBehaviour
 
         mode = newMode;
 
-        ability1.color = new Color(0f, 0f, 0f, 0.3f);
-        ability2.color = new Color(0f, 0f, 0f, 0.3f);
-        ability3.color = new Color(0f, 0f, 0f, 0.3f);
-        ability4.color = new Color(0f, 0f, 0f, 0.3f);
+        ability1.SetActive(false);
+        ability2.SetActive(false);
+        ability3.SetActive(false);
+        ability4.SetActive(false);
 
 
         if (mode == 1)
         {
-            ability1.color = new Color(0f, 1f, 0f, 1f); // Green at 100% opacity
+            ability1.SetActive(true);
         }
         if (mode == 2)
         {
-            ability2.color = new Color(0f, 1f, 0f, 1f); // Green at 100% opacity
+            ability2.SetActive(true);
         }
         if (mode == 3)
         {
-            ability3.color = new Color(0f, 1f, 0f, 1f); // Green at 100% opacity
+            ability3.SetActive(true);
         }
         if (mode == 4)
         {
-            ability4.color = new Color(0f, 1f, 0f, 1f); // Green at 100% opacity
+            ability4.SetActive(true);
         }
 
         resetState();

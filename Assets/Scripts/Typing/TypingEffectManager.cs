@@ -10,9 +10,6 @@ public class TypingEffectManager : MonoBehaviour
     [SerializeField] private GameObject effectPanel;
     [SerializeField] private float modMultiplier = 1.2f;
 
-    [SerializeField] private GameObject key_tab_up;
-    [SerializeField] private GameObject key_tab_down;
-
     [SerializeField] private PropBar damageBar;
     [SerializeField] private PropBar healingBar;
     [SerializeField] private PropBar punishmentBar;
@@ -32,9 +29,6 @@ public class TypingEffectManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             effectPanel.SetActive(!effectPanel.activeSelf);
-
-            key_tab_up.SetActive(!key_tab_up.activeSelf);
-            key_tab_down.SetActive(!key_tab_down.activeSelf);
         }
     }
 
