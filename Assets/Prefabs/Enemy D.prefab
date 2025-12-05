@@ -1016,6 +1016,7 @@ GameObject:
   - component: {fileID: 3759080820371051121}
   - component: {fileID: 8591169848546180403}
   - component: {fileID: 8101347984176030135}
+  - component: {fileID: 3293710971299703185}
   m_Layer: 0
   m_Name: Enemy Animation
   m_TagString: Untagged
@@ -1129,6 +1130,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentObject: {fileID: 3086381489617743574}
   offset: {x: 0, y: 0, z: 0}
+--- !u!114 &3293710971299703185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3939956541070083487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5b86136d848c274abcc5bd92b467400, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scale: {x: 140, y: 140, z: 140}
+  rotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!1 &4046294340688656100
 GameObject:
   m_ObjectHideFlags: 0
