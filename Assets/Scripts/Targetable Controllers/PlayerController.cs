@@ -41,6 +41,8 @@ public class PlayerController : TargetableController
 
     private void Update()
     {
+        if (targetingID.Value == ulong.MaxValue) return;
+
         if (!modelShown && typeTracker != null && typeTracker.currentClass != null)
         {
             int classType = -1;
