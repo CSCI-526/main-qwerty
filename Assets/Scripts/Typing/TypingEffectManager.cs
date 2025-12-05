@@ -111,17 +111,17 @@ public class TypingEffectManager : MonoBehaviour
         {
             if (typingEffect is ForceCapitalizeCurseData capitalData)
             {
-                stats.capitalizedCharacters += capitalData.GetCapitalizedLetter();
+                stats.capitalizedCharacters += "" + capitalData.GetCapitalizedLetter();
             }
             else if (typingEffect is ForceDoublingCurseData doubleData)
             {
                 if (doubleData.IsCaseSensitive())
                 {
-                    stats.doubledCharacters += doubleData.GetDoubledLetter();
+                    stats.doubledCharacters += "" + doubleData.GetDoubledLetter();
                 }
                 else
                 {
-                    stats.doubledCharacters += Char.ToLower(doubleData.GetDoubledLetter()) + Char.ToUpper(doubleData.GetDoubledLetter());
+                    stats.doubledCharacters += "" + Char.ToLower(doubleData.GetDoubledLetter()) + Char.ToUpper(doubleData.GetDoubledLetter());
                 }
             }
             else
