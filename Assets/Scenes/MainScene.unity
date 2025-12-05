@@ -499,7 +499,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &75003975
 RectTransform:
   m_ObjectHideFlags: 0
@@ -636,7 +636,7 @@ MonoBehaviour:
   padding:
     m_Left: 325
     m_Right: 0
-    m_Top: 150
+    m_Top: 200
     m_Bottom: 0
   reverseOrder: 0
   stretchChildren: 0
