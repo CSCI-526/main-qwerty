@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -31,6 +32,32 @@ public class PlayerController : TargetableController
     protected override void OnTargetIDChanged(ulong oldID, ulong newID)
     {
         gameManager.RefreshPlayers();
+    }
+
+    [SerializeField] List<GameObject> playerModels;
+    TypeTracker typeTracker => FindFirstObjectByType<TypeTracker>();
+    bool modelShown = false;
+
+    private void Update()
+    {
+        if (!modelShown && typeTracker != null && typeTracker.currentClass != null)
+        {
+            ShowPlayerModel();
+        }
+    }
+
+    private void ShowPlayerModel()
+    {
+        if (typeTracker.currentClass.className.Equals("Balanced"))
+            playerModels[0].SetActive(true);
+        else if (typeTracker.currentClass.className.Equals("DPS"))
+            playerModels[1].SetActive(true);
+        else if (typeTracker.currentClass.className.Equals("Enchanter"))
+            playerModels[2].SetActive(true);
+        else if (typeTracker.currentClass.className.Equals("Healer"))
+            playerModels[3].SetActive(true);
+
+        modelShown = true;
     }
 
     #region Network Variable Methods

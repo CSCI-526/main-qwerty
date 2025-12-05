@@ -694,7 +694,7 @@ public class GameManager : NetworkBehaviour
 
         if (target == null) return;
 
-        if (effectType.ToString().Equals("LeechBuff") || effectType.ToString().Equals("DamageBuff"))
+        if (effectType.ToString().Equals("LeechBuff") || effectType.ToString().Equals("DamageBuff") || effectType.ToString().Equals("HealBuff"))
         {
             PlayBuffDebuffEffectRpc(targetType, targetingID, true);
         }
