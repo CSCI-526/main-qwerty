@@ -13,6 +13,7 @@ public class EnchanterClass : ClassBase
         baseValue = Mathf.Clamp(baseValue * maxDamageValue * 0.6f, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
+        soundManager.PlaySound(1);
         LogAbility("EnchanterClass", 1, "Attack (0.6x base value)");
     }
 
@@ -25,6 +26,7 @@ public class EnchanterClass : ClassBase
             gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, mod, 1, "LeechBuff");
         }
         gameManager.addBuffDebuffToListRpc(0, playerID, mod, 1, "LeechBuff");
+        soundManager.PlaySound(2);
         LogAbility("EnchanterClass", 2, "Next attack leeches 30% of damage done");
     }
 
@@ -37,6 +39,7 @@ public class EnchanterClass : ClassBase
             target.ModifyCurrentShieldRpc((int)baseValue);
         }
         gameManager.localPlayer.ModifyCurrentShieldRpc((int)baseValue);
+        soundManager.PlaySound(2);
         LogAbility("EnchanterClass", 3, "Grant target a damage shield of x% base value");
     }
 
@@ -45,6 +48,7 @@ public class EnchanterClass : ClassBase
         ulong targetType = DetermineTargetType(target);
         float mod = 0.4f * baseValue;
         gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 1.0f + mod, 3, "DamageTakenDebuff");
+        soundManager.PlaySound(3);
         LogAbility("EnchanterClass", 3, "Debuff: target takes +40% damage (3 hits)");
     }
 
@@ -90,7 +94,7 @@ public class EnchanterClass : ClassBase
     {
         "Enchanter",
         "Applying buffs to an ally also applies it to yourself.",
-        "A weak attack.",
+        "A weak attack that does less damage.",
         "Makes the player's next attack leech for 30% of the damage done.",
         "Gives a player a shield that blocks damage.",
         "Makes an enemy take 40% more damage on the next 3 attacks."

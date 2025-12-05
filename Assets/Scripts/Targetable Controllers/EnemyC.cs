@@ -9,33 +9,22 @@ public class EnemyC : EnemyController
 
     protected override void ShootWord(string word)
     {
-        PlayerController targetPlayer = gameManager.GetRandomPlayer();
-
-        if (targetPlayer == null) return;
-
-        GameObject projectile = Instantiate(projectilePrefab, projectileStartingPoint.transform.position, Quaternion.identity);
-        projectile.GetComponent<NetworkObject>().Spawn(true);
-
-        projectile.transform.SetParent(gameManager.GetProjectileParent().transform);
-        projectile.transform.rotation = projectileStartingPoint.transform.rotation;
-        projectile.transform.localScale = Vector3.one;
-
-        ProjectileController pc = projectile.GetComponent<ProjectileController>();
-        // Mark the word as ??????
-        pc.UpdateTextEveryoneRpc(new FixedString128Bytes(word), special: 2);
-        pc.SetTargetWord(word);
-        pc.SetSpawner(this);
-        pc.SetTarget(targetPlayer);
-
-        // Update the text to the target
-        pc.UpdateTextClientRpc(new FixedString128Bytes(word), special: 2, rpcParams: RpcTarget.Single(targetPlayer.GetPlayerID(), RpcTargetUse.Temp));
-        pc.targetingID.Value = ++gameManager.projectileTargetingIdCounter;
-
-        gameManager.AddProjectile(new ProjectileNetworkData
+        int randomAttack = Random.Range(0, 10);
+        if (randomAttack < 3)
         {
-            TargetingID = pc.targetingID.Value
-        });
-
-        wordList.Add(word);
+            ShootWordA(word);
+        }
+        else if (randomAttack < 7)
+        {
+            ShootWordC(word);
+        }
+        else if (randomAttack < 9)
+        {
+            ShootWordB(word);
+        }
+        else
+        {
+            ShootWordD(word);
+        }
     }
 }

@@ -30,7 +30,7 @@ public class ForceCapitalizeCurseData : TypingEffectBase
         }
         else
         {
-            return $"Capslock on Letter {char.ToUpper(capitalizedLetter)}";
+            return $"All letter " + char.ToUpper(capitalizedLetter) + " capitalized.";
         }
     }
 

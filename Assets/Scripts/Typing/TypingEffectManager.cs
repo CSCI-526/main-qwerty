@@ -10,8 +10,11 @@ public class TypingEffectManager : MonoBehaviour
     [SerializeField] private GameObject effectPanel;
     [SerializeField] private float modMultiplier = 1.2f;
 
-    [SerializeField] private GameObject key_tab_up;
-    [SerializeField] private GameObject key_tab_down;
+    [SerializeField] private PropBar damageBar;
+    [SerializeField] private PropBar healingBar;
+    [SerializeField] private PropBar punishmentBar;
+    [SerializeField] private PropBar bulletSpeedBar;
+    
 
     private List<TypingEffectBase> activeTypingEffects = new(); // currently active curses & buffs
 
@@ -26,9 +29,6 @@ public class TypingEffectManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             effectPanel.SetActive(!effectPanel.activeSelf);
-
-            key_tab_up.SetActive(!key_tab_up.activeSelf);
-            key_tab_down.SetActive(!key_tab_down.activeSelf);
         }
     }
 
@@ -74,14 +74,18 @@ public class TypingEffectManager : MonoBehaviour
                 }
             }
 
-            float bulletSpeedModPercentage = (float)Math.Pow(modMultiplier, bulletSpeedModTotal) * 100f;
-            float healModPercentage = 1.0f / (float)Math.Pow(modMultiplier, healModTotal) * 100f;
-            float damageModPercentage = 1.0f / (float)Math.Pow(modMultiplier, damageModTotal) * 100f;
-            float punishmentModPercentage = (float)Math.Pow(modMultiplier, punishmentModTotal) * 100f;
+            // float bulletSpeedModPercentage = (float)Math.Pow(modMultiplier, bulletSpeedModTotal) * 100f;
+            // float healModPercentage = 1.0f / (float)Math.Pow(modMultiplier, healModTotal) * 100f;
+            // float damageModPercentage = 1.0f / (float)Math.Pow(modMultiplier, damageModTotal) * 100f;
+            // float punishmentModPercentage = (float)Math.Pow(modMultiplier, punishmentModTotal) * 100f;
+            damageBar.SetLevel(-damageModTotal);
+            healingBar.SetLevel(-healModTotal);
+            punishmentBar.SetLevel(punishmentModTotal);
+            bulletSpeedBar.SetLevel(bulletSpeedModTotal);
 
-            string desc = $"{damageModPercentage:F2}% damage, {healModPercentage:F2}% healing, \n{punishmentModPercentage:F2}% punishment, {bulletSpeedModPercentage:F2}% enemy bullet speed\n";
-            desc += "Current Curses:\n" + string.Join(", ", curseDescs) + "\n";
-            desc += "Current Buffs:\n" + string.Join(", ", buffDescs) + "\n";
+            // string desc = $"{damageModPercentage:F2}% damage, {healModPercentage:F2}% healing, \n{punishmentModPercentage:F2}% punishment, {bulletSpeedModPercentage:F2}% enemy bullet speed\n";
+            string desc = "Extra Curses:\n" + string.Join(", ", curseDescs) + "\n";
+            desc += "Extra Buffs:\n" + string.Join(", ", buffDescs) + "\n";
             effectText.text = desc;
         }
     }
@@ -111,17 +115,17 @@ public class TypingEffectManager : MonoBehaviour
         {
             if (typingEffect is ForceCapitalizeCurseData capitalData)
             {
-                stats.capitalizedCharacters += capitalData.GetCapitalizedLetter();
+                stats.capitalizedCharacters += "" + capitalData.GetCapitalizedLetter();
             }
             else if (typingEffect is ForceDoublingCurseData doubleData)
             {
                 if (doubleData.IsCaseSensitive())
                 {
-                    stats.doubledCharacters += doubleData.GetDoubledLetter();
+                    stats.doubledCharacters += "" + doubleData.GetDoubledLetter();
                 }
                 else
                 {
-                    stats.doubledCharacters += Char.ToLower(doubleData.GetDoubledLetter()) + Char.ToUpper(doubleData.GetDoubledLetter());
+                    stats.doubledCharacters += "" + Char.ToLower(doubleData.GetDoubledLetter()) + Char.ToUpper(doubleData.GetDoubledLetter());
                 }
             }
             else
@@ -278,6 +282,18 @@ public class TypingEffectManager : MonoBehaviour
     public TypingEffectBase AllLowercase()
     {
         var effect = ScriptableObject.CreateInstance<AllLowercaseBuffData>();
+        // effect.Initialize();
+        // AddTypingEffect(effect);
+        return effect;
+    }
+
+    /// <summary>
+    /// Shorthand for creating NoPunctuation Buff
+    /// </summary>
+    /// <returns>Effect data</returns>
+    public TypingEffectBase NoPunctuation()
+    {
+        var effect = ScriptableObject.CreateInstance<NoPunctuationBuffData>();
         // effect.Initialize();
         // AddTypingEffect(effect);
         return effect;

@@ -25,7 +25,6 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] GameObject playerNameError;
     [SerializeField] GameObject joinCodeError;
     [SerializeField] GameObject playerNameWarning;
-    [SerializeField] GameObject allowAnalyticsWarning;
 
     private NetworkManager networkManager => NetworkManager.Singleton;
 
@@ -59,7 +58,6 @@ public class LobbyManager : MonoBehaviour
                 playerName = playerNameInputField.text;
                 playerNameUI.SetActive(false);
                 playerNameWarning.SetActive(false);
-                allowAnalyticsWarning.SetActive(false);
                 joinLobbyUI.SetActive(true);
                 createLobbyUI.SetActive(true);
                 networkManager.GetComponent<AnalyticsManager>().SetPlayerConsent(allowAnalyticsToggle.isOn);

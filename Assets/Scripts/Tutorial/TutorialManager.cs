@@ -32,6 +32,11 @@ public class TutorialManager : MonoBehaviour
             }
         }
     }
+    public int getTutorialStep()
+    {
+        return tutorialStep;
+    }
+
     public bool abilityAllowed(string ability)
     {
         if (!isTutorialActive || tutorialStep == tutorialLength)

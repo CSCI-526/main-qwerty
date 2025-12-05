@@ -20,6 +20,7 @@ public class BalancedClass : ClassBase
         baseValue = Mathf.Clamp(baseValue * maxDamageValue * 0.9f, 1, int.MaxValue);
         int delta = Math.Min((int)(-baseValue / Math.Pow(modMultipler, mod)), -1);
         gameManager.playerDealDamageRpc(playerID, targetType, target.targetingID.Value, delta);
+        soundManager.PlaySound(1);
         LogAbility("BalancedClass", 1, "Quick strike (0.9x base attack)");
     }
 
@@ -28,6 +29,7 @@ public class BalancedClass : ClassBase
         ulong targetType = DetermineTargetType(target);
         float mod = 0.5f * baseValue;
         gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 1.0f + mod, 1, "DamageBuff");
+        soundManager.PlaySound(2);
         LogAbility("BalancedClass", 2, "Self buff: next attack +50% damage");
     }
 
@@ -36,6 +38,7 @@ public class BalancedClass : ClassBase
         ulong targetType = DetermineTargetType(target);
         float mod = 0.3f * baseValue;
         gameManager.addBuffDebuffToListRpc(targetType, target.targetingID.Value, 1.0f + mod, 3, "DamageTakenDebuff");
+        soundManager.PlaySound(3);
         LogAbility("BalancedClass", 3, "Debuff: target takes +30% damage (2 hits)");
     }
 
@@ -46,6 +49,7 @@ public class BalancedClass : ClassBase
         baseValue = Mathf.Clamp(baseValue * maxHealValue, 1, int.MaxValue);
         int delta = Math.Max((int)(baseValue / Math.Pow(modMultipler, mod)), 1);
         gameManager.playerHealRpc(playerID, targetType, target.targetingID.Value, delta);
+        soundManager.PlaySound(4);
         LogAbility("BalancedClass", 4, "Heal ally for 1.0x of base value");
     }
 
@@ -62,10 +66,10 @@ public class BalancedClass : ClassBase
     public override List<string> instructionText { get; } = new List<string>
     {
         "Each class has 4 abilities. Press 1 to try out the first one.",
-        "This ability damages enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
+        "This damages enemies. Enter the enemy's <color=yellow>Target Word</color> (Word in yellow):",
         "Enemy targeted, type the prompt below.",
         "Let's try the 2nd ability now. Press 2.",
-        "This ability buffs a player. Enter a player's <color=yellow>Target Word</color>:",
+        "This buffs a player. Enter a player's <color=yellow>Target Word</color>:",
         "Player targeted, type the prompt below.",
         "Let's try the 3rd ability. Press 3.",
         "This debuffs an enemy. Enter an enemy's <color=yellow>Target Word</color>:",
@@ -91,7 +95,7 @@ public class BalancedClass : ClassBase
     {
         "Balanced",
         "Attacks leech 20% of damage dealt.",
-        "A quick attack.",
+        "A quick attack that deals less damage.",
         "Buff yourself or an ally to increase the damage of the next attack by 50%",
         "Debuff an enemy to make them take 30% more damage on the next 2 attacks.",
         "Heal a Player."
